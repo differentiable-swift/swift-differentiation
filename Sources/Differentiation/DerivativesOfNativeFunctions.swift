@@ -1,11 +1,6 @@
 #if canImport(_Differentiation)
 
 import _Differentiation
-import Foundation
-
-// -------------------------------------------------------------------------
-// derivatives for native functions
-// -------------------------------------------------------------------------
 
 /// For min(): "Returns: The lesser of `x` and `y`. If `x` is equal to `y`, returns `x`."
 /// https://github.com/apple/swift/blob/main/stdlib/public/core/Algorithm.swift#L18
@@ -60,17 +55,6 @@ public func absVJP<T: Comparable & SignedNumeric & Differentiable>(_ value: T)
         }
     }
     return (value: abs(value), pullback: pullback)
-}
-
-/// Differentiation of ``atan2``
-@derivative(of: atan2(_:_:))
-public func vjpAtan2(
-    y: Double, x: Double
-) -> (value: Double, pullback: (Double) -> (Double, Double)) {
-    (
-        value: atan2(y, x),
-        pullback: { ($0 * x / (x * x + y * y), -$0 * y / (x * x + y * y)) }
-    )
 }
 
 #endif
