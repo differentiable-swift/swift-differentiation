@@ -7,11 +7,6 @@ import _Differentiation
 // and
 // https://bugs.swift.org/browse/TF-1193
 
-/// This file makes `Dictionary` differentiable.
-///
-/// Note: This will eventually be moved into the Swift standard library. Once it is in the
-/// standard library, we can delete it from this repository.
-/// Implements the `Differentiable` requirements.
 extension Dictionary: Differentiable where Value: Differentiable {
     public typealias TangentVector = [Key: Value.TangentVector]
     public mutating func move(by direction: TangentVector) {
@@ -45,18 +40,11 @@ extension Dictionary: AdditiveArithmetic where Value: AdditiveArithmetic {
     public static var zero: Self { [:] }
 }
 
-// attempt to make builtin subscript differentiable:
-// https://bugs.swift.org/browse/TF-1193
-// https://github.com/apple/swift/pull/32614/
-// https://github.com/borglab/SwiftFusion/blob/main/Sources/SwiftFusion/Core/Dictionary+Differentiable.swift
-
 extension Dictionary where Value: Differentiable {
-    // get
-    // swiftformat:disable:next typeSugar
-    // periphery:ignore
-    @usableFromInline
+    /// Defines a derivative for `Dictionary`s subscript getter enabling calls like `var value = dictionary[key]` to be differentiable
+    @inlinable
     @derivative(of: subscript(_:))
-    func vjpSubscriptGet(key: Key)
+    public func _vjpSubscript(key: Key)
         -> (value: Value?, pullback: (Optional<Value>.TangentVector) -> Dictionary<Key, Value>.TangentVector)
     {
         // When adding two dictionaries, nil values are equivalent to zeroes, so there is no need to manually zero-out
