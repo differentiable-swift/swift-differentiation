@@ -6,7 +6,7 @@ import _Differentiation
 /// https://github.com/apple/swift/blob/main/stdlib/public/core/Algorithm.swift#L18
 @inlinable
 @derivative(of: min)
-public func minVJP<T: Comparable & Differentiable>(
+public func _vjpMin<T: Comparable & Differentiable>(
     _ lhs: T,
     _ rhs: T
 ) -> (value: T, pullback: (T.TangentVector) -> (T.TangentVector, T.TangentVector)) {
@@ -25,7 +25,7 @@ public func minVJP<T: Comparable & Differentiable>(
 /// https://github.com/apple/swift/blob/main/stdlib/public/core/Algorithm.swift#L52
 @inlinable
 @derivative(of: max)
-public func maxVJP<T: Comparable & Differentiable>(
+public func _vjpMax<T: Comparable & Differentiable>(
     _ lhs: T,
     _ rhs: T
 ) -> (value: T, pullback: (T.TangentVector) -> (T.TangentVector, T.TangentVector)) {
@@ -43,7 +43,7 @@ public func maxVJP<T: Comparable & Differentiable>(
 /// To differentiate ``abs``
 @inlinable
 @derivative(of: abs)
-public func absVJP<T: Comparable & SignedNumeric & Differentiable>(_ value: T)
+public func _vjpAbs<T: Comparable & SignedNumeric & Differentiable>(_ value: T)
     -> (value: T, pullback: (T.TangentVector) -> T.TangentVector)
 {
     func pullback(_ tangentVector: T.TangentVector) -> T.TangentVector {
