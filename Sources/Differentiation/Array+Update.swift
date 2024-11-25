@@ -2,6 +2,22 @@
 
 import _Differentiation
 
+#endif
+public extension Array {
+    /// A functional version of `Array.subscript.modify`.
+    /// Differentiation does yet not support `Array.subscript.modify` because
+    /// it is a coroutine.
+    @inlinable
+    #if canImport(_Differentiation)
+    @differentiable(reverse where Element: Differentiable)
+    #endif
+    mutating func update(at index: Int, with newValue: Element) {
+        self[index] = newValue
+    }
+}
+
+#if canImport(_Differentiation)
+
 public extension Array where Element: Differentiable {
     // Note: a compiler bug (SR-15530: https://bugs.swift.org/browse/SR-15530)
     // causes the vjpUpdate functions to be associated with the wrong
@@ -35,17 +51,6 @@ public extension Array where Element: Differentiable {
         })
     }
 }
+
 #endif
 
-public extension Array {
-    /// A functional version of `Array.subscript.modify`.
-    /// Differentiation does yet not support `Array.subscript.modify` because
-    /// it is a coroutine.
-    @inlinable
-    #if canImport(_Differentiation)
-    @differentiable(reverse where Element: Differentiable)
-    #endif
-    mutating func update(at index: Int, with newValue: Element) {
-        self[index] = newValue
-    }
-}
