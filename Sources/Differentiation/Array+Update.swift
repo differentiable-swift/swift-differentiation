@@ -3,14 +3,14 @@
 import _Differentiation
 
 #endif
+
 public extension Array {
-    /// A functional version of `Array.subscript.modify`.
-    /// Differentiation does yet not support `Array.subscript.modify` because
-    /// it is a coroutine.
-    @inlinable
+    /// A Differentiable alternative to `Array.subscript.modify`.
+    /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
     #if canImport(_Differentiation)
     @differentiable(reverse where Element: Differentiable)
     #endif
+    @inlinable
     mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
@@ -18,13 +18,7 @@ public extension Array {
 
 #if canImport(_Differentiation)
 
-public extension Array where Element: Differentiable {
-    // Note: a compiler bug (SR-15530: https://bugs.swift.org/browse/SR-15530)
-    // causes the vjpUpdate functions to be associated with the wrong
-    // base functions unless you exactly align the function signatures in the
-    // @derivative(of:) attribute and make sure the @inlinable attribute is the
-    // same.
-
+extension Array where Element: Differentiable {
     /// This function defines a derivative for AutoDiff to use when update() is called. It's not meant to be called directly in most
     /// situations.
     ///
@@ -32,9 +26,9 @@ public extension Array where Element: Differentiable {
     ///     - index: The index to update the value at.
     ///     - newValue: The value to write.
     /// - Returns: The object, plus the pullback.
-    @inlinable
     @derivative(of: update(at:with:))
-    mutating func vjpUpdate(
+    @inlinable
+    public mutating func _vjpUpdate(
         at index: Int,
         with newValue: Element
     ) -> (value: Void, pullback: (inout TangentVector) -> (Element.TangentVector)) {
