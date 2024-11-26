@@ -1,9 +1,16 @@
 #if canImport(_Differentiation)
 
+import Differentiation
+import Testing
+
+@Suite("Dictionary Differentiation Tests")
+struct DictionaryDifferentiationTests {
+    
+}
+
 import PLDifferentiation
 import XCTest
 
-// swiftlint:disable force_unwrapping
 final class DictionaryDifferentiationTests: XCTestCase {
     func testSubscriptGet() throws {
         let dictionary: [String: Double] = ["a": 3, "b": 7]
@@ -138,6 +145,5 @@ final class DictionaryDifferentiationTests: XCTestCase {
         XCTAssertEqual(answerGenericType, answerExpected)
     }
 }
-// swiftlint:enable force_unwrapping
 
 #endif
