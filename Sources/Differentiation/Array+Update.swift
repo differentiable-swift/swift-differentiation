@@ -4,14 +4,14 @@ import _Differentiation
 
 #endif
 
-public extension Array {
+extension Array {
     /// A Differentiable alternative to `Array.subscript.modify`.
     /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
     #if canImport(_Differentiation)
     @differentiable(reverse where Element: Differentiable)
     #endif
     @inlinable
-    mutating func update(at index: Int, with newValue: Element) {
+    public mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
 }
