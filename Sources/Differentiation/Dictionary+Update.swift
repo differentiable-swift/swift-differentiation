@@ -30,7 +30,7 @@ extension Dictionary where Value: Differentiable {
     @inlinable
     public mutating func _vjpUpdate(
         at key: Key,
-        with newValue: Value
+        with newValue: Value // TODO: this should be optional?
     ) -> (value: Void, pullback: (inout TangentVector) -> (Value.TangentVector)) {
         update(at: key, with: newValue)
 
@@ -39,6 +39,7 @@ extension Dictionary where Value: Differentiable {
 
         return ((), { tangentVector in
             // manual zero tangent initialization
+            // TODO: Should we consider missing keys as a complete tangentvector with zero values for those keys?
             if tangentVector.count < forwardCount { // TODO: is this the correct check keys could still differ
                 tangentVector = Self.TangentVector() // TODO: should we be replacing this or merging
                 for key in forwardKeys {
