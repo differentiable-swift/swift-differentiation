@@ -1,10 +1,11 @@
 #if canImport(_Differentiation)
 
-@testable import PLDifferentiation
-import XCTest
+import Differentiation
+import Testing
 
-final class NativeFunctionDerivativesTests: XCTestCase {
-
+@Suite("Derivatives of native functions")
+struct DerivativesOfNativeFunctionsTests {
+    @Test
     func testMin() {
         // I'm using this container because the compiler can't quite determine
         // the type of a top-level min() function passed into gradient(at:of:).
@@ -12,15 +13,15 @@ final class NativeFunctionDerivativesTests: XCTestCase {
         func minContainer(_ lhs: Float, _ rhs: Float) -> Float {
             return min(lhs, rhs)
         }
-
-        let gradLessThan = gradient(at: 2.0, 3.0, of: minContainer)
-        XCTAssertEqual(gradLessThan.0, 1.0, accuracy: 0.001)
-        XCTAssertEqual(gradLessThan.1, 0.0, accuracy: 0.001)
-        let gradGreaterThan = gradient(at: 20.0, -2.0, of: minContainer)
-        XCTAssertEqual(gradGreaterThan.0, 0.0, accuracy: 0.001)
-        XCTAssertEqual(gradGreaterThan.1, 1.0, accuracy: 0.001)
+        let vwgLessThan = valueWithGradient(at: 2.0, 3.0, of: minContainer)
+        #expect(vwgLessThan.value == 2.0)
+        #expect(vwgLessThan.gradient == (1.0, 0.0))
+        let vwgGreaterThan = valueWithGradient(at: 20.0, -2.0, of: minContainer)
+        #expect(vwgGreaterThan.value == -2.0)
+        #expect(vwgGreaterThan.gradient == (0.0, 1.0))
     }
-
+    
+    @Test
     func testMax() {
         // I'm using this container because the compiler can't quite determine
         // the type of a top-level min() function passed into gradient(at:of:).
@@ -28,15 +29,15 @@ final class NativeFunctionDerivativesTests: XCTestCase {
         func maxContainer(_ lhs: Float, _ rhs: Float) -> Float {
             return max(lhs, rhs)
         }
-
-        let gradLessThan = gradient(at: 2.0, 3.0, of: maxContainer)
-        XCTAssertEqual(gradLessThan.0, 0.0, accuracy: 0.001)
-        XCTAssertEqual(gradLessThan.1, 1.0, accuracy: 0.001)
-        let gradGreaterThan = gradient(at: 20.0, -2.0, of: maxContainer)
-        XCTAssertEqual(gradGreaterThan.0, 1.0, accuracy: 0.001)
-        XCTAssertEqual(gradGreaterThan.1, 0.0, accuracy: 0.001)
+        let vwgLessThan = valueWithGradient(at: 2.0, 3.0, of: maxContainer)
+        #expect(vwgLessThan.value == 3.0)
+        #expect(vwgLessThan.gradient == (0.0, 1.0))
+        let vwgGreaterThan = valueWithGradient(at: 20.0, -2.0, of: maxContainer)
+        #expect(vwgGreaterThan.value == 20.0)
+        #expect(vwgGreaterThan.gradient == (1.0, 0.0))
     }
-
+    
+    @Test
     func testAbs() {
         // I'm using this container because the compiler can't quite determine
         // the type of a top-level abs() function passed into gradient(at:of:).
@@ -45,12 +46,13 @@ final class NativeFunctionDerivativesTests: XCTestCase {
             return abs(value)
         }
 
-        let gradPositive = gradient(at: 4.0, of: absContainer)
-        XCTAssertEqual(gradPositive, 1.0, accuracy: 0.001)
+        let vwgPositive = valueWithGradient(at: 4.0, of: absContainer)
+        #expect(vwgPositive.value == 4.0)
+        #expect(vwgPositive.gradient == 1.0)
 
-        let gradNegative = gradient(at: -4.0, of: absContainer)
-        XCTAssertEqual(gradNegative, -1.0, accuracy: 0.001)
-
+        let vwgNegative = valueWithGradient(at: -4.0, of: absContainer)
+        #expect(vwgNegative.value == 4.0)
+        #expect(vwgNegative.gradient == -1.0)
     }
 }
 

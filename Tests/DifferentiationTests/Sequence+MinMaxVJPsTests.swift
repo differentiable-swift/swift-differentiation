@@ -1,11 +1,14 @@
 #if canImport(_Differentiation)
 
-import PLDifferentiation
-import XCTest
+import Differentiation
+import Testing
 
-final class DifferentiableMinMaxTests: XCTestCase {
+@Suite("Sequence+MinMaxVJPs")
+struct SequenceMinMaxVJPs {
+
     let inputArray = [2.0, 1.0, 3.0]
 
+    @Test
     func testDifferentiableMin() throws {
         @differentiable(reverse)
         func wrapper(_ value: [Double]) -> Double {
@@ -17,10 +20,11 @@ final class DifferentiableMinMaxTests: XCTestCase {
         }
 
         let (value, gradient) = valueWithGradient(at: inputArray, of: wrapper)
-        XCTAssertEqual(value, 5.0, "Result of \(value) did not match expected value of 5.0")
-        XCTAssertEqual(gradient, [0.0, 10.0, 0.0], "Gradient of \(gradient) did not match expected value of [0.0, 10.0, 0.0]")
+        #expect(value == 5.0)
+        #expect(gradient == [0.0, 10.0, 0.0])
     }
 
+    @Test
     func testDifferentiableMax() throws {
         @differentiable(reverse)
         func wrapper(_ value: [Double]) -> Double {
@@ -32,8 +36,8 @@ final class DifferentiableMinMaxTests: XCTestCase {
         }
 
         let (value, gradient) = valueWithGradient(at: inputArray, of: wrapper)
-        XCTAssertEqual(value, 45.0, "Result of \(value) did not match expected value of 45.0")
-        XCTAssertEqual(gradient, [0.0, 0.0, 30.0], "Gradient of \(gradient) did not match expected value of [0.0, 0.0, 30.0]")
+        #expect(value == 45.0)
+        #expect(gradient == [0.0, 0.0, 30.0])
     }
 }
 
