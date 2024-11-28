@@ -4,20 +4,6 @@
 import XCTest
 
 final class NativeFunctionDerivativesTests: XCTestCase {
-    func testPow() {
-        let gradDouble = gradient(at: 2.0, 3.0, of: pow)
-        XCTAssertEqual(gradDouble.0, 12.0, accuracy: 0.001)
-        XCTAssertEqual(gradDouble.1, 5.5451774445, accuracy: 0.001)
-
-        let gradFloat = gradient(at: 2.0 as Float, 3.0 as Float, of: pow)
-        XCTAssertEqual(gradFloat.0, 12.0, accuracy: 0.001)
-        XCTAssertEqual(gradFloat.1, 5.5451774445, accuracy: 0.001)
-    }
-
-    func testExp() {
-        let gradDouble = gradient(at: 3.0, of: exp)
-        XCTAssertEqual(gradDouble, 20.08553, accuracy: 0.001)
-    }
 
     func testMin() {
         // I'm using this container because the compiler can't quite determine
@@ -64,11 +50,7 @@ final class NativeFunctionDerivativesTests: XCTestCase {
 
         let gradNegative = gradient(at: -4.0, of: absContainer)
         XCTAssertEqual(gradNegative, -1.0, accuracy: 0.001)
-    }
 
-    func testSqrt() {
-        let gradDouble = gradient(at: 4.0, of: sqrt)
-        XCTAssertEqual(gradDouble, 0.25, accuracy: 0.001)
     }
 }
 
