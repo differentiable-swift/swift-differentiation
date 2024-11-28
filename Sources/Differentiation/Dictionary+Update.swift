@@ -4,14 +4,14 @@ import _Differentiation
 
 #endif
 
-public extension Dictionary {
+extension Dictionary {
     /// A Differentiable alternative to `Dictionary.subscript.modify`
     /// Differentiation does not yet support `Dictionary.subscript.modify` because it is a coroutine.
     #if canImport(_Differentiation)
     @differentiable(reverse where Value: Differentiable)
     #endif
     @inlinable
-    mutating func update(at key: Key, with newValue: Value) {
+    public mutating func update(at key: Key, with newValue: Value) {
         self[key] = newValue
     }
 }

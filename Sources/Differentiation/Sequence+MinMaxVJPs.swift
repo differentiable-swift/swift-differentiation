@@ -2,7 +2,7 @@
 
 import _Differentiation
 
-public extension Sequence where
+extension Sequence where
     Self: Collection, // we constrain to conform to collection cause otherwise we can't access any values by index
     Self: Differentiable,
     Self.TangentVector: RangeReplaceableCollection, // we constrain the tangentvector to be able to create a value and write to it
@@ -15,7 +15,7 @@ public extension Sequence where
     // level is because of the DocC crash: https://github.com/swiftlang/swift/issues/75258
     /// To differentiate ``Swift/Sequence/max``
     @derivative(of: max)
-    func _vjpMax() -> (
+    public func _vjpMax() -> (
         value: Element?,
         pullback: (Element?.TangentVector) -> (Self.TangentVector)
     ) where Self.Index == Self.TangentVector.Index {
@@ -51,7 +51,7 @@ public extension Sequence where
     // level is because of the DocC crash: https://github.com/swiftlang/swift/issues/75258
     /// To differentiate ``Swift/Sequence/min``
     @derivative(of: min)
-    func _vjpMin() -> (
+    public func _vjpMin() -> (
         value: Element?,
         pullback: (Element?.TangentVector) -> (Self.TangentVector)
     ) where Self.Index == Self.TangentVector.Index {
