@@ -3,15 +3,9 @@
 import Differentiation
 import Testing
 
-@Suite("Dictionary Differentiation Tests")
+@Suite("Dictionary+Differentiation")
 struct DictionaryDifferentiationTests {
-    
-}
-
-import PLDifferentiation
-import XCTest
-
-final class DictionaryDifferentiationTests: XCTestCase {
+    @Test
     func testSubscriptGet() throws {
         let dictionary: [String: Double] = ["a": 3, "b": 7]
 
@@ -24,125 +18,95 @@ final class DictionaryDifferentiationTests: XCTestCase {
             return a + b
         }
 
-        let valAndGrad = valueWithGradient(at: dictionary, of: readFromDictionary)
+        let vwg = valueWithGradient(at: dictionary, of: readFromDictionary)
 
-        XCTAssertEqual(valAndGrad.value, 3 * aMultiplier + 7 * bMultiplier)
-        XCTAssertEqual(valAndGrad.gradient["a"]!, aMultiplier)
-        XCTAssertEqual(valAndGrad.gradient["b"]!, bMultiplier)
+        #expect(vwg.value == 3 * aMultiplier + 7 * bMultiplier)
+        #expect(vwg.gradient == ["a": aMultiplier, "b": bMultiplier])
     }
-
-    func testSubscriptSet() throws {
-        let dictionary: [String: Double] = ["a": 1, "b": 1]
-
-        let aMultiplier: Double = 13
-        let bMultiplier: Double = 17
-
-        func writeAndReadFromDictionary(d: [String: Double], newA: Double, newB: Double) -> Double {
-            var d = d
-            d.set("a", to: newA)
-            d.set("b", to: newB)
-            let a = d["a"]! * aMultiplier
-            let b = d["b"]! * bMultiplier
-            return a + b
-        }
-
-        let newA: Double = 3
-        let newB: Double = 7
-
-        let valAndGrad = valueWithGradient(at: dictionary, newA, newB, of: writeAndReadFromDictionary)
-
-        XCTAssertEqual(valAndGrad.value, newA * aMultiplier + newB * bMultiplier)
-        XCTAssertEqual(valAndGrad.gradient.0["a"], 0)
-        XCTAssertEqual(valAndGrad.gradient.0["b"], 0)
-        XCTAssertEqual(valAndGrad.gradient.1, aMultiplier)
-        XCTAssertEqual(valAndGrad.gradient.2, bMultiplier)
-    }
-
-    func testDictionaryNonInout() {
-        func getD(from newValues: [String: Double?], at key: String) -> Double? {
-            if newValues.keys.contains(key) {
-                return newValues[key]!
-            }
-            return nil
-        }
+    
+    @Test
+    func testDictionaryReadAndCombineValues() {
         @differentiable(reverse)
-        func testFunctionD(newValues: [String: Double?]) -> Double {
-            return 1.0 * getD(from: newValues, at: "s1")! +
-                2.0 * getD(from: newValues, at: "s2")! +
-                3.0 * getD(from: newValues, at: "s3")!
+        func testFunction(newValues: [String: Double]) -> Double {
+            return 1.0 * newValues["s1"]! +
+            2.0 * newValues["s2"]! +
+            3.0 * newValues["s3"]!
         }
-
-        func get<DataType>(from newValues: [String: DataType?], at key: String) -> DataType?
-            where DataType: Differentiable
-        {
-            if newValues.keys.contains(key) {
-                return newValues[key]!
-            }
-            return nil
-        }
-        @differentiable(reverse)
-        func testFunction(newValues: [String: Double?]) -> Double {
-            return 1.0 * get(from: newValues, at: "s1")! +
-                2.0 * get(from: newValues, at: "s2")! +
-                3.0 * get(from: newValues, at: "s3")!
-        }
-
-        let answerExpected = [1.0, 2.0, 3.0]
-        let answerConcreteType = gradient(
-            at: ["s1": 10.0, "s2": 20.0, "s3": 30.0],
-            of: testFunctionD
-        ).sorted(by: { $0.key < $1.key }).compactMap(\.value.value)
-        let answerGenericType = gradient(
+        
+        let vwg = valueWithGradient(
             at: ["s1": 10.0, "s2": 20.0, "s3": 30.0],
             of: testFunction
-        ).sorted(by: { $0.key < $1.key }).compactMap(\.value.value)
-
-        XCTAssertEqual(answerConcreteType, answerExpected)
-        XCTAssertEqual(answerGenericType, answerExpected)
+        )
+        
+        #expect(vwg.value == 140.0)
+        #expect(vwg.gradient == ["s1": 1.0, "s2": 2.0, "s3": 3.0])
     }
-
-    func testDictionaryInout() {
-        func dictionaryOperationD(of newValues: [String: Double?], on another: inout [String: Double?]) {
-            for key in withoutDerivative(at: another.keys) where newValues.keys.contains(key) {
-                let value = newValues[key]!
-                another.set(key, to: value)
+    
+    @Test
+    func testDictionaryInoutWriteMethod() {
+        @differentiable(reverse)
+        func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
+            for key in withoutDerivative(at: otherDict.keys) {
+                let otherValue = otherDict[key]!
+                mainDict.update(at: key, with: otherValue)
             }
         }
+        
         @differentiable(reverse)
-        func testFunctionD(newValues: [String: Double?], dict: [String: Double?]) -> Double {
-            var newDict = dict
-            dictionaryOperationD(of: newValues, on: &newDict)
-            return 1.0 * newDict["s1"]!! + 2.0 * newDict["s2"]!! + 3.0 * newDict["s3"]!!
+        func inoutWrapper(dictionary: [String: Double], otherDictionary: [String: Double]) -> [String: Double] {
+            // we wrap the `combineByReplacingDictionaryValues`
+            var mainCopy = dictionary
+            combineByReplacingDictionaryValues(of: &mainCopy, with: otherDictionary)
+            return mainCopy
         }
-
-        func dictionaryOperation<DataType>(of newValues: [String: DataType?], on another: inout [String: DataType?])
-            where DataType: Differentiable
-        {
-            for key in withoutDerivative(at: another.keys) where newValues.keys.contains(key) {
-                let value = newValues[key]!
-                another.set(key, to: value)
+        
+        let vwpb = valueWithPullback(
+            at: ["s1": 10.0, "s2": 20.0, "s3": 30.0],
+            ["s1": 2.0],//, "s2": nil, "s3": nil],
+            of: inoutWrapper
+        )
+        
+        #expect(vwpb.value == ["s1": 2.0, "s2": 20.0, "s3": 30.0])
+        // we need to provide a full tangentvector to the pullback hence the keys with zero entries.
+        #expect(vwpb.pullback(["s1": 1.0, "s2": 0.0, "s3": 0.0]) == (["s1": 0.0, "s2": 0.0, "s3": 0.0], ["s1": 1.0]))
+        #expect(vwpb.pullback(["s1": 0.0, "s2": 1.0, "s3": 0.0]) == (["s1": 0.0, "s2": 1.0, "s3": 0.0], ["s1": 0.0]))
+        #expect(vwpb.pullback(["s1": 0.0, "s2": 0.0, "s3": 1.0]) == (["s1": 0.0, "s2": 0.0, "s3": 1.0], ["s1": 0.0]))
+    }
+    
+    @Test
+    func testInoutWriteAndSumValues() {
+        @differentiable(reverse)
+        func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
+            for key in withoutDerivative(at: otherDict.keys) {
+                let otherValue = otherDict[key]!
+                mainDict.update(at: key, with: otherValue)
             }
         }
+        
         @differentiable(reverse)
-        func testFunction(newValues: [String: Double?], dict: [String: Double?]) -> Double {
-            var newDict = dict
-            dictionaryOperation(of: newValues, on: &newDict)
-            return 1.0 * newDict["s1"]!! + 2.0 * newDict["s2"]!! + 3.0 * newDict["s3"]!!
+        func sumValues(of dictionary: [String: Double]) -> Double {
+            var sum: Double = 0.0
+            for key in withoutDerivative(at: dictionary.keys) {
+                sum += dictionary[key]!
+            }
+            return sum
         }
-        let answerExpected = [1.0, 2.0, 3.0]
-        let answerConcreteType = gradient(
+        
+        @differentiable(reverse, wrt: dictionary)
+        func inoutWrapperAndSum(dictionary: [String: Double], otherDictionary: [String: Double]) -> Double {
+            var mainCopy = dictionary
+            combineByReplacingDictionaryValues(of: &mainCopy, with: otherDictionary)
+            return sumValues(of: mainCopy)
+        }
+        
+        let vwg = valueWithGradient(
             at: ["s1": 10.0, "s2": 20.0, "s3": 30.0],
-            ["s1": 0.0, "s2": nil, "s3": nil],
-            of: testFunctionD
-        ).0.sorted(by: { $0.key < $1.key }).compactMap(\.value.value)
-        let answerGenericType = gradient(
-            at: ["s1": 10.0, "s2": 20.0, "s3": 30.0],
-            ["s1": 0.0, "s2": nil, "s3": nil],
-            of: testFunction
-        ).0.sorted(by: { $0.key < $1.key }).compactMap(\.value.value)
-
-        XCTAssertEqual(answerConcreteType, answerExpected)
-        XCTAssertEqual(answerGenericType, answerExpected)
+            ["s1": 2.0],//, "s2": nil, "s3": nil],
+            of: inoutWrapperAndSum
+        )
+        
+        #expect(vwg.value == 52.0)
+        #expect(vwg.gradient == (["s1": 0.0, "s2": 1.0, "s3": 1.0], ["s1": 1.0]))
     }
 }
 
