@@ -19,7 +19,7 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
     }
 
     public var zeroTangentVectorInitializer: () -> TangentVector {
-        let listOfKeys = keys // capturing only what's needed, not the entire self, in order to not waste memory
+        let listOfKeys = keys  // capturing only what's needed, not the entire self, in order to not waste memory
         func initializer() -> Self.TangentVector {
             return listOfKeys.reduce(into: [Key: Value.TangentVector]()) { $0[$1] = Value.TangentVector.zero }
         }
@@ -49,14 +49,15 @@ extension Dictionary where Value: Differentiable {
     {
         // When adding two dictionaries, nil values are equivalent to zeroes, so there is no need to manually zero-out
         // every key's value. Instead, it is faster to create a dictionary with the single non-zero entry.
-        return (self[key], { tangentVector in
-            if let value = tangentVector.value {
+        (
+            self[key],
+            { tangentVector in
+                guard let value = tangentVector.value else {
+                    return .zero
+                }
                 return [key: value]
             }
-            else {
-                return .zero
-            }
-        })
+        )
     }
 }
 #endif

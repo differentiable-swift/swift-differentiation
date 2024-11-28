@@ -25,7 +25,7 @@ struct DictionaryUpdateTests {
         let newB: Double = 7
 
         let valAndGrad = valueWithGradient(at: dictionary, newA, newB, of: writeAndReadFromDictionary)
-        
+
         #expect(valAndGrad.value == newA * aMultiplier + newB * bMultiplier)
         #expect(valAndGrad.gradient == (["a": 0, "b": 0], aMultiplier, bMultiplier))
     }
