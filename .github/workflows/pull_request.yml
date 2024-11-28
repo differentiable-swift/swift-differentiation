@@ -3,6 +3,14 @@ name: Pull Request
 on: [pull_request]
 
 jobs:
+  lint:
+    name: Lint Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Formatting
+        run: swift format lint --recursive --strict .
+
   test-ubuntu-latest:
     name: Test Swift ${{ matrix.swift }} Ubuntu Latest
     strategy:
