@@ -7,7 +7,7 @@ import _Differentiation
 // and
 // https://bugs.swift.org/browse/TF-1193
 
-extension Dictionary: Differentiable where Value: Differentiable {
+extension Dictionary: @retroactive Differentiable where Value: Differentiable {
     public typealias TangentVector = [Key: Value.TangentVector]
     public mutating func move(by direction: TangentVector) {
         for (componentKey, componentDirection) in direction {
@@ -28,7 +28,7 @@ extension Dictionary: Differentiable where Value: Differentiable {
 }
 
 /// Implements the `AdditiveArithmetic` requirements.
-extension Dictionary: AdditiveArithmetic where Value: AdditiveArithmetic {
+extension Dictionary: @retroactive AdditiveArithmetic where Value: AdditiveArithmetic {
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs, uniquingKeysWith: +)
     }
