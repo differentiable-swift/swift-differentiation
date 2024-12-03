@@ -34,17 +34,19 @@ extension Array where Element: Differentiable {
     ) -> (value: Void, pullback: (inout TangentVector) -> (Element.TangentVector)) {
         update(at: index, with: newValue)
         let forwardCount = self.count
-        return ((), { tangentVector in
-            // manual zero tangent initialization
-            if tangentVector.base.count < forwardCount {
-                tangentVector.base = .init(repeating: .zero, count: forwardCount)
+        return (
+            (),
+            { tangentVector in
+                // manual zero tangent initialization
+                if tangentVector.base.count < forwardCount {
+                    tangentVector.base = .init(repeating: .zero, count: forwardCount)
+                }
+                let dElement = tangentVector[index]
+                tangentVector.base[index] = .zero
+                return dElement
             }
-            let dElement = tangentVector[index]
-            tangentVector.base[index] = .zero
-            return dElement
-        })
+        )
     }
 }
 
 #endif
-

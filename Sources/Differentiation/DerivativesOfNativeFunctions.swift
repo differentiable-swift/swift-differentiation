@@ -11,12 +11,10 @@ public func _vjpMin<T: Comparable & Differentiable>(
     _ rhs: T
 ) -> (value: T, pullback: (T.TangentVector) -> (T.TangentVector, T.TangentVector)) {
     func pullback(_ tangentVector: T.TangentVector) -> (T.TangentVector, T.TangentVector) {
-        if lhs <= rhs {
-            return (tangentVector, .zero)
-        }
-        else {
+        guard lhs <= rhs else {
             return (.zero, tangentVector)
         }
+        return (tangentVector, .zero)
     }
     return (value: min(lhs, rhs), pullback: pullback)
 }
@@ -30,12 +28,10 @@ public func _vjpMax<T: Comparable & Differentiable>(
     _ rhs: T
 ) -> (value: T, pullback: (T.TangentVector) -> (T.TangentVector, T.TangentVector)) {
     func pullback(_ tangentVector: T.TangentVector) -> (T.TangentVector, T.TangentVector) {
-        if lhs < rhs {
-            return (.zero, tangentVector)
-        }
-        else {
+        guard lhs < rhs else {
             return (tangentVector, .zero)
         }
+        return (.zero, tangentVector)
     }
     return (value: max(lhs, rhs), pullback: pullback)
 }
@@ -47,12 +43,10 @@ public func _vjpAbs<T: Comparable & SignedNumeric & Differentiable>(_ value: T)
     -> (value: T, pullback: (T.TangentVector) -> T.TangentVector)
 {
     func pullback(_ tangentVector: T.TangentVector) -> T.TangentVector {
-        if value < 0 {
-            return .zero - tangentVector
-        }
-        else {
+        guard value < 0 else {
             return tangentVector
         }
+        return .zero - tangentVector
     }
     return (value: abs(value), pullback: pullback)
 }

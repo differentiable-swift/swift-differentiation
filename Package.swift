@@ -9,7 +9,7 @@ let package = Package(
         .library(
             name: "Differentiation",
             targets: ["Differentiation"]
-        ),
+        )
     ],
     targets: [
         .target(name: "Differentiation"),
