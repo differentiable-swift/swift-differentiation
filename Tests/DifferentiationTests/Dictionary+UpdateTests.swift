@@ -16,8 +16,10 @@ struct DictionaryUpdateTests {
             var d = d
             d.update(at: "a", with: newA)
             d.update(at: "b", with: newB)
-            let a = d["a"]! * aMultiplier
-            let b = d["b"]! * bMultiplier
+
+            // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+            // swift-format-ignore: NeverForceUnwrap
+            let a = d["a"]! * aMultiplier, b = d["b"]! * bMultiplier
             return a + b
         }
 

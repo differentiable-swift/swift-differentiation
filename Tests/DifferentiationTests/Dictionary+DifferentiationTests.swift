@@ -13,8 +13,9 @@ struct DictionaryDifferentiationTests {
         let bMultiplier: Double = 17
 
         func readFromDictionary(d: [String: Double]) -> Double {
-            let a = d["a"]! * aMultiplier
-            let b = d["b"]! * bMultiplier
+            // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+            // swift-format-ignore: NeverForceUnwrap
+            let a = d["a"]! * aMultiplier, b = d["b"]! * bMultiplier
             return a + b
         }
 
@@ -28,6 +29,8 @@ struct DictionaryDifferentiationTests {
     func testDictionaryReadAndCombineValues() {
         @differentiable(reverse)
         func testFunction(newValues: [String: Double]) -> Double {
+            // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+            // swift-format-ignore: NeverForceUnwrap
             1.0 * newValues["s1"]! + 2.0 * newValues["s2"]! + 3.0 * newValues["s3"]!
         }
 
@@ -45,6 +48,8 @@ struct DictionaryDifferentiationTests {
         @differentiable(reverse)
         func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
             for key in withoutDerivative(at: otherDict.keys) {
+                // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+                // swift-format-ignore: NeverForceUnwrap
                 let otherValue = otherDict[key]!
                 mainDict.update(at: key, with: otherValue)
             }
@@ -76,6 +81,8 @@ struct DictionaryDifferentiationTests {
         @differentiable(reverse)
         func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
             for key in withoutDerivative(at: otherDict.keys) {
+                // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+                // swift-format-ignore: NeverForceUnwrap
                 let otherValue = otherDict[key]!
                 mainDict.update(at: key, with: otherValue)
             }
@@ -85,6 +92,8 @@ struct DictionaryDifferentiationTests {
         func sumValues(of dictionary: [String: Double]) -> Double {
             var sum: Double = 0.0
             for key in withoutDerivative(at: dictionary.keys) {
+                // note that we cannot use #require here as this function cannot throw (due to current compiler constraints wrt differentiation)
+                // swift-format-ignore: NeverForceUnwrap
                 sum += dictionary[key]!
             }
             return sum
