@@ -1,3 +1,4 @@
+// swift-format-ignore-file
 #if canImport(_Differentiation)
 
 import _Differentiation
