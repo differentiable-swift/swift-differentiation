@@ -4,7 +4,7 @@ import _Differentiation
 
 extension Optional where Wrapped: Differentiable {
     @inlinable
-    @differentiable(reverse, wrt: self)
+    @differentiable(reverse,wrt: self)
     public func differentiableMap<Result: Differentiable>(
         _ body: @differentiable(reverse) (Wrapped) -> Result
     ) -> Optional<Result> {

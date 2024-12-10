@@ -89,7 +89,7 @@ struct DictionaryDifferentiationTests {
             }
             return sum
         }
-        @differentiable(reverse, wrt: dictionary)
+        @differentiable(reverse,wrt: dictionary)
 
         func inoutWrapperAndSum(dictionary: [String: Double], otherDictionary: [String: Double]) -> Double {
             var mainCopy = dictionary
