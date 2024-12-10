@@ -8,7 +8,11 @@ import _Differentiation
 // https://bugs.swift.org/browse/TF-1193
 
 extension Dictionary: @retroactive Differentiable where Value: Differentiable {
+    /// Tangent Vectors for each key-value pair
     public typealias TangentVector = [Key: Value.TangentVector]
+
+    /// Shift the dictionary by the given ``TangentVector``
+    /// All keys in the given shift vectar must exist in the dictionary
     public mutating func move(by direction: TangentVector) {
         for (componentKey, componentDirection) in direction {
             func fatalMissingComponent() -> Value {
@@ -18,6 +22,7 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
         }
     }
 
+    /// Create a zero tangent vector for every key
     public var zeroTangentVectorInitializer: () -> TangentVector {
         let listOfKeys = keys  // capturing only what's needed, not the entire self, in order to not waste memory
         func initializer() -> Self.TangentVector {
@@ -29,14 +34,17 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
 
 /// Implements the `AdditiveArithmetic` requirements.
 extension Dictionary: @retroactive AdditiveArithmetic where Value: AdditiveArithmetic {
+    /// Combine two dictionaries by adding their keys
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs, uniquingKeysWith: +)
     }
 
+    /// Combine two dictionaries by subtracting their keys
     public static func - (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs.mapValues { .zero - $0 }, uniquingKeysWith: +)
     }
 
+    /// Return an empty dictionary
     public static var zero: Self { [:] }
 }
 
