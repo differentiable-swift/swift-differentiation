@@ -14,7 +14,7 @@
      "NeverUseForceTry" : true,
      "NeverUseImplicitlyUnwrappedOptionals" : true,
      "NoAccessLevelOnExtensionDeclaration" : true,
-     "NoLeadingUnderscores" : true,
+     "NoLeadingUnderscores" : false,
      "OmitExplicitReturns" : true,
      "UseEarlyExits" : true,
      "UseWhereClausesInForLoops" : true,
