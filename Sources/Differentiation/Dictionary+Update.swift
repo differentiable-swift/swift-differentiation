@@ -1,3 +1,4 @@
+// swift-format-ignore-file
 #if canImport(_Differentiation)
 
 import _Differentiation
@@ -30,32 +31,33 @@ extension Dictionary where Value: Differentiable {
     @inlinable
     public mutating func _vjpUpdate(
         at key: Key,
-        with newValue: Value // TODO: this should be optional?
+        with newValue: Value  // TODO: this should be optional?
     ) -> (value: Void, pullback: (inout TangentVector) -> (Value.TangentVector)) {
         update(at: key, with: newValue)
 
         let forwardCount = count
-        let forwardKeys = keys // may be heavy to capture all of these, not sure how to do without them though
+        let forwardKeys = keys  // may be heavy to capture all of these, not sure how to do without them though
 
-        return ((), { tangentVector in
-            // manual zero tangent initialization
-            // TODO: Should we consider missing keys as a complete tangentvector with zero values for those keys?
-            if tangentVector.count < forwardCount { // TODO: is this the correct check keys could still differ
-                tangentVector = Self.TangentVector() // TODO: should we be replacing this or merging
-                for key in forwardKeys {
-                    tangentVector[key] = .zero
+        return (
+            (),
+            { tangentVector in
+                // manual zero tangent initialization
+                // TODO: Should we consider missing keys as a complete tangentvector with zero values for those keys?
+                if tangentVector.count < forwardCount {  // TODO: is this the correct check keys could still differ
+                    tangentVector = Self.TangentVector()  // TODO: should we be replacing this or merging
+                    for key in forwardKeys {
+                        tangentVector[key] = .zero
+                    }
                 }
-            }
 
-            if let dElement = tangentVector[key] {
+                guard let dElement = tangentVector[key] else {  // should this fail?
+                    tangentVector[key] = .zero
+                    return .zero
+                }
                 tangentVector[key] = .zero
                 return dElement
             }
-            else { // should this fail?
-                tangentVector[key] = .zero
-                return .zero
-            }
-        })
+        )
     }
 }
 

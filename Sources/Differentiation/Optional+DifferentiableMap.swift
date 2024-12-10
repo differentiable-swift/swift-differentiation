@@ -3,8 +3,9 @@
 import _Differentiation
 
 extension Optional where Wrapped: Differentiable {
+    /// Apply a differentiable closure to the wrapped value
     @inlinable
-    @differentiable(reverse, wrt: self)
+    @differentiable(reverse,wrt: self)
     public func differentiableMap<Result: Differentiable>(
         _ body: @differentiable(reverse) (Wrapped) -> Result
     ) -> Optional<Result> {

@@ -8,7 +8,11 @@ import _Differentiation
 // https://bugs.swift.org/browse/TF-1193
 
 extension Dictionary: @retroactive Differentiable where Value: Differentiable {
+    /// Tangent Vectors for each key-value pair
     public typealias TangentVector = [Key: Value.TangentVector]
+
+    /// Shift the dictionary by the given ``TangentVector``
+    /// All keys in the given shift vectar must exist in the dictionary
     public mutating func move(by direction: TangentVector) {
         for (componentKey, componentDirection) in direction {
             func fatalMissingComponent() -> Value {
@@ -18,10 +22,11 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
         }
     }
 
+    /// Create a zero tangent vector for every key
     public var zeroTangentVectorInitializer: () -> TangentVector {
-        let listOfKeys = keys // capturing only what's needed, not the entire self, in order to not waste memory
+        let listOfKeys = keys  // capturing only what's needed, not the entire self, in order to not waste memory
         func initializer() -> Self.TangentVector {
-            return listOfKeys.reduce(into: [Key: Value.TangentVector]()) { $0[$1] = Value.TangentVector.zero }
+            listOfKeys.reduce(into: [Key: Value.TangentVector]()) { $0[$1] = Value.TangentVector.zero }
         }
         return initializer
     }
@@ -29,14 +34,17 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
 
 /// Implements the `AdditiveArithmetic` requirements.
 extension Dictionary: @retroactive AdditiveArithmetic where Value: AdditiveArithmetic {
+    /// Combine two dictionaries by adding their keys
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs, uniquingKeysWith: +)
     }
 
+    /// Combine two dictionaries by subtracting their keys
     public static func - (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs.mapValues { .zero - $0 }, uniquingKeysWith: +)
     }
 
+    /// Return an empty dictionary
     public static var zero: Self { [:] }
 }
 
@@ -49,14 +57,15 @@ extension Dictionary where Value: Differentiable {
     {
         // When adding two dictionaries, nil values are equivalent to zeroes, so there is no need to manually zero-out
         // every key's value. Instead, it is faster to create a dictionary with the single non-zero entry.
-        return (self[key], { tangentVector in
-            if let value = tangentVector.value {
+        (
+            self[key],
+            { tangentVector in
+                guard let value = tangentVector.value else {
+                    return .zero
+                }
                 return [key: value]
             }
-            else {
-                return .zero
-            }
-        })
+        )
     }
 }
 #endif

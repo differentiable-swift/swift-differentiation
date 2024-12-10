@@ -1,0 +1,25 @@
+ {
+   "fileScopedDeclarationPrivacy" : {
+     "accessLevel" : "private"
+   },
+   "indentation" : {
+     "spaces" : 4
+   },
+   "indentConditionalCompilationBlocks" : false,
+   "indentSwitchCaseLabels" : true,
+   "lineLength" : 140,
+   "rules" : {
+     "AllPublicDeclarationsHaveDocumentation" : true,
+     "NeverForceUnwrap" : true,
+     "NeverUseForceTry" : true,
+     "NeverUseImplicitlyUnwrappedOptionals" : true,
+     "NoAccessLevelOnExtensionDeclaration" : true,
+     "NoLeadingUnderscores" : false,
+     "OmitExplicitReturns" : true,
+     "UseEarlyExits" : true,
+     "UseWhereClausesInForLoops" : true,
+     "ValidateDocumentationComments" : true
+   },
+   "spacesAroundRangeFormationOperators" : true,
+   "version" : 1
+ }
