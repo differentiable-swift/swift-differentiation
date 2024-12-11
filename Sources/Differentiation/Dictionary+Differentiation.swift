@@ -17,14 +17,6 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
             self[componentKey, default: fatalMissingComponent()].move(by: componentDirection)
         }
     }
-
-    public var zeroTangentVectorInitializer: () -> TangentVector {
-        let listOfKeys = keys // capturing only what's needed, not the entire self, in order to not waste memory
-        func initializer() -> Self.TangentVector {
-            return listOfKeys.reduce(into: [Key: Value.TangentVector]()) { $0[$1] = Value.TangentVector.zero }
-        }
-        return initializer
-    }
 }
 
 /// Implements the `AdditiveArithmetic` requirements.
