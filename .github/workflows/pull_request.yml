@@ -3,6 +3,12 @@ name: Pull Request
 on: [pull_request]
 
 jobs:
+  Lint:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: SwiftFormat
+        run: swiftformat --lint --strict . --reporter github-actions-log
   test-ubuntu-latest:
     name: Test Swift ${{ matrix.swift }} Ubuntu Latest
     strategy:
