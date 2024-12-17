@@ -47,4 +47,3 @@ extension Array where Element: Differentiable {
 }
 
 #endif
-

@@ -41,7 +41,7 @@ extension Dictionary where Value: Differentiable {
     {
         // When adding two dictionaries, nil values are equivalent to zeroes, so there is no need to manually zero-out
         // every key's value. Instead, it is faster to create a dictionary with the single non-zero entry.
-        return (self[key], { tangentVector in
+        (self[key], { tangentVector in
             if let value = tangentVector.value {
                 return [key: value]
             }
