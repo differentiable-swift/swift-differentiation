@@ -1,17 +1,17 @@
 # swift-differentiation
 
-This repository is a collection of useful extensions to Swift Differentiation, the experimental Swift language feature.
+This repository is a collection of useful extensions to [Swift Differentiation](https://github.com/differentiable-swift#meet-differentiable-swift), the experimental Swift language feature.
 The contents of this repository extend the current implementation of Differentiable Swift to give the user access to more differentiable methods than currently provided in the Swift standard library. It also contains some workarounds for some methods that currently are not differentiable due to missing support in the language itself.
-Some of these extensions we would like to eventually upstream into the Swift standard library and for these methods this package serves as a place to incubate and battle test these methods. 
+Some of these extensions we would like to eventually upstream into the Swift standard library. This package serves as a place to incubate and battle test these methods. 
 Other extensions are meant to be phased out as the language feature itself fills the gap that these methods currently bridge (for example `Array.update(at:with:)`).
 
 The ultimate goal of this repository is for the library portion to no longer exist since all implementations are either upstreamed to [Swift](https://github.com/swiftlang/swift) or the provided workarounds are no longer needed since there's more direct language support making them obsolete. 
-We would like this repository to become a collection of Examples and documentation on the language feature however. So that people can more easily get started using Differentiable Swift! 
+We would ultimately like this repository to become a collection of Examples and documentation on the language feature so that people can more easily get started using Differentiable Swift! 
 
 ## Overview
 Currently this package provides the following functionality:
 - Differentiable support for the `Dictionary` type.
-- Extensions to the `Array` type to be able to make writes to a given index differentiable (`update(at:with:)`) since using the subscript setter is currently not supported due to missing coroutine support.
+- Extensions to the `Array` type to be able to make writes to a given index differentiable (`update(at:with:)`) since using the subscript setter is currently not supported due to [missing coroutine support](https://github.com/swiftlang/swift/issues/54401).
 - `Collection` conformances for the `Array.DifferentiableView` type to make it easier to work with directly.
 - Some missing derivatives of standard library Swift functions like, `min(_:_:)`, `max(_:_:)`, `abs(_:)`, `atan2(_:_:)`, `Sequence.min()` and `Sequence.max()`
 - Provides a `differentiableMap(_:)` function for the Optional type. 
@@ -28,12 +28,12 @@ import _Differentiation
 ```
 in any file where differentiation will be used. The compiler will warn you about this if you do forget to add the above and try to use any differentiable Swift capabilities.
 
-When using this package and it's methods you only need to add the following:
+When using this package and its methods you only need to add the following:
 ```swift 
 import Differentiation
 ```
 Since the package also exports the `_Differentiation` module. 
-Make sure to add the package to you dependencies however:
+Make sure to add the package to your dependencies however:
 ```swift
 dependencies: [
   .package(url: "https://github.com/differentiable-swift/swift-differentiation", from: "0.0.1")
