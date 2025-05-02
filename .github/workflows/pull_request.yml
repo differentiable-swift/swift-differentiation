@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   Lint:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
       - name: SwiftFormat
@@ -13,10 +13,31 @@ jobs:
     name: Test Swift ${{ matrix.swift }} Ubuntu Latest
     strategy:
       matrix:
-        swift: ["6.0", "6.0.1", "6.0.2"]
+        swift: ["6.0.3", "6.1"]
     runs-on: ubuntu-latest
     container: swift:${{ matrix.swift }}
     steps:
       - uses: actions/checkout@v4
       - name: Run Tests
         run: swift test -Xswiftc -warnings-as-errors -Xcc -Werror
+  test-macos-15:
+    name: Test Swift ${{ matrix.swift }} macOS
+    strategy:
+      matrix:
+        swift: ["6.0.3", "6.1"]
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Swiftly
+        run: |
+          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg && \
+            installer -pkg swiftly.pkg -target CurrentUserHomeDirectory && \
+            ~/.swiftly/bin/swiftly init --quiet-shell-followup && \
+            . ~/.swiftly/env.sh && \
+            hash -r
+      - name: Install Swift ${{ matrix.swift }}
+        run: ~/.swiftly/bin/swiftly install --use ${{ matrix.swift }}
+      - name: Run Tests
+        run: |
+          export PATH=${HOME}/.swiftly/bin:${PATH}
+          swift test -Xswiftc -warnings-as-errors -Xcc -Werror
