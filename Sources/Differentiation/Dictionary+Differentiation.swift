@@ -9,6 +9,8 @@ import _Differentiation
 
 extension Dictionary: @retroactive Differentiable where Value: Differentiable {
     public typealias TangentVector = [Key: Value.TangentVector]
+
+    @inlinable
     public mutating func move(by direction: TangentVector) {
         for (componentKey, componentDirection) in direction {
             func fatalMissingComponent() -> Value {
@@ -21,14 +23,17 @@ extension Dictionary: @retroactive Differentiable where Value: Differentiable {
 
 /// Implements the `AdditiveArithmetic` requirements.
 extension Dictionary: @retroactive AdditiveArithmetic where Value: AdditiveArithmetic {
+    @inlinable
     public static func + (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs, uniquingKeysWith: +)
     }
 
+    @inlinable
     public static func - (_ lhs: Self, _ rhs: Self) -> Self {
         lhs.merging(rhs.mapValues { .zero - $0 }, uniquingKeysWith: +)
     }
 
+    @inlinable
     public static var zero: Self { [:] }
 }
 

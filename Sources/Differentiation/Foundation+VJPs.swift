@@ -5,6 +5,7 @@ import Foundation
 
 /// Differentiation of ``atan2``
 @derivative(of: atan2(_:_:))
+@inlinable
 public func _vjpAtan2(
     y: Double, x: Double
 ) -> (value: Double, pullback: (Double) -> (Double, Double)) {

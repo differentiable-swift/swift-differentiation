@@ -15,6 +15,7 @@ extension Sequence where
     // level is because of the DocC crash: https://github.com/swiftlang/swift/issues/75258
     /// To differentiate ``Swift/Sequence/max``
     @derivative(of: max)
+    @inlinable
     public func _vjpMax() -> (
         value: Element?,
         pullback: (Element?.TangentVector) -> (Self.TangentVector)
@@ -51,6 +52,7 @@ extension Sequence where
     // level is because of the DocC crash: https://github.com/swiftlang/swift/issues/75258
     /// To differentiate ``Swift/Sequence/min``
     @derivative(of: min)
+    @inlinable
     public func _vjpMin() -> (
         value: Element?,
         pullback: (Element?.TangentVector) -> (Self.TangentVector)
