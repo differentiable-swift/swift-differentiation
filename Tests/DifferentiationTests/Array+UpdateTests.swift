@@ -15,7 +15,7 @@ struct ArrayUpdateTests {
             var result: Double = 0
             for index in withoutDerivative(at: 0 ..< array.count) {
                 let multiplier = 1.0 + Double(index)
-                array.update(at: index, with: multiplier * array[index])
+                array[index] = multiplier * array[index]
                 result += array[index]
             }
             return result

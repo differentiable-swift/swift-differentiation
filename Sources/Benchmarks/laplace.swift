@@ -57,7 +57,7 @@ extension Array where Element == Float {
             return result
         }
         for i in withoutDerivative(at: 1..<n - 1) {
-            result.update(at: i, with: self.laplace(i))
+            result[i] = self.laplace(i)
         }
         return result
     }
@@ -148,7 +148,7 @@ extension ConstantTimeAccessor where Element == Float {
     static func addLaplaceBenchmarks(_ benchmark: inout Benchmark) {
         benchmark.add(
             title: benchmarkTitle,
-            type: Self.self,
+            type: DArray<Float>.self,
             input: Array<Float>.self,
             regular: { input in
                 var input = ConstantTimeAccessor(input)
