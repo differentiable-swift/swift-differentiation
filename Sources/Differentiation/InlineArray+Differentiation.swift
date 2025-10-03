@@ -2,6 +2,7 @@
 
 import _Differentiation
 
+@available(macOS 26, *)
 extension InlineArray: @retroactive Differentiable where Element: Differentiable {
     public typealias TangentVector = InlineArray<count, Element.TangentVector>
 
@@ -68,6 +69,7 @@ extension InlineArray: @retroactive Differentiable where Element: Differentiable
     }
 }
 
+@available(macOS 26, *)
 extension InlineArray: @retroactive AdditiveArithmetic where Element: AdditiveArithmetic {
     @inlinable
     public static var zero: InlineArray<count, Element> {
@@ -85,6 +87,7 @@ extension InlineArray: @retroactive AdditiveArithmetic where Element: AdditiveAr
     }
 }
 
+@available(macOS 26, *)
 extension InlineArray where Element: Differentiable & AdditiveArithmetic {
     @derivative(of: +)
     @inlinable
@@ -128,6 +131,7 @@ extension InlineArray where Element: Differentiable & AdditiveArithmetic {
 }
 
 // Temporary conformance to `Equatable` as this will eventually land in the stdlib
+@available(macOS 26, *)
 extension InlineArray: @retroactive Equatable where Element: Equatable {
     @inlinable
     public static func == (lhs: InlineArray<count, Element>, rhs: InlineArray<count, Element>) -> Bool {
