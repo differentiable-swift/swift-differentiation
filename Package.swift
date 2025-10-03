@@ -5,11 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "swift-differentiation",
-    platforms: [
-        // we only support the latest versions of OSes as `@available(...)` is not yet supported for differentiation.
-        .macOS("26"),
-        .iOS("26"),
-    ],
     products: [
         .library(
             name: "Differentiation",
