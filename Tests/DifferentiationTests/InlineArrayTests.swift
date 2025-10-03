@@ -28,26 +28,29 @@ struct InlineArrayTests {
         #expect(diff[1] == 1.5)
     }
 
-    // Test differentiable init(repeating:)
-    @Test("vjp of init(repeating:) aggregates tangent inputs correctly")
-    @available(macOS 26, *)
-    func testVJPInitRepeating() {
-        // For differentiable init(repeating:), the pullback should sum all elements of the tangent vector
-        let repeated = InlineArray<2, Double>(repeating: 4.0)
-        // forward run
-        // Now test pullback: apply VJP
-        // The API for using VJP: call `valueWithPullback` or similar
-        let (value, pullback) = valueWithPullback(at: 4.0, of: { value in InlineArray<2, Double>(repeating: value) })
-        // value should equal what init(repeating:) produces
-        #expect(value == repeated)
+    // disabled until Swift 6.3 as we can't register derivative for methods marked @_alwaysEmitIntoClient for now.
+    /*
+     // Test differentiable init(repeating:)
+     @Test("vjp of init(repeating:) aggregates tangent inputs correctly")
+     @available(macOS 26, *)
+     func testVJPInitRepeating() {
+         // For differentiable init(repeating:), the pullback should sum all elements of the tangent vector
+         let repeated = InlineArray<2, Double>(repeating: 4.0)
+         // forward run
+         // Now test pullback: apply VJP
+         // The API for using VJP: call `valueWithPullback` or similar
+         let (value, pullback) = valueWithPullback(at: 4.0, of: { value in InlineArray<2, Double>(repeating: value) })
+         // value should equal what init(repeating:) produces
+         #expect(value == repeated)
 
-        // construct some tangent vector
-        let tv: InlineArray<2, Double> = [10.0, 20.0]
-        // apply pullback
-        let back = pullback(tv)
-        // Should equal sum of elements, i.e. 10 + 20 == 30, as Double’s tangent
-        #expect(back == 30.0)
-    }
+         // construct some tangent vector
+         let tv: InlineArray<2, Double> = [10.0, 20.0]
+         // apply pullback
+         let back = pullback(tv)
+         // Should equal sum of elements, i.e. 10 + 20 == 30, as Double’s tangent
+         #expect(back == 30.0)
+     }
+      */
 
     @Test("vjp of read is correct")
     @available(macOS 26, *)
