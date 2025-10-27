@@ -17,6 +17,7 @@ benchmark.registerInputGenerator(for: ([Float], [Float]).self) { size in
 
 protocol HasBenchmarks {
     static func addMapReduceBenchmarks(_ benchmark: inout Benchmark)
+    static func addZipMapAddBenchmarks(_ benchmark: inout Benchmark)
     static func addMeanSquaredErrorBenchmarks(_ benchmark: inout Benchmark)
     static func addLaplaceBenchmarks(_ benchmark: inout Benchmark)
     static func addSubscriptGetContinuousBenchmarks(_ benchmark: inout Benchmark)
@@ -32,6 +33,7 @@ let types: [HasBenchmarks.Type] = [
 
 for type in types {
     type.addMapReduceBenchmarks(&benchmark)
+    type.addZipMapAddBenchmarks(&benchmark)
     type.addMeanSquaredErrorBenchmarks(&benchmark)
     type.addLaplaceBenchmarks(&benchmark)
     type.addSubscriptGetContinuousBenchmarks(&benchmark)
