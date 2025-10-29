@@ -15,6 +15,39 @@ benchmark.registerInputGenerator(for: ([Float], [Float]).self) { size in
     )
 }
 
+benchmark.registerInputGenerator(for: DArray<Float>.self) { size in
+    DArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+}
+
+benchmark.registerInputGenerator(for: (DArray<Float>, DArray<Float>).self) { size in
+    (
+        DArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) }),
+        DArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+    )
+}
+
+benchmark.registerInputGenerator(for: ConstantTimeAccessor<Float>.self) { size in
+    ConstantTimeAccessor((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+}
+
+benchmark.registerInputGenerator(for: (ConstantTimeAccessor<Float>, ConstantTimeAccessor<Float>).self) { size in
+    (
+        ConstantTimeAccessor((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) }),
+        ConstantTimeAccessor((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+    )
+}
+
+benchmark.registerInputGenerator(for: DCTA<Float>.self) { size in
+    DCTA((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+}
+
+benchmark.registerInputGenerator(for: (DCTA<Float>, DCTA<Float>).self) { size in
+    (
+        DCTA((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) }),
+        DCTA((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+    )
+}
+
 protocol HasBenchmarks {
     static func addMapReduceBenchmarks(_ benchmark: inout Benchmark)
     static func addZipMapAddBenchmarks(_ benchmark: inout Benchmark)
@@ -26,9 +59,15 @@ protocol HasBenchmarks {
 }
 
 extension Array: HasBenchmarks where Element == Float {}
+extension DArray: HasBenchmarks where Element == Float {}
+extension ConstantTimeAccessor: HasBenchmarks where Element == Float {}
+extension DCTA: HasBenchmarks where Element == Float {}
 
 let types: [HasBenchmarks.Type] = [
     Array<Float>.self,
+    DArray<Float>.self,
+    ConstantTimeAccessor<Float>.self,
+    DCTA<Float>.self,
 ]
 
 for type in types {

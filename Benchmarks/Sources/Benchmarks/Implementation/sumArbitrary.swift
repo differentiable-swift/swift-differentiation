@@ -16,6 +16,43 @@ extension Array where Element == Float {
     }
 }
 
+extension DArray where Element == Float {
+    @inlinable
+    @differentiable(reverse)
+    func sumArbitrary(indices: [Index]) -> Float {
+        var result: Element = 0
+        for i in withoutDerivative(at: indices) {
+            result += self[i]
+        }
+        return result
+    }
+}
+
+extension ConstantTimeAccessor where Element == Float {
+    @inlinable
+    @differentiable(reverse)
+    mutating func sumArbitrary(indices _: [Int]) -> Float {
+        var result: Element = 0
+        for i in 0 ..< self.count {
+            self.accessElement(at: i)
+            result += self.accessed
+        }
+        return result
+    }
+}
+
+extension DCTA where Element == Float {
+    @inlinable
+    @differentiable(reverse)
+    mutating func sumArbitrary(indices _: [Int]) -> Float {
+        var result: Element = 0
+        for i in 0 ..< self.count {
+            result += self[i]
+        }
+        return result
+    }
+}
+
 private let benchmarkTitle = "sumArbitrary"
 
 extension Array where Element == Float {
@@ -42,6 +79,119 @@ extension Array where Element == Float {
                 let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
                 let pullback = valueWithPullback(
                     at: input, of: { $0.sumArbitrary(indices: indices) }
+                ).pullback
+                return { _ in
+                    blackHole(pullback(1.0))
+                }
+            }
+        )
+    }
+}
+
+extension DArray where Element == Float {
+    static func addSumArbitraryBenchmarks(_ benchmark: inout CollectionsBenchmark.Benchmark) {
+        benchmark.add(
+            title: benchmarkTitle,
+            type: Self.self,
+            regular: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(input.sumArbitrary(indices: indices))
+                }
+            },
+            forward: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(valueWithPullback(at: input, of: { $0.sumArbitrary(indices: indices) }))
+                }
+            },
+            reverse: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                let pullback = valueWithPullback(
+                    at: input, of: { $0.sumArbitrary(indices: indices) }
+                ).pullback
+                return { _ in
+                    blackHole(pullback(1.0))
+                }
+            }
+        )
+    }
+}
+
+extension ConstantTimeAccessor where Element == Float {
+    static func addSumArbitraryBenchmarks(_ benchmark: inout Benchmark) {
+        benchmark.add(
+            title: benchmarkTitle,
+            type: Self.self,
+            regular: { input in
+                var input = input
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(input.sumArbitrary(indices: indices))
+                }
+            },
+            forward: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(valueWithPullback(at: input, of: { input in
+                        var input = input
+                        return input.sumArbitrary(indices: indices)
+                    }))
+                }
+            },
+            reverse: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                let pullback = valueWithPullback(
+                    at: input, of: { input in
+                        var input = input
+                        return input.sumArbitrary(indices: indices)
+                    }
+                ).pullback
+                return { _ in
+                    blackHole(pullback(1.0))
+                }
+            }
+        )
+    }
+}
+
+extension DCTA where Element == Float {
+    static func addSumArbitraryBenchmarks(_ benchmark: inout Benchmark) {
+        benchmark.add(
+            title: benchmarkTitle,
+            type: Self.self,
+            regular: { input in
+                var input = input
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(input.sumArbitrary(indices: indices))
+                }
+            },
+            forward: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                return { _ in
+                    blackHole(valueWithPullback(at: input, of: { input in
+                        var input = input
+                        return input.sumArbitrary(indices: indices)
+                    }))
+                }
+            },
+            reverse: { input in
+                let indicesCount = Int(floor(Double(input.count) / Double(4)))
+                let indices = (0 ..< indicesCount).map { _ in Int.random(in: 0 ..< input.count) }
+                let pullback = valueWithPullback(
+                    at: input, of: { input in
+                        var input = input
+                        return input.sumArbitrary(indices: indices)
+                    }
                 ).pullback
                 return { _ in
                     blackHole(pullback(1.0))
