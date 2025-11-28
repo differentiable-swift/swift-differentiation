@@ -96,6 +96,70 @@ extension Zip2Sequence: @retroactive Differentiable where
             }
         )
     }
+
+    @inlinable
+    public func differentiableReduce<Result: Differentiable>(
+        _ initialResult: Result,
+        _ nextPartialResult: @differentiable(reverse) (Result, Sequence1.Element, Sequence2.Element) -> Result
+    ) -> Result {
+        self.reduce(initialResult, { result, element in nextPartialResult(result, element.0, element.1) })
+    }
+
+    @derivative(of: differentiableReduce)
+    @inlinable
+    public func _vjpDifferentiableReduce<Result: Differentiable>(
+        _ initialResult: Result,
+        _ nextPartialResult: @differentiable(reverse) (Result, Sequence1.Element, Sequence2.Element) -> Result
+    ) -> (
+        value: Result,
+        pullback: (Result.TangentVector) -> (Zip2Sequence.TangentVector, Result.TangentVector)
+    ) {
+        var result: Result = initialResult
+        let underestimatedCount = self.underestimatedCount
+        var pullbacks: [
+            (Result.TangentVector) -> (Result.TangentVector, Sequence1.Element.TangentVector, Sequence2.Element.TangentVector)
+        ] = []
+        pullbacks.reserveCapacity(underestimatedCount)
+
+        for (element1, element2) in self {
+            let (nextPartialResult, pullback) = valueWithPullback(at: result, element1, element2, of: nextPartialResult)
+            result = nextPartialResult
+            pullbacks.append(pullback)
+        }
+        return (
+            value: result,
+            pullback: { v in
+                var resultTangent = v
+                var results1: [Sequence1.Element.TangentVector] = []
+                results1.reserveCapacity(underestimatedCount)
+                var results2: [Sequence2.Element.TangentVector] = []
+                results2.reserveCapacity(underestimatedCount)
+
+                for pullback in pullbacks.reversed() {
+                    let (newResultTangent, sequence1Tangent, sequence2Tangent) = pullback(resultTangent)
+                    resultTangent = newResultTangent
+                    results1.append(sequence1Tangent)
+                    results2.append(sequence2Tangent)
+                }
+
+                // TODO: eleminate the intermediate storage for the reversed results (`results1` and `results2`)
+                var results1Reversed = Sequence1.TangentVector()
+                results1.reserveCapacity(underestimatedCount)
+                var results2Reversed = Sequence2.TangentVector()
+                results2.reserveCapacity(underestimatedCount)
+
+                for element in results1.reversed() {
+                    results1Reversed.append(element)
+                }
+
+                for element in results2.reversed() {
+                    results2Reversed.append(element)
+                }
+
+                return (TangentVector(results1Reversed, results2Reversed), resultTangent)
+            }
+        )
+    }
 }
 
 extension Zip2Sequence {
