@@ -70,7 +70,7 @@ extension Zip2Sequence: @retroactive Differentiable where
         var results: [Result] = []
         results.reserveCapacity(self.underestimatedCount)
         var pullbacks: [(Result.TangentVector) -> (Sequence1.Element.TangentVector, Sequence2.Element.TangentVector)] = []
-        results.reserveCapacity(self.underestimatedCount)
+        pullbacks.reserveCapacity(self.underestimatedCount)
 
         for pair in self {
             let (value, pullback) = valueWithPullback(at: pair.0, pair.1, of: transform)
