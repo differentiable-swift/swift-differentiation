@@ -10,8 +10,10 @@ public func _vjpZip<Sequence1, Sequence2>(
     value: Zip2Sequence<Sequence1, Sequence2>,
     pullback: (Zip2Sequence<Sequence1, Sequence2>.TangentVector) -> (Sequence1.TangentVector, Sequence2.TangentVector)
 ) where
-    Sequence1: Differentiable & RangeReplaceableCollection,
-    Sequence2: Differentiable & RangeReplaceableCollection,
+    Sequence1: Differentiable,
+    Sequence2: Differentiable,
+    Sequence1: RangeReplaceableCollection,
+    Sequence2: RangeReplaceableCollection,
     Sequence1.Element: Differentiable,
     Sequence2.Element: Differentiable,
     Sequence1.TangentVector: RangeReplaceableCollection,
@@ -28,8 +30,10 @@ public func _vjpZip<Sequence1, Sequence2>(
 }
 
 extension Zip2Sequence: @retroactive Differentiable where
-    Sequence1: Differentiable & RangeReplaceableCollection,
-    Sequence2: Differentiable & RangeReplaceableCollection,
+    Sequence1: Differentiable,
+    Sequence2: Differentiable,
+    Sequence1: RangeReplaceableCollection, // conformance is required to have an initializer for S1 and S2 in the `move(by:)` implementation
+    Sequence2: RangeReplaceableCollection, // we can get around this inside the stdlib as we can access the sequences on Self directly
     Sequence1.Element: Differentiable,
     Sequence2.Element: Differentiable,
     Sequence1.TangentVector: RangeReplaceableCollection,
