@@ -10,7 +10,7 @@ struct ZipDifferentiableTests {
         let b: [Double] = [5, 6, 7]
 
         let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
-            zip(s1, s2)
+            differentiableZip(s1, s2)
         })
 
         #expect(value.map(\.0) == a)
@@ -19,7 +19,7 @@ struct ZipDifferentiableTests {
         let va: [Double].DifferentiableView = [1, 0, 0]
         let vb: [Double].DifferentiableView = [0, 0, 0]
 
-        let gradient = pullback(Zip2Sequence.TangentVector(va, vb))
+        let gradient = pullback(Zip2SequenceDifferentiable.TangentVector(va, vb))
         #expect(gradient == ([1, 0, 0], [0, 0, 0]))
     }
 
@@ -29,7 +29,7 @@ struct ZipDifferentiableTests {
         let b: [Double] = [5, 6, 7]
 
         let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
-            zip(s1, s2).differentiableMap { $0 + $1 }
+            differentiableZip(s1, s2).differentiableMap { $0 + $1 }
         })
 
         #expect(value == [6, 8, 10])
@@ -44,7 +44,7 @@ struct ZipDifferentiableTests {
         let b: [Double] = [5, 6, 7]
 
         let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
-            zip(s1, s2).differentiableMap { $0 * $1 }
+            differentiableZip(s1, s2).differentiableMap { $0 * $1 }
         })
 
         #expect(value == [5, 12, 21])
@@ -62,7 +62,7 @@ struct ZipDifferentiableTests {
         let b: [Double] = [5, 6, 7]
 
         let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
-            zip(s1, s2).differentiableMap { $0 + $1 }.differentiableReduce(0.0) { $0 + $1 }
+            differentiableZip(s1, s2).differentiableMap { $0 + $1 }.differentiableReduce(0.0) { $0 + $1 }
         })
 
         #expect(value == 24.0)
