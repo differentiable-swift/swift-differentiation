@@ -1,5 +1,8 @@
 # swift-differentiation
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdifferentiable-swift%2Fswift-differentiation%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/differentiable-swift/swift-differentiation)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fdifferentiable-swift%2Fswift-differentiation%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/differentiable-swift/swift-differentiation)
+
 This repository is a collection of useful extensions to [Swift Differentiation](https://github.com/differentiable-swift#meet-differentiable-swift), the experimental Swift language feature.
 The contents of this repository extend the current implementation of Differentiable Swift to give the user access to more differentiable methods than currently provided in the Swift standard library. It also contains some workarounds for some methods that currently are not differentiable due to missing support in the language itself.
 Some of these extensions we would like to eventually upstream into the Swift standard library. This package serves as a place to incubate and battle test these methods. 
