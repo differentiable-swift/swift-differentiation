@@ -138,4 +138,18 @@ extension Repeated.DifferentiableView:
     public var endIndex: Index { base.endIndex }
 }
 
+extension Repeated where Element: Differentiable {
+    @derivative(of: subscript.get)
+    @inlinable
+    public func _vjpSubscriptGet(index: Int) -> (value: Element, pullback: (Element.TangentVector) -> TangentVector) {
+        let count = self.count
+        return (
+            value: self[index],
+            pullback: { v in
+                TangentVector(base: repeatElement(v, count: count))
+            }
+        )
+    }
+}
+
 #endif
