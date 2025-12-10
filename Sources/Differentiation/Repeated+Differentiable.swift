@@ -11,7 +11,7 @@ public func _vjpRepeatElement<Element: Differentiable>(
     (
         value: repeatElement(element, count: count),
         pullback: { v in
-            return v.base.repeatedValue
+            v.base.repeatedValue
         }
     )
 }

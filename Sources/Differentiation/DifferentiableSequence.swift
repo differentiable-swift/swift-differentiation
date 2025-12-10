@@ -42,17 +42,17 @@ extension Repeated.DifferentiableView: DifferentiableSequenceTangentVector where
 
 //// TODO: Blocked by tuples not conforming to AdditiveArithmetic
 //// This would allow nested calls of differentiable Zip
-//extension Zip2SequenceDifferentiable.TangentVector: DifferentiableSequence where
+// extension Zip2SequenceDifferentiable.TangentVector: DifferentiableSequence where
 //    Sequence1: DifferentiableSequence,
 //    Sequence2: DifferentiableSequence,
 //    Sequence1.TangentVector.Element: AdditiveArithmetic,
 //    Sequence2.TangentVector.Element: AdditiveArithmetic
-//{}
+// {}
 //
-//extension Zip2SequenceDifferentiable.TangentVector: DifferentiableSequenceTangentVector where
+// extension Zip2SequenceDifferentiable.TangentVector: DifferentiableSequenceTangentVector where
 //    Sequence1: DifferentiableSequence,
 //    Sequence2: DifferentiableSequence
-//{
+// {
 //    public init() {
 //        self.sequence1 = .init()
 //        self.sequence2 = .init()
@@ -66,6 +66,6 @@ extension Repeated.DifferentiableView: DifferentiableSequenceTangentVector where
 //    public mutating func appendContribution(of value: (Sequence1.TangentVector.Element, Sequence2.TangentVector.Element)) {
 //        fatalError("Incomplete")
 //    }
-//}
+// }
 
 #endif

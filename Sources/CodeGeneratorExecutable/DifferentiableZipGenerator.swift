@@ -12,30 +12,30 @@ enum ZipSequenceGenerator {
             var a: A
             @usableFromInline
             var b: B
-        
+
             @inlinable
             init(_ a: A, _ b: B) {
                 self.a = a
                 self.b = b
             }
-        
+
             @derivative(of: init)
             @inlinable
             static func _vjpInit(_ a: A, _ b: B) -> (value: Pair, pullback: (Pair.TangentVector) -> (A.TangentVector, B.TangentVector)) {
                 fatalError()
             }
         }
-        
+
         public func valueWithPullback<T, U, V, W, R>(
           at t: T, _ u: U, _ v: V, _ w: W, of f: @differentiable(reverse) (T, U, V, W) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: t, u, Pair(v, w)) { t, u, pair in 
                 f(t, u, pair.a, pair.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -44,17 +44,17 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         public func valueWithPullback<T, U, V, W, X, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, of f: @differentiable(reverse) (T, U, V, W, X) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector, X.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: t, Pair(u, v), Pair(w, x)) { t, pair1, pair2 in 
                 f(t, pair1.a, pair1.b, pair2.a, pair2.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -63,17 +63,17 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         public func valueWithPullback<T, U, V, W, X, Y, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, of f: @differentiable(reverse) (T, U, V, W, X, Y) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector, X.TangentVector, Y.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: Pair(t, u), Pair(v, w), Pair(x, y)) { pair1, pair2, pair3 in 
                 f(pair1.a, pair1.b, pair2.a, pair2.b, pair3.a, pair3.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -82,17 +82,17 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         public func valueWithPullback<T, U, V, W, X, Y, Z, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector, X.TangentVector, Y.TangentVector, Z.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: Pair(t, u), Pair(v, w), Pair(x, Pair(y, z))) { pair1, pair2, pair3 in 
                 f(pair1.a, pair1.b, pair2.a, pair2.b, pair3.a, pair3.b.a, pair3.b.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -101,17 +101,17 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         public func valueWithPullback<S, T, U, V, W, X, Y, Z, R>(
           at s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (S, T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (S.TangentVector, T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector, X.TangentVector, Y.TangentVector, Z.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: Pair(s, t), Pair(u, v), Pair(Pair(w, x), Pair(y, z))) { pair1, pair2, pair3 in 
                 f(pair1.a, pair1.b, pair2.a, pair2.b, pair3.a.a, pair3.a.b, pair3.b.a, pair3.b.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -120,17 +120,17 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         public func valueWithPullback<Q, S, T, U, V, W, X, Y, Z, R>(
           at q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (Q, S, T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
                 -> (Q.TangentVector, S.TangentVector, T.TangentVector, U.TangentVector, V.TangentVector, W.TangentVector, X.TangentVector, Y.TangentVector, Z.TangentVector)) {
-            
+
             let (value, pullback) = valueWithPullback(at: Pair(q, s), Pair(t, Pair(u, v)), Pair(Pair(w, x), Pair(y, z))) { pair1, pair2, pair3 in 
                 f(pair1.a, pair1.b, pair2.a, pair2.b.a, pair2.b.b, pair3.a.a, pair3.a.b, pair3.b.a, pair3.b.b)
             }
-        
+
             return (
                 value: value,
                 pullback: { v in 
@@ -139,24 +139,24 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-            
+
         #endif
-        
+
         """
-        for arity in (2 ... arity) {
+        for arity in 2 ... arity {
             code.append(generateFor(arity: arity))
             code.append("\n\n")
         }
         return code
     }
-    
+
     static func indent(_ indent: Int) -> String {
-        return (0 ..< indent).map { _ in "   " }.joined()
+        (0 ..< indent).map { _ in "   " }.joined()
     }
-    
+
     static func generateFor(arity: Int) -> String {
         let arityRange = 1 ... arity
-        
+
         var code = """
         // MARK: Zip\(arity)SequenceDifferentiable
         """
@@ -168,11 +168,11 @@ enum ZipSequenceGenerator {
             "_ sequence\($0): Sequence\($0)"
         }.joined(separator: ",\n")
         code += """
-        
+
         ) -> Zip\(arity)SequenceDifferentiable<\(arityRange.map { "Sequence\($0)" }.joined(separator: ", "))> {
             Zip\(arity)SequenceDifferentiable(\(arityRange.map { "sequence\($0)" }.joined(separator: ", ")))
         }
-        
+
         @frozen
         public struct Zip\(arity)SequenceDifferentiable<\(arityRange.map { "Sequence\($0): Sequence" }.joined(separator: ", "))> {
         """
@@ -183,14 +183,14 @@ enum ZipSequenceGenerator {
             """
         }.joined(separator: "\n")
         code += """
-        
+
             @inlinable
             internal init(
         """
         code += arityRange.map {
             "_ sequence\($0): Sequence\($0)"
         }.joined(separator: ",\n")
-        
+
         code += """
             ) {
         """
@@ -201,7 +201,7 @@ enum ZipSequenceGenerator {
 
             }
         }
-        
+
         extension Zip\(arity)SequenceDifferentiable {
             @frozen
             public struct Iterator {
@@ -213,10 +213,10 @@ enum ZipSequenceGenerator {
             """
         }.joined(separator: "\n")
         code += """
-        
+
                 @usableFromInline
                 internal var _reachedEnd: Bool = false
-        
+
                 @inlinable
                 internal init(
         """
@@ -224,18 +224,18 @@ enum ZipSequenceGenerator {
             "_ iterator\($0): Sequence\($0).Iterator"
         }.joined(separator: ",\n")
         code += """
-        
+
                 ) {
         """
         code += arityRange.map {
             "self._baseStream\($0) = iterator\($0)"
         }.joined(separator: "\n")
         code += """
-        
+
                 }
             }
         }
-        
+
         extension Zip\(arity)SequenceDifferentiable.Iterator: IteratorProtocol {
             public typealias Element = (\(arityRange.map { "Sequence\($0).Element" }.joined(separator: ", ")))
 
@@ -283,7 +283,7 @@ enum ZipSequenceGenerator {
             "_sequence\($0).underestimatedCount"
         }.joined(separator: ",\n")
         code += """
-        
+
                 )
             }
         }
@@ -303,14 +303,14 @@ enum ZipSequenceGenerator {
         code += """
         {}
         """
-        
+
         // MARK: Differentiable code
-        
+
         code += """
         // MARK: Zip\(arity)SequenceDifferentiable + Differentiable
-        
+
         #if canImport(_Differentiation)
-        
+
         @derivative(of: differentiableZip)
         @inlinable
         public func _vjpDifferentiableZip<\(arityRange.map { "Sequence\($0)" }.joined(separator: ", "))>(
@@ -319,12 +319,13 @@ enum ZipSequenceGenerator {
             "_ sequence\($0): Sequence\($0)"
         }.joined(separator: ",\n")
         code += """
-        
+
         ) -> (
             value: Zip\(arity)SequenceDifferentiable<\(arityRange.map { "Sequence\($0)" }.joined(separator: ", "))>,
-            pullback: (Zip\(arity)SequenceDifferentiable<\(arityRange.map { "Sequence\($0)" }.joined(separator: ", "))>.TangentVector) -> (\(arityRange.map { "Sequence\($0).TangentVector" }.joined(separator: ", ")))
+            pullback: (Zip\(arity)SequenceDifferentiable<\(arityRange.map { "Sequence\($0)" }
+            .joined(separator: ", "))>.TangentVector) -> (\(arityRange.map { "Sequence\($0).TangentVector" }.joined(separator: ", ")))
         ) where
-        
+
         """
         code += arityRange.map {
             """
@@ -345,7 +346,7 @@ enum ZipSequenceGenerator {
         }
 
         extension Zip\(arity)SequenceDifferentiable: Differentiable where
-        
+
         """
         code += arityRange.map {
             """
@@ -365,28 +366,29 @@ enum ZipSequenceGenerator {
             "_sequence\($0).move(by: offset.sequence\($0))"
         }.joined(separator: "\n")
         code += """
-        
             }
 
             @inlinable
-            public func differentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (\(arityRange.map { "Sequence\($0).Element" }.joined(separator: ", ")))
-                -> Result
+            public func differentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (\(arityRange
+            .map { "Sequence\($0).Element" }.joined(separator: ", "))) -> Result
             ) -> [Result] {
                 self.map(transform)
             }
 
             @derivative(of: differentiableMap)
             @inlinable
-            public func _vjpDifferentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (\(arityRange.map { "Sequence\($0).Element" }.joined(separator: ", ")))
-                -> Result
+            public func _vjpDifferentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (\(arityRange
+            .map { "Sequence\($0).Element" }.joined(separator: ", "))) -> Result
             ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
                 var results: [Result] = []
                 results.reserveCapacity(self.underestimatedCount)
-                var pullbacks: [(Result.TangentVector) -> (\(arityRange.map { "Sequence\($0).Element.TangentVector" }.joined(separator: ", ")))] = []
+                var pullbacks: [(Result.TangentVector) -> (\(arityRange.map { "Sequence\($0).Element.TangentVector" }
+            .joined(separator: ", ")))] = []
                 results.reserveCapacity(self.underestimatedCount)
 
                 for parameters in self {
-                    let (value, pullback) = valueWithPullback(at: \(arityRange.map { "parameters.\($0-1)" }.joined(separator: ", ")), of: transform)
+                    let (value, pullback) = valueWithPullback(at: \(arityRange.map { "parameters.\($0 - 1)" }
+            .joined(separator: ", ")), of: transform)
                     results.append(value)
                     pullbacks.append(pullback)
                 }
@@ -394,7 +396,7 @@ enum ZipSequenceGenerator {
                 return (
                     value: results,
                     pullback: { v in
-        
+
         """
         code += arityRange.map {
             """
@@ -404,11 +406,11 @@ enum ZipSequenceGenerator {
         }.joined(separator: "\n")
         code += """
 
-                        // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                        // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
-                        for (tangentElement, pullback) in zip(v, pullbacks) {
-                            let (\(arityRange.map { "result\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
-        
+            // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+            // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+            for (tangentElement, pullback) in zip(v, pullbacks) {
+                let (\(arityRange.map { "result\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+
         """
         code += arityRange.map {
             "results\($0).appendContribution(of: result\($0))"
@@ -436,7 +438,7 @@ enum ZipSequenceGenerator {
             """
         }.joined(separator: ",\n")
         code += """
-        
+
             {
                 public typealias TangentVector = Self
                 public typealias Element = (\(arityRange.map { "Sequence\($0).TangentVector.Element" }.joined(separator: ", ")))
@@ -483,7 +485,7 @@ enum ZipSequenceGenerator {
             """
         }.joined(separator: "\n")
         code += """
-        
+
                     @usableFromInline
                     var reachedEnd: Bool = false
 
@@ -494,7 +496,7 @@ enum ZipSequenceGenerator {
             "self.baseStream\($0) = baseStream\($0)"
         }.joined(separator: "\n")
         code += """
-        
+
                     }
 
                     @inlinable
@@ -509,7 +511,7 @@ enum ZipSequenceGenerator {
             "let element\($0) = baseStream\($0).next()"
         }.joined(separator: ",\n")
         code += """
-        
+
                         else {
                             reachedEnd = true
                             return nil
@@ -520,9 +522,9 @@ enum ZipSequenceGenerator {
                 }
             }
         }
-        
+
         #endif
-        
+
         """
         return code
     }
