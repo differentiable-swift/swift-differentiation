@@ -70,27 +70,26 @@ struct RepeatedDifferentiableTests {
         #expect(gradient12.1.base.repeatedValue == 2.0)
         #expect(gradient12.1.count == 3)
     }
-    
+
     @Test
-        func captureScalarArgument() {
-            @differentiable(reverse)
-            func f(a: Double, b: [Double]) -> [Double] {
-                let count = withoutDerivative(at: b.count)
-                let vectorA = repeatElement(a, count: count)
-                
-                return differentiableZip(vectorA, b).differentiableMap(*)
-            }
-            
-            let a: Double = 2.0
-            let b: [Double] = [1, 2, 3]
-            
-            let expected: [Double] = [2, 4, 6]
-            
-            let (value, pullback) = valueWithPullback(at: a, b, of: f)
-            #expect(value == expected)
-            let gradient = pullback([0.0, 1.0, 0.0])
-            #expect(gradient.0 == 2.0)
-            #expect(gradient.1 == [0.0, 2.0, 0.0])
+    func captureScalarArgument() {
+        @differentiable(reverse)
+        func f(a: Double, b: [Double]) -> [Double] {
+            let count = withoutDerivative(at: b.count)
+            let vectorA = repeatElement(a, count: count)
+
+            return differentiableZip(vectorA, b).differentiableMap(*)
         }
 
+        let a = 2.0
+        let b: [Double] = [1, 2, 3]
+
+        let expected: [Double] = [2, 4, 6]
+
+        let (value, pullback) = valueWithPullback(at: a, b, of: f)
+        #expect(value == expected)
+        let gradient = pullback([0.0, 1.0, 0.0])
+        #expect(gradient.0 == 2.0)
+        #expect(gradient.1 == [0.0, 2.0, 0.0])
+    }
 }

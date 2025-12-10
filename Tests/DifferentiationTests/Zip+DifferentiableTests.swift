@@ -87,15 +87,19 @@ struct ZipDifferentiableTests {
         let gradient1 = pullback1(1.0)
         #expect(gradient1 == expectedGradient)
     }
-    
+
     @Test
     func arity3Zip() {
         let a: [Double] = [1, 2, 3]
         let b: [Double] = [4, 5, 6]
         let c: [Double] = [7, 8, 9]
-        
+
         let expectedValue = 45.0
-        let expectedGradient: ([Double].TangentVector, [Double].TangentVector, [Double].TangentVector) = ([1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0])
+        let expectedGradient: ([Double].TangentVector, [Double].TangentVector, [Double].TangentVector) = (
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0]
+        )
 
         let (zipValue, zipPullback) = valueWithPullback(at: a, b, c, of: { (s1: [Double], s2: [Double], s3: [Double]) in
             differentiableZip(s1, s2, s3).differentiableMap { $0 + $1 + $2 }.differentiableReduce(0.0) { $0 + $1 }
@@ -120,7 +124,7 @@ struct ZipDifferentiableTests {
         let gradient1 = pullback1(1.0)
         #expect(gradient1 == expectedGradient)
     }
-    
+
     @Test
     func arity5() {
         let a: [Double] = [1, 2, 3]
@@ -128,11 +132,12 @@ struct ZipDifferentiableTests {
         let c: [Double] = [7, 8, 9]
         let d: [Double] = [10, 11, 12]
         let e: [Double] = [13, 14, 15]
-        
+
         differentiableZip(a, b, c, d, e)
     }
 
-// MARK: Currently not supported.
+    // MARK: Currently not supported.
+
 //    @Test
 //    func nestedZip() {
 //        let a: [Double] = [1, 2, 3]
