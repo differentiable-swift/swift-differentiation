@@ -133,7 +133,8 @@ struct ZipDifferentiableTests {
         let d: [Double] = [10, 11, 12]
         let e: [Double] = [13, 14, 15]
 
-        differentiableZip(a, b, c, d, e)
+        let result = differentiableZip(a, b, c, d, e).differentiableMap { $0 + $1 + $2 + $3 + $4 }
+        #expect(result == [35, 40, 45])
     }
 
     // MARK: Currently not supported.
