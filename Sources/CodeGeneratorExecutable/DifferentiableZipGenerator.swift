@@ -3,7 +3,10 @@ enum ZipSequenceGenerator {
         var code = """
         #if canImport(_Differentiation)
         import _Differentiation
-        
+
+        """
+        // TODO: We should get rid of these overloads as soon as we have a variadic valueWithPullback implementation
+        code += """
         public struct Pair<A: Differentiable, B: Differentiable>: Differentiable {
             @usableFromInline
             var a: A
@@ -420,6 +423,9 @@ enum ZipSequenceGenerator {
             }
         }
 
+        """
+        // TODO: We should change this to a DifferentiableView approach similar to Repeated and Array once tuples can conform to `AdditiveArithmetic` (This currently blocks from `Element` conforming due to being a tuple of sequence elements
+        code += """
         extension Zip\(arity)SequenceDifferentiable {
             public struct TangentVector: Sequence & Differentiable & AdditiveArithmetic where 
         """
