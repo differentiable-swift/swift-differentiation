@@ -18,12 +18,6 @@ enum ZipSequenceGenerator {
                 self.a = a
                 self.b = b
             }
-
-            @derivative(of: init)
-            @inlinable
-            static func _vjpInit(_ a: A, _ b: B) -> (value: Pair, pullback: (Pair.TangentVector) -> (A.TangentVector, B.TangentVector)) {
-                fatalError()
-            }
         }
 
         public func valueWithPullback<T, U, V, W, R>(
