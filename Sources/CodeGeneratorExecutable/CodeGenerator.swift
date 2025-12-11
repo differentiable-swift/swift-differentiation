@@ -11,7 +11,7 @@ struct CodeGenerator {
 
         let zipDifferentiableFileURL = output.appending(component: "Zip+Differentiable.swift")
 
-        let zipDifferenctiableCode = ZipSequenceGenerator.generate(upToArity: 11)
+        let zipDifferenctiableCode = ZipSequenceGenerator.generate(upToArity: 12)
 
         try zipDifferenctiableCode.write(to: zipDifferentiableFileURL, atomically: true, encoding: .utf8)
     }
