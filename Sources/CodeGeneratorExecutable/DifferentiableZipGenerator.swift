@@ -20,7 +20,8 @@ enum ZipSequenceGenerator {
             }
         }
 
-        public func valueWithPullback<T, U, V, W, R>(
+        @usableFromInline
+        func valueWithPullback<T, U, V, W, R>(
           at t: T, _ u: U, _ v: V, _ w: W, of f: @differentiable(reverse) (T, U, V, W) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
@@ -39,7 +40,8 @@ enum ZipSequenceGenerator {
             )
         }
 
-        public func valueWithPullback<T, U, V, W, X, R>(
+        @usableFromInline
+        func valueWithPullback<T, U, V, W, X, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, of f: @differentiable(reverse) (T, U, V, W, X) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
@@ -58,7 +60,8 @@ enum ZipSequenceGenerator {
             )
         }
 
-        public func valueWithPullback<T, U, V, W, X, Y, R>(
+        @usableFromInline
+        func valueWithPullback<T, U, V, W, X, Y, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, of f: @differentiable(reverse) (T, U, V, W, X, Y) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
@@ -77,7 +80,8 @@ enum ZipSequenceGenerator {
             )
         }
 
-        public func valueWithPullback<T, U, V, W, X, Y, Z, R>(
+        @usableFromInline
+        func valueWithPullback<T, U, V, W, X, Y, Z, R>(
           at t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
@@ -96,7 +100,8 @@ enum ZipSequenceGenerator {
             )
         }
 
-        public func valueWithPullback<S, T, U, V, W, X, Y, Z, R>(
+        @usableFromInline
+        func valueWithPullback<S, T, U, V, W, X, Y, Z, R>(
           at s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (S, T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
@@ -115,7 +120,8 @@ enum ZipSequenceGenerator {
             )
         }
 
-        public func valueWithPullback<Q, S, T, U, V, W, X, Y, Z, R>(
+        @usableFromInline
+        func valueWithPullback<Q, S, T, U, V, W, X, Y, Z, R>(
           at q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (Q, S, T, U, V, W, X, Y, Z) -> R
         ) -> (value: R,
               pullback: (R.TangentVector)
