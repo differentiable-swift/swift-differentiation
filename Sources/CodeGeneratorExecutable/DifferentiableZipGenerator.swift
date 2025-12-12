@@ -530,8 +530,12 @@ enum ZipSequenceGenerator {
                 @inlinable
                 public var underestimatedCount: Int {
                     Swift.min(
-                        sequence1.underestimatedCount,
-                        sequence2.underestimatedCount
+        """
+        code += arityRange.map {
+            "sequence\($0).underestimatedCount"
+        }.joined(separator: ",\n")
+        code += """
+        
                     )
                 }
 
