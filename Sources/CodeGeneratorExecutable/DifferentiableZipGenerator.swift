@@ -445,7 +445,7 @@ enum ZipSequenceGenerator {
                 results.reserveCapacity(self.underestimatedCount)
                 var pullbacks: [(Result.TangentVector) -> (\(arityRange.map { "Sequence\($0).Element.TangentVector" }
             .joined(separator: ", ")))] = []
-                results.reserveCapacity(self.underestimatedCount)
+                pullbacks.reserveCapacity(self.underestimatedCount)
 
                 for parameters in self {
                     let (value, pullback) = valueWithPullback(at: \(arityRange.map { "parameters.\($0 - 1)" }
