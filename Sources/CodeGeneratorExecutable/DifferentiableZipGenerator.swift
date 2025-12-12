@@ -139,7 +139,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         @usableFromInline
         func valueWithPullback<P, Q, S, T, U, V, W, X, Y, Z, R>(
           at p: P, _ q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (P, Q, S, T, U, V, W, X, Y, Z) -> R
@@ -159,7 +159,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         @usableFromInline
         func valueWithPullback<O, P, Q, S, T, U, V, W, X, Y, Z, R>(
           at o: O, _ p: P, _ q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (O, P, Q, S, T, U, V, W, X, Y, Z) -> R
@@ -179,7 +179,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         @usableFromInline
         func valueWithPullback<N, O, P, Q, S, T, U, V, W, X, Y, Z, R>(
           at n: N, _ o: O, _ p: P, _ q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (N, O, P, Q, S, T, U, V, W, X, Y, Z) -> R
@@ -199,7 +199,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         @usableFromInline
         func valueWithPullback<M, N, O, P, Q, S, T, U, V, W, X, Y, Z, R>(
           at m: M, _ n: N, _ o: O, _ p: P, _ q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (M, N, O, P, Q, S, T, U, V, W, X, Y, Z) -> R
@@ -219,7 +219,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         @usableFromInline
         func valueWithPullback<L, M, N, O, P, Q, S, T, U, V, W, X, Y, Z, R>(
           at l: L, _ m: M, _ n: N, _ o: O, _ p: P, _ q: Q, _ s: S, _ t: T, _ u: U, _ v: V, _ w: W, _ x: X, _ y: Y, _ z: Z, of f: @differentiable(reverse) (L, M, N, O, P, Q, S, T, U, V, W, X, Y, Z) -> R
@@ -239,7 +239,7 @@ enum ZipSequenceGenerator {
                 }
             )
         }
-        
+
         #endif
 
         """
@@ -574,7 +574,7 @@ enum ZipSequenceGenerator {
             "sequence\($0).underestimatedCount"
         }.joined(separator: ",\n")
         code += """
-        
+
                     )
                 }
 
