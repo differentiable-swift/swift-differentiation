@@ -626,6 +626,128 @@ enum ZipSequenceGenerator {
                 }
             }
         }
+        
+        @inlinable
+        public func differentiableZipWith<\(arityRange.map { "Collection\($0)" }.joined(separator: ", ")), Result>(
+        """
+        code += arityRange.map { "_ c\($0): Collection\($0),"}.joined(separator: "\n")
+        code += """
+            with transform: @differentiable(reverse) (\(arityRange.map { "Collection\($0).Element" }.joined(separator: ", "))) -> Result
+        ) -> [Result] where
+        
+        """
+        code += arityRange.map {
+            """
+            Collection\($0): DifferentiableCollection,
+            Collection\($0).Element: Differentiable,
+            """
+        }.joined(separator: "\n")
+        code += """
+            Result: Differentiable
+        {
+            let capacity = min(\(arityRange.map { "c\($0).count" }.joined(separator: ", ")))
+            
+            if capacity == 0 { return [] }
+            
+            var results = ContiguousArray<Result>()
+            results.reserveCapacity(capacity)
+
+        """
+        code += arityRange.map {
+            "var c\($0)i = c\($0).startIndex"
+        }.joined(separator: "\n")
+        code += """
+            
+            for _ in 0 ..< capacity {
+                results.append(transform(\(arityRange.map { "c\($0)[c\($0)i]"  }.joined(separator: ", "))))
+        
+        """
+        code += arityRange.map {
+            "c\($0).formIndex(after: &c\($0)i)"
+        }.joined(separator: "\n")
+        code += """
+        
+            }
+            
+            return Array(results)
+        }
+
+        @derivative(of: differentiableZipWith)
+        @inlinable
+        public func _vjpDifferentiableZipWith<\(arityRange.map { "Collection\($0)" }.joined(separator: ", ")), Result>(
+        """
+        code += arityRange.map { "_ c\($0): Collection\($0),"}.joined(separator: "\n")
+        code += """
+            with transform: @differentiable(reverse) (\(arityRange.map { "Collection\($0).Element" }.joined(separator: ", "))) -> Result
+        ) -> (value: [Result], pullback: ([Result].TangentVector) -> (\(arityRange.map { "Collection\($0).TangentVector" }.joined(separator: ", ")))) where
+        
+        """
+        code += arityRange.map {
+            """
+            Collection\($0): DifferentiableCollection,
+            Collection\($0).Element: Differentiable,
+            """
+        }.joined(separator: "\n")
+        code += """
+        
+            Result: Differentiable
+        {
+            let count = min(\(arityRange.map { "c\($0).count" }.joined(separator: ", ")))
+            
+            if count == 0 {
+                return (value: [], pullback: { v in (\(arityRange.map { "Collection\($0).TangentVector()" }.joined(separator: ", "))) })
+            }
+            
+            var results = ContiguousArray<Result>()
+            results.reserveCapacity(count)
+            var pullbacks: ContiguousArray<(Result.TangentVector) -> (\(arityRange.map { "Collection\($0).Element.TangentVector" }.joined(separator: ", ")))> = []
+            pullbacks.reserveCapacity(count)
+
+        """
+        code += arityRange.map {
+            "var c\($0)i = c\($0).startIndex"
+        }.joined(separator: "\n")
+        code += """
+            
+            for _ in 0 ..< count {
+                let (value, pullback) = valueWithPullback(at: \(arityRange.map { "c\($0)[c\($0)i]" }.joined(separator: ", ")), of: transform)
+                
+                results.append(value)
+                pullbacks.append(pullback)
+        
+        """
+        code += arityRange.map { "c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n")
+        code += """
+        
+            }
+            
+            return (
+                value: Array(results),
+                pullback: { v in
+        
+        """
+        code += arityRange.map {
+            """
+            var results\($0) = Collection\($0).TangentVector()
+            results\($0).reserveCapacity(v.count)
+            """
+        }.joined(separator: "\n")
+        code += """
+                    
+                    for (tangentElement, pullback) in zip(v, pullbacks) {
+                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+        
+        """
+        code += arityRange.map { "results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n")
+        code += """
+        
+                    }
+                    
+                    return (\(arityRange.map { "results\($0)" }.joined(separator: ", ")))
+                }
+            )
+        }
+
 
         #endif
 

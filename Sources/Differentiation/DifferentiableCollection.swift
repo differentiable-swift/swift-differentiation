@@ -2,6 +2,33 @@
 
 import _Differentiation
 
+public protocol DifferentiableCollection: Differentiable & Collection where
+    Element: Differentiable,
+    TangentVector: DifferentiableCollectionTangentVector,
+    TangentVector.Element == Element.TangentVector
+{
+    associatedtype Element
+    associatedtype TangentVector
+}
+
+public protocol DifferentiableCollectionTangentVector: DifferentiableCollection {
+    init()
+    mutating func reserveCapacity(_ capacity: Int)
+    mutating func appendContribution(of value: Element)
+}
+
+extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
+
+extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
+
+extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic { }
+
+extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
+
+extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
+
+extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic { }
+
 public protocol DifferentiableSequence: Differentiable & Sequence where
     Element: Differentiable & AdditiveArithmetic,
     TangentVector: DifferentiableSequenceTangentVector,
@@ -36,7 +63,9 @@ extension Repeated.DifferentiableView: DifferentiableSequenceTangentVector where
     public init() { self = .zero }
     public func reserveCapacity(_: Int) {}
     public mutating func appendContribution(of value: Element) {
-        self.base = repeatElement(self.base.repeatedValue + value, count: self.base.count + 1)
+        let newValue = self.base.repeatedValue + value
+        let newCount = self.base.count + 1
+        self.base = repeatElement(newValue, count: newCount)
     }
 }
 
