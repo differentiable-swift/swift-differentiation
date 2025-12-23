@@ -70,4 +70,34 @@ struct ZipDifferentiableTests {
         let gradient = pullback(1.0)
         #expect(gradient == ([1.0, 1.0, 1.0], [1.0, 1.0, 1.0]))
     }
+
+    @Test
+    func zipReduceAdd() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [5, 6, 7]
+
+        let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
+            zip(s1, s2).differentiableReduce(0.0) { $0 + $1 + $2 }
+        })
+
+        #expect(value == 24)
+
+        let gradient = pullback(1.0)
+        #expect(gradient == ([1, 1, 1], [1, 1, 1]))
+    }
+
+    @Test
+    func zipReduceMultiply() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [5, 6, 7]
+
+        let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
+            zip(s1, s2).differentiableReduce(1.0) { $0 * $1 * $2 }
+        })
+
+        #expect(value == 1260)
+
+        let gradient = pullback(1.0)
+        #expect(gradient == ([1260, 630, 420], [252, 210, 180]))
+    }
 }
