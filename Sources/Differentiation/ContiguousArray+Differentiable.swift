@@ -6,6 +6,7 @@ import _Differentiation
 extension ContiguousArray {
     /// A Differentiable alternative to `Array.subscript.modify`.
     /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
+    /// https://github.com/swiftlang/swift/issues/55256
     #if canImport(_Differentiation)
     @differentiable(reverse where Element: Differentiable)
     #endif
