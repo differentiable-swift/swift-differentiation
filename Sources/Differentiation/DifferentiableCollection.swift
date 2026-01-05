@@ -21,48 +21,20 @@ extension Array: DifferentiableCollection where Element: Differentiable & Additi
 
 extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
 
-extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic { }
-
-extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
-
-extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
-
-extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic { }
-
-public protocol DifferentiableSequence: Differentiable & Sequence where
-    Element: Differentiable & AdditiveArithmetic,
-    TangentVector: DifferentiableSequenceTangentVector,
-    TangentVector.Element == Element.TangentVector,
-    TangentVector.TangentVector == TangentVector
-{
-    associatedtype Element
-    associatedtype TangentVector
-}
-
-public protocol DifferentiableSequenceTangentVector: DifferentiableSequence {
-    init()
-    mutating func reserveCapacity(_ capacity: Int)
-    mutating func appendContribution(of value: Element)
-}
-
-extension Array: DifferentiableSequence where Element: Differentiable & AdditiveArithmetic {}
-
-extension Array.DifferentiableView: DifferentiableSequence where Element: AdditiveArithmetic {}
-
-extension Array.DifferentiableView: DifferentiableSequenceTangentVector where Element: AdditiveArithmetic {
+extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     public mutating func appendContribution(of value: Element) {
         self.append(value)
     }
 }
 
-extension Repeated: DifferentiableSequence where Element: Differentiable & AdditiveArithmetic {}
+extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
 
-extension Repeated.DifferentiableView: DifferentiableSequence where Element: AdditiveArithmetic {}
+extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
 
-extension Repeated.DifferentiableView: DifferentiableSequenceTangentVector where Element: AdditiveArithmetic {
+extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     public init() { self = .zero }
-    public func reserveCapacity(_: Int) {}
-    public mutating func appendContribution(of value: Element) {
+    public mutating func reserveCapacity(_ capacity: Int) { /* no-op */ }
+    public mutating func appendContribution(of value: Repeated<Element>.Element) {
         let newValue = self.base.repeatedValue + value
         let newCount = self.base.count + 1
         self.base = repeatElement(newValue, count: newCount)
