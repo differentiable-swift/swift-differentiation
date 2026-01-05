@@ -17,9 +17,9 @@ public protocol DifferentiableCollectionTangentVector: DifferentiableCollection 
     mutating func appendContribution(of value: Element)
 }
 
-extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
+extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
 
-extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
+extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     public mutating func appendContribution(of value: Element) {
@@ -27,13 +27,13 @@ extension Array.DifferentiableView: DifferentiableCollectionTangentVector where 
     }
 }
 
-extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic { }
+extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
 
-extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
+extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     public init() { self = .zero }
-    public mutating func reserveCapacity(_ capacity: Int) { /* no-op */ }
+    public mutating func reserveCapacity(_: Int) { /* no-op */ }
     public mutating func appendContribution(of value: Repeated<Element>.Element) {
         let newValue = self.base.repeatedValue + value
         let newCount = self.base.count + 1

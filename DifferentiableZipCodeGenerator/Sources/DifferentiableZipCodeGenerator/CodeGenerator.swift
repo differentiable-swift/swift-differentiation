@@ -8,12 +8,12 @@ struct CodeGenerator {
         }
         // arguments[0] is the path to this command line tool
         let output = URL(filePath: CommandLine.arguments[1])
-        
+
         guard let upToArity = Int(CommandLine.arguments[2]) else {
             throw CodeGeneratorError.invalidArguments
         }
-        
-        for arity in 2...upToArity {
+
+        for arity in 2 ... upToArity {
             let zipDifferentiableFileURL = output.appending(component: "Zip+DifferentiableArity\(arity).swift")
 
             let code = ZipSequenceGenerator.generateFor(arity: arity)
