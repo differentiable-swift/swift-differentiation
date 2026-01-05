@@ -1,4 +1,6 @@
-// MARK: Zip9SequenceDifferentiable@inlinable
+// MARK: Zip9SequenceDifferentiable
+
+@inlinable
 public func differentiableZip<
     C1,
     C2,
@@ -20,63 +22,127 @@ public func differentiableZip<
     _ collection8: C8,
     _ collection9: C9
 ) -> Zip9SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8, C9> {
-    Zip9SequenceDifferentiable(collection1, collection2, collection3, collection4, collection5, collection6, collection7, collection8, collection9)
+    Zip9SequenceDifferentiable(
+        collection1,
+        collection2,
+        collection3,
+        collection4,
+        collection5,
+        collection6,
+        collection7,
+        collection8,
+        collection9
+    )
 }
 
 @frozen
-public struct Zip9SequenceDifferentiable<C1: Collection, C2: Collection, C3: Collection, C4: Collection, C5: Collection, C6: Collection, C7: Collection, C8: Collection, C9: Collection> where C1.Index == Int, C2.Index == Int, C3.Index == Int, C4.Index == Int, C5.Index == Int, C6.Index == Int, C7.Index == Int, C8.Index == Int, C9.Index == Int {@usableFromInline
-internal var _collection1: C1
-@usableFromInline
-internal var _collection2: C2
-@usableFromInline
-internal var _collection3: C3
-@usableFromInline
-internal var _collection4: C4
-@usableFromInline
-internal var _collection5: C5
-@usableFromInline
-internal var _collection6: C6
-@usableFromInline
-internal var _collection7: C7
-@usableFromInline
-internal var _collection8: C8
-@usableFromInline
-internal var _collection9: C9
+public struct Zip9SequenceDifferentiable<
+    C1: Collection,
+    C2: Collection,
+    C3: Collection,
+    C4: Collection,
+    C5: Collection,
+    C6: Collection,
+    C7: Collection,
+    C8: Collection,
+    C9: Collection
+> where
+    C1.Index == Int,
+    C2.Index == Int,
+    C3.Index == Int,
+    C4.Index == Int,
+    C5.Index == Int,
+    C6.Index == Int,
+    C7.Index == Int,
+    C8.Index == Int,
+    C9.Index == Int
+{
+    @usableFromInline
+    internal var _collection1: C1
+    @usableFromInline
+    internal var _collection2: C2
+    @usableFromInline
+    internal var _collection3: C3
+    @usableFromInline
+    internal var _collection4: C4
+    @usableFromInline
+    internal var _collection5: C5
+    @usableFromInline
+    internal var _collection6: C6
+    @usableFromInline
+    internal var _collection7: C7
+    @usableFromInline
+    internal var _collection8: C8
+    @usableFromInline
+    internal var _collection9: C9
     @inlinable
-    internal init(_ collection1: C1,
-_ collection2: C2,
-_ collection3: C3,
-_ collection4: C4,
-_ collection5: C5,
-_ collection6: C6,
-_ collection7: C7,
-_ collection8: C8,
-_ collection9: C9    ) {self._collection1 = collection1
-self._collection2 = collection2
-self._collection3 = collection3
-self._collection4 = collection4
-self._collection5 = collection5
-self._collection6 = collection6
-self._collection7 = collection7
-self._collection8 = collection8
-self._collection9 = collection9
+    internal init(
+        _ collection1: C1,
+        _ collection2: C2,
+        _ collection3: C3,
+        _ collection4: C4,
+        _ collection5: C5,
+        _ collection6: C6,
+        _ collection7: C7,
+        _ collection8: C8,
+        _ collection9: C9
+    ) {
+        self._collection1 = collection1
+        self._collection2 = collection2
+        self._collection3 = collection3
+        self._collection4 = collection4
+        self._collection5 = collection5
+        self._collection6 = collection6
+        self._collection7 = collection7
+        self._collection8 = collection8
+        self._collection9 = collection9
     }
 }
 
 extension Zip9SequenceDifferentiable: Collection {
-    public typealias Element = (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element, C8.Element, C9.Element)
+    public typealias Element = (
+        C1.Element,
+        C2.Element,
+        C3.Element,
+        C4.Element,
+        C5.Element,
+        C6.Element,
+        C7.Element,
+        C8.Element,
+        C9.Element
+    )
     public typealias Index = Int
 
     @inlinable
     public var startIndex: Int { 0 }
     @inlinable
     public var endIndex: Int {
-        Swift.min(_collection1.count, _collection2.count, _collection3.count, _collection4.count, _collection5.count, _collection6.count, _collection7.count, _collection8.count, _collection9.count)
+        Swift.min(
+            _collection1.count,
+            _collection2.count,
+            _collection3.count,
+            _collection4.count,
+            _collection5.count,
+            _collection6.count,
+            _collection7.count,
+            _collection8.count,
+            _collection9.count
+        )
     }
-    
+
     @inlinable
     public subscript(index: Int) -> Element {
-        (_collection1[index], _collection2[index], _collection3[index], _collection4[index], _collection5[index], _collection6[index], _collection7[index], _collection8[index], _collection9[index])
+        (
+            _collection1[index],
+            _collection2[index],
+            _collection3[index],
+            _collection4[index],
+            _collection5[index],
+            _collection6[index],
+            _collection7[index],
+            _collection8[index],
+            _collection9[index]
+        )
     }
 
     @inlinable
@@ -88,165 +154,245 @@ extension Zip9SequenceDifferentiable: Collection {
     public func formIndex(after i: inout Int) {
         i += 1
     }
-
 }
 
-extension Zip9SequenceDifferentiable: Sendable where C1: Sendable,
-C2: Sendable,
-C3: Sendable,
-C4: Sendable,
-C5: Sendable,
-C6: Sendable,
-C7: Sendable,
-C8: Sendable,
-C9: Sendable{}
+extension Zip9SequenceDifferentiable: Sendable where
+    C1: Sendable,
+    C2: Sendable,
+    C3: Sendable,
+    C4: Sendable,
+    C5: Sendable,
+    C6: Sendable,
+    C7: Sendable,
+    C8: Sendable,
+    C9: Sendable
+{}
+
 // MARK: Zip9SequenceDifferentiable + Differentiable
 
 #if canImport(_Differentiation)
 
 @derivative(of: differentiableZip)
 @inlinable
-public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7, C8, C9>(_ collection1: C1,
-_ collection2: C2,
-_ collection3: C3,
-_ collection4: C4,
-_ collection5: C5,
-_ collection6: C6,
-_ collection7: C7,
-_ collection8: C8,
-_ collection9: C9
+public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7, C8, C9>(
+    _ collection1: C1,
+    _ collection2: C2,
+    _ collection3: C3,
+    _ collection4: C4,
+    _ collection5: C5,
+    _ collection6: C6,
+    _ collection7: C7,
+    _ collection8: C8,
+    _ collection9: C9
 ) -> (
     value: Zip9SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8, C9>,
-    pullback: (Zip9SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8, C9>.TangentVector) -> (C1.TangentVector, C2.TangentVector, C3.TangentVector, C4.TangentVector, C5.TangentVector, C6.TangentVector, C7.TangentVector, C8.TangentVector, C9.TangentVector)
+    pullback: (Zip9SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8, C9>.TangentVector) -> (
+        C1.TangentVector,
+        C2.TangentVector,
+        C3.TangentVector,
+        C4.TangentVector,
+        C5.TangentVector,
+        C6.TangentVector,
+        C7.TangentVector,
+        C8.TangentVector,
+        C9.TangentVector
+    )
 ) where
-C1: Differentiable,
-C1.Element: Differentiable,
-C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C1.TangentVector.Index == Int,
-C1.TangentVector.Element == C1.Element.TangentVector,
-C2: Differentiable,
-C2.Element: Differentiable,
-C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C2.TangentVector.Index == Int,
-C2.TangentVector.Element == C2.Element.TangentVector,
-C3: Differentiable,
-C3.Element: Differentiable,
-C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C3.TangentVector.Index == Int,
-C3.TangentVector.Element == C3.Element.TangentVector,
-C4: Differentiable,
-C4.Element: Differentiable,
-C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C4.TangentVector.Index == Int,
-C4.TangentVector.Element == C4.Element.TangentVector,
-C5: Differentiable,
-C5.Element: Differentiable,
-C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C5.TangentVector.Index == Int,
-C5.TangentVector.Element == C5.Element.TangentVector,
-C6: Differentiable,
-C6.Element: Differentiable,
-C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C6.TangentVector.Index == Int,
-C6.TangentVector.Element == C6.Element.TangentVector,
-C7: Differentiable,
-C7.Element: Differentiable,
-C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C7.TangentVector.Index == Int,
-C7.TangentVector.Element == C7.Element.TangentVector,
-C8: Differentiable,
-C8.Element: Differentiable,
-C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C8.TangentVector.Index == Int,
-C8.TangentVector.Element == C8.Element.TangentVector,
-C9: Differentiable,
-C9.Element: Differentiable,
-C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C9.TangentVector.Index == Int,
-C9.TangentVector.Element == C9.Element.TangentVector{
+    C1: Differentiable,
+    C1.Element: Differentiable,
+    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C1.TangentVector.Index == Int,
+    C1.TangentVector.Element == C1.Element.TangentVector,
+    C2: Differentiable,
+    C2.Element: Differentiable,
+    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C2.TangentVector.Index == Int,
+    C2.TangentVector.Element == C2.Element.TangentVector,
+    C3: Differentiable,
+    C3.Element: Differentiable,
+    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C3.TangentVector.Index == Int,
+    C3.TangentVector.Element == C3.Element.TangentVector,
+    C4: Differentiable,
+    C4.Element: Differentiable,
+    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C4.TangentVector.Index == Int,
+    C4.TangentVector.Element == C4.Element.TangentVector,
+    C5: Differentiable,
+    C5.Element: Differentiable,
+    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C5.TangentVector.Index == Int,
+    C5.TangentVector.Element == C5.Element.TangentVector,
+    C6: Differentiable,
+    C6.Element: Differentiable,
+    C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C6.TangentVector.Index == Int,
+    C6.TangentVector.Element == C6.Element.TangentVector,
+    C7: Differentiable,
+    C7.Element: Differentiable,
+    C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C7.TangentVector.Index == Int,
+    C7.TangentVector.Element == C7.Element.TangentVector,
+    C8: Differentiable,
+    C8.Element: Differentiable,
+    C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C8.TangentVector.Index == Int,
+    C8.TangentVector.Element == C8.Element.TangentVector,
+    C9: Differentiable,
+    C9.Element: Differentiable,
+    C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C9.TangentVector.Index == Int,
+    C9.TangentVector.Element == C9.Element.TangentVector
+{
     (
-        value: differentiableZip(collection1, collection2, collection3, collection4, collection5, collection6, collection7, collection8, collection9),
+        value: differentiableZip(
+            collection1,
+            collection2,
+            collection3,
+            collection4,
+            collection5,
+            collection6,
+            collection7,
+            collection8,
+            collection9
+        ),
         pullback: { v in
-            (v.collection1, v.collection2, v.collection3, v.collection4, v.collection5, v.collection6, v.collection7, v.collection8, v.collection9)
+            (
+                v.collection1,
+                v.collection2,
+                v.collection3,
+                v.collection4,
+                v.collection5,
+                v.collection6,
+                v.collection7,
+                v.collection8,
+                v.collection9
+            )
         }
     )
 }
 
 extension Zip9SequenceDifferentiable: Differentiable where
-C1: Differentiable,
-C1.Element: Differentiable,
-C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C1.TangentVector.Index == Int,
-C1.TangentVector.Element == C1.Element.TangentVector,
-C2: Differentiable,
-C2.Element: Differentiable,
-C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C2.TangentVector.Index == Int,
-C2.TangentVector.Element == C2.Element.TangentVector,
-C3: Differentiable,
-C3.Element: Differentiable,
-C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C3.TangentVector.Index == Int,
-C3.TangentVector.Element == C3.Element.TangentVector,
-C4: Differentiable,
-C4.Element: Differentiable,
-C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C4.TangentVector.Index == Int,
-C4.TangentVector.Element == C4.Element.TangentVector,
-C5: Differentiable,
-C5.Element: Differentiable,
-C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C5.TangentVector.Index == Int,
-C5.TangentVector.Element == C5.Element.TangentVector,
-C6: Differentiable,
-C6.Element: Differentiable,
-C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C6.TangentVector.Index == Int,
-C6.TangentVector.Element == C6.Element.TangentVector,
-C7: Differentiable,
-C7.Element: Differentiable,
-C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C7.TangentVector.Index == Int,
-C7.TangentVector.Element == C7.Element.TangentVector,
-C8: Differentiable,
-C8.Element: Differentiable,
-C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C8.TangentVector.Index == Int,
-C8.TangentVector.Element == C8.Element.TangentVector,
-C9: Differentiable,
-C9.Element: Differentiable,
-C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-C9.TangentVector.Index == Int,
-C9.TangentVector.Element == C9.Element.TangentVector
+    C1: Differentiable,
+    C1.Element: Differentiable,
+    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C1.TangentVector.Index == Int,
+    C1.TangentVector.Element == C1.Element.TangentVector,
+    C2: Differentiable,
+    C2.Element: Differentiable,
+    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C2.TangentVector.Index == Int,
+    C2.TangentVector.Element == C2.Element.TangentVector,
+    C3: Differentiable,
+    C3.Element: Differentiable,
+    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C3.TangentVector.Index == Int,
+    C3.TangentVector.Element == C3.Element.TangentVector,
+    C4: Differentiable,
+    C4.Element: Differentiable,
+    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C4.TangentVector.Index == Int,
+    C4.TangentVector.Element == C4.Element.TangentVector,
+    C5: Differentiable,
+    C5.Element: Differentiable,
+    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C5.TangentVector.Index == Int,
+    C5.TangentVector.Element == C5.Element.TangentVector,
+    C6: Differentiable,
+    C6.Element: Differentiable,
+    C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C6.TangentVector.Index == Int,
+    C6.TangentVector.Element == C6.Element.TangentVector,
+    C7: Differentiable,
+    C7.Element: Differentiable,
+    C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C7.TangentVector.Index == Int,
+    C7.TangentVector.Element == C7.Element.TangentVector,
+    C8: Differentiable,
+    C8.Element: Differentiable,
+    C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C8.TangentVector.Index == Int,
+    C8.TangentVector.Element == C8.Element.TangentVector,
+    C9: Differentiable,
+    C9.Element: Differentiable,
+    C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+    C9.TangentVector.Index == Int,
+    C9.TangentVector.Element == C9.Element.TangentVector
 {
     @inlinable
-    public mutating func move(by offset: TangentVector) {_collection1.move(by: offset.collection1)
-_collection2.move(by: offset.collection2)
-_collection3.move(by: offset.collection3)
-_collection4.move(by: offset.collection4)
-_collection5.move(by: offset.collection5)
-_collection6.move(by: offset.collection6)
-_collection7.move(by: offset.collection7)
-_collection8.move(by: offset.collection8)
-_collection9.move(by: offset.collection9)    }
+    public mutating func move(by offset: TangentVector) {
+        _collection1.move(by: offset.collection1)
+        _collection2.move(by: offset.collection2)
+        _collection3.move(by: offset.collection3)
+        _collection4.move(by: offset.collection4)
+        _collection5.move(by: offset.collection5)
+        _collection6.move(by: offset.collection6)
+        _collection7.move(by: offset.collection7)
+        _collection8.move(by: offset.collection8)
+        _collection9.move(by: offset.collection9)
+    }
 
     @inlinable
-    public func differentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element, C8.Element, C9.Element) -> Result
+    public func differentiableMap<Result: Differentiable>(
+        _ transform: @differentiable(reverse) (
+            C1.Element,
+            C2.Element,
+            C3.Element,
+            C4.Element,
+            C5.Element,
+            C6.Element,
+            C7.Element,
+            C8.Element,
+            C9.Element
+        ) -> Result
     ) -> [Result] {
         self.map(transform)
     }
 
     @derivative(of: differentiableMap)
     @inlinable
-    public func _vjpDifferentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element, C8.Element, C9.Element) -> Result
+    public func _vjpDifferentiableMap<Result: Differentiable>(
+        _ transform: @differentiable(reverse) (
+            C1.Element,
+            C2.Element,
+            C3.Element,
+            C4.Element,
+            C5.Element,
+            C6.Element,
+            C7.Element,
+            C8.Element,
+            C9.Element
+        ) -> Result
     ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
         var results: [Result] = []
         results.reserveCapacity(self.count)
-        var pullbacks: [(Result.TangentVector) -> (C1.Element.TangentVector, C2.Element.TangentVector, C3.Element.TangentVector, C4.Element.TangentVector, C5.Element.TangentVector, C6.Element.TangentVector, C7.Element.TangentVector, C8.Element.TangentVector, C9.Element.TangentVector)] = []
+        var pullbacks: [(Result.TangentVector) -> (
+            C1.Element.TangentVector,
+            C2.Element.TangentVector,
+            C3.Element.TangentVector,
+            C4.Element.TangentVector,
+            C5.Element.TangentVector,
+            C6.Element.TangentVector,
+            C7.Element.TangentVector,
+            C8.Element.TangentVector,
+            C9.Element.TangentVector
+        )] = []
         pullbacks.reserveCapacity(self.count)
 
         for parameters in self {
-            let (value, pullback) = valueWithPullback(at: parameters.0, parameters.1, parameters.2, parameters.3, parameters.4, parameters.5, parameters.6, parameters.7, parameters.8, of: transform)
+            let (value, pullback) = valueWithPullback(
+                at:
+                parameters.0,
+                parameters.1,
+                parameters.2,
+                parameters.3,
+                parameters.4,
+                parameters.5,
+                parameters.6,
+                parameters.7,
+                parameters.8,
+                of: transform
+            )
             results.append(value)
             pullbacks.append(pullback)
         }
@@ -254,89 +400,145 @@ _collection9.move(by: offset.collection9)    }
         return (
             value: results,
             pullback: { v in
-var results1 = C1.TangentVector()
-results1.reserveCapacity(v.count)
-var results2 = C2.TangentVector()
-results2.reserveCapacity(v.count)
-var results3 = C3.TangentVector()
-results3.reserveCapacity(v.count)
-var results4 = C4.TangentVector()
-results4.reserveCapacity(v.count)
-var results5 = C5.TangentVector()
-results5.reserveCapacity(v.count)
-var results6 = C6.TangentVector()
-results6.reserveCapacity(v.count)
-var results7 = C7.TangentVector()
-results7.reserveCapacity(v.count)
-var results8 = C8.TangentVector()
-results8.reserveCapacity(v.count)
-var results9 = C9.TangentVector()
-results9.reserveCapacity(v.count)
-    // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
-    for (tangentElement, pullback) in zip(v, pullbacks) {
-        let (result1, result2, result3, result4, result5, result6, result7, result8, result9) = pullback(tangentElement)
-results1.appendContribution(of: result1)
-results2.appendContribution(of: result2)
-results3.appendContribution(of: result3)
-results4.appendContribution(of: result4)
-results5.appendContribution(of: result5)
-results6.appendContribution(of: result6)
-results7.appendContribution(of: result7)
-results8.appendContribution(of: result8)
-results9.appendContribution(of: result9)
+                var results1 = C1.TangentVector()
+                var results2 = C2.TangentVector()
+                var results3 = C3.TangentVector()
+                var results4 = C4.TangentVector()
+                var results5 = C5.TangentVector()
+                var results6 = C6.TangentVector()
+                var results7 = C7.TangentVector()
+                var results8 = C8.TangentVector()
+                var results9 = C9.TangentVector()
+
+                results1.reserveCapacity(v.count)
+                results2.reserveCapacity(v.count)
+                results3.reserveCapacity(v.count)
+                results4.reserveCapacity(v.count)
+                results5.reserveCapacity(v.count)
+                results6.reserveCapacity(v.count)
+                results7.reserveCapacity(v.count)
+                results8.reserveCapacity(v.count)
+                results9.reserveCapacity(v.count)
+
+                // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+                // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+
+                for (tangentElement, pullback) in zip(v, pullbacks) {
+                    let (
+                        result1,
+                        result2,
+                        result3,
+                        result4,
+                        result5,
+                        result6,
+                        result7,
+                        result8,
+                        result9
+                    ) = pullback(tangentElement)
+
+                    results1.appendContribution(of: result1)
+                    results2.appendContribution(of: result2)
+                    results3.appendContribution(of: result3)
+                    results4.appendContribution(of: result4)
+                    results5.appendContribution(of: result5)
+                    results6.appendContribution(of: result6)
+                    results7.appendContribution(of: result7)
+                    results8.appendContribution(of: result8)
+                    results9.appendContribution(of: result9)
                 }
 
-                return TangentVector(results1, results2, results3, results4, results5, results6, results7, results8, results9)
+                return TangentVector(
+                    results1,
+                    results2,
+                    results3,
+                    results4,
+                    results5,
+                    results6,
+                    results7,
+                    results8,
+                    results9
+                )
             }
         )
     }
 }
+
 extension Zip9SequenceDifferentiable {
-    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where C1: Differentiable,
-C1.TangentVector: Collection,
-C1.TangentVector.Index == Int,
-C2: Differentiable,
-C2.TangentVector: Collection,
-C2.TangentVector.Index == Int,
-C3: Differentiable,
-C3.TangentVector: Collection,
-C3.TangentVector.Index == Int,
-C4: Differentiable,
-C4.TangentVector: Collection,
-C4.TangentVector.Index == Int,
-C5: Differentiable,
-C5.TangentVector: Collection,
-C5.TangentVector.Index == Int,
-C6: Differentiable,
-C6.TangentVector: Collection,
-C6.TangentVector.Index == Int,
-C7: Differentiable,
-C7.TangentVector: Collection,
-C7.TangentVector.Index == Int,
-C8: Differentiable,
-C8.TangentVector: Collection,
-C8.TangentVector.Index == Int,
-C9: Differentiable,
-C9.TangentVector: Collection,
-C9.TangentVector.Index == Int
+    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
+        C1: Differentiable,
+        C1.TangentVector: Collection,
+        C1.TangentVector.Index == Int,
+        C2: Differentiable,
+        C2.TangentVector: Collection,
+        C2.TangentVector.Index == Int,
+        C3: Differentiable,
+        C3.TangentVector: Collection,
+        C3.TangentVector.Index == Int,
+        C4: Differentiable,
+        C4.TangentVector: Collection,
+        C4.TangentVector.Index == Int,
+        C5: Differentiable,
+        C5.TangentVector: Collection,
+        C5.TangentVector.Index == Int,
+        C6: Differentiable,
+        C6.TangentVector: Collection,
+        C6.TangentVector.Index == Int,
+        C7: Differentiable,
+        C7.TangentVector: Collection,
+        C7.TangentVector.Index == Int,
+        C8: Differentiable,
+        C8.TangentVector: Collection,
+        C8.TangentVector.Index == Int,
+        C9: Differentiable,
+        C9.TangentVector: Collection,
+        C9.TangentVector.Index == Int
     {
         public typealias TangentVector = Self
-        public typealias Element = (C1.TangentVector.Element, C2.TangentVector.Element, C3.TangentVector.Element, C4.TangentVector.Element, C5.TangentVector.Element, C6.TangentVector.Element, C7.TangentVector.Element, C8.TangentVector.Element, C9.TangentVector.Element)
+        public typealias Element = (
+            C1.TangentVector.Element,
+            C2.TangentVector.Element,
+            C3.TangentVector.Element,
+            C4.TangentVector.Element,
+            C5.TangentVector.Element,
+            C6.TangentVector.Element,
+            C7.TangentVector.Element,
+            C8.TangentVector.Element,
+            C9.TangentVector.Element
+        )
         public typealias Index = Int
 
         @inlinable
         public var startIndex: Int { 0 }
         @inlinable
-        public var endIndex: Int { 
-            Swift.min(collection1.count, collection2.count, collection3.count, collection4.count, collection5.count, collection6.count, collection7.count, collection8.count, collection9.count)
+        public var endIndex: Int {
+            Swift.min(
+                collection1.count,
+                collection2.count,
+                collection3.count,
+                collection4.count,
+                collection5.count,
+                collection6.count,
+                collection7.count,
+                collection8.count,
+                collection9.count
+            )
         }
-        
+
         @inlinable
         public subscript(index: Int) -> Element {
-            (collection1[index], collection2[index], collection3[index], collection4[index], collection5[index], collection6[index], collection7[index], collection8[index], collection9[index])
+            (
+                collection1[index],
+                collection2[index],
+                collection3[index],
+                collection4[index],
+                collection5[index],
+                collection6[index],
+                collection7[index],
+                collection8[index],
+                collection9[index]
+            )
         }
-    
+
         @inlinable
         public func index(after index: Int) -> Int {
             index + 1
@@ -346,204 +548,335 @@ C9.TangentVector.Index == Int
         public func formIndex(after i: inout Int) {
             i += 1
         }
-@usableFromInline
-var collection1: C1.TangentVector
-@usableFromInline
-var collection2: C2.TangentVector
-@usableFromInline
-var collection3: C3.TangentVector
-@usableFromInline
-var collection4: C4.TangentVector
-@usableFromInline
-var collection5: C5.TangentVector
-@usableFromInline
-var collection6: C6.TangentVector
-@usableFromInline
-var collection7: C7.TangentVector
-@usableFromInline
-var collection8: C8.TangentVector
-@usableFromInline
-var collection9: C9.TangentVector
-        @inlinable
-        init(_ collection1: C1.TangentVector, _ collection2: C2.TangentVector, _ collection3: C3.TangentVector, _ collection4: C4.TangentVector, _ collection5: C5.TangentVector, _ collection6: C6.TangentVector, _ collection7: C7.TangentVector, _ collection8: C8.TangentVector, _ collection9: C9.TangentVector) {self.collection1 = collection1
-self.collection2 = collection2
-self.collection3 = collection3
-self.collection4 = collection4
-self.collection5 = collection5
-self.collection6 = collection6
-self.collection7 = collection7
-self.collection8 = collection8
-self.collection9 = collection9        }
 
+        @usableFromInline
+        var collection1: C1.TangentVector
+        @usableFromInline
+        var collection2: C2.TangentVector
+        @usableFromInline
+        var collection3: C3.TangentVector
+        @usableFromInline
+        var collection4: C4.TangentVector
+        @usableFromInline
+        var collection5: C5.TangentVector
+        @usableFromInline
+        var collection6: C6.TangentVector
+        @usableFromInline
+        var collection7: C7.TangentVector
+        @usableFromInline
+        var collection8: C8.TangentVector
+        @usableFromInline
+        var collection9: C9.TangentVector
+        @inlinable
+        init(
+            _ collection1: C1.TangentVector,
+            _ collection2: C2.TangentVector,
+            _ collection3: C3.TangentVector,
+            _ collection4: C4.TangentVector,
+            _ collection5: C5.TangentVector,
+            _ collection6: C6.TangentVector,
+            _ collection7: C7.TangentVector,
+            _ collection8: C8.TangentVector,
+            _ collection9: C9.TangentVector
+        ) {
+            self.collection1 = collection1
+            self.collection2 = collection2
+            self.collection3 = collection3
+            self.collection4 = collection4
+            self.collection5 = collection5
+            self.collection6 = collection6
+            self.collection7 = collection7
+            self.collection8 = collection8
+            self.collection9 = collection9
+        }
     }
 }
 
 @inlinable
-public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, Result>(_ c1: C1,
-_ c2: C2,
-_ c3: C3,
-_ c4: C4,
-_ c5: C5,
-_ c6: C6,
-_ c7: C7,
-_ c8: C8,
-_ c9: C9,    with transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element, C8.Element, C9.Element) -> Result
+public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, Result>(
+    _ c1: C1,
+    _ c2: C2,
+    _ c3: C3,
+    _ c4: C4,
+    _ c5: C5,
+    _ c6: C6,
+    _ c7: C7,
+    _ c8: C8,
+    _ c9: C9,
+    with transform: @differentiable(reverse) (
+        C1.Element,
+        C2.Element,
+        C3.Element,
+        C4.Element,
+        C5.Element,
+        C6.Element,
+        C7.Element,
+        C8.Element,
+        C9.Element
+    ) -> Result
 ) -> [Result] where
-C1: DifferentiableCollection,
-C1.Element: Differentiable,
-C2: DifferentiableCollection,
-C2.Element: Differentiable,
-C3: DifferentiableCollection,
-C3.Element: Differentiable,
-C4: DifferentiableCollection,
-C4.Element: Differentiable,
-C5: DifferentiableCollection,
-C5.Element: Differentiable,
-C6: DifferentiableCollection,
-C6.Element: Differentiable,
-C7: DifferentiableCollection,
-C7.Element: Differentiable,
-C8: DifferentiableCollection,
-C8.Element: Differentiable,
-C9: DifferentiableCollection,
-C9.Element: Differentiable,    Result: Differentiable
+    C1: DifferentiableCollection,
+    C1.Element: Differentiable,
+    C2: DifferentiableCollection,
+    C2.Element: Differentiable,
+    C3: DifferentiableCollection,
+    C3.Element: Differentiable,
+    C4: DifferentiableCollection,
+    C4.Element: Differentiable,
+    C5: DifferentiableCollection,
+    C5.Element: Differentiable,
+    C6: DifferentiableCollection,
+    C6.Element: Differentiable,
+    C7: DifferentiableCollection,
+    C7.Element: Differentiable,
+    C8: DifferentiableCollection,
+    C8.Element: Differentiable,
+    C9: DifferentiableCollection,
+    C9.Element: Differentiable,
+    Result: Differentiable
 {
-    let capacity = min(c1.count, c2.count, c3.count, c4.count, c5.count, c6.count, c7.count, c8.count, c9.count)
-    
+    let capacity = min(
+        c1.count,
+        c2.count,
+        c3.count,
+        c4.count,
+        c5.count,
+        c6.count,
+        c7.count,
+        c8.count,
+        c9.count
+    )
+
     if capacity == 0 { return [] }
-    
+
     var results = ContiguousArray<Result>()
     results.reserveCapacity(capacity)
-var c1i = c1.startIndex
-var c2i = c2.startIndex
-var c3i = c3.startIndex
-var c4i = c4.startIndex
-var c5i = c5.startIndex
-var c6i = c6.startIndex
-var c7i = c7.startIndex
-var c8i = c8.startIndex
-var c9i = c9.startIndex    
+
+    var c1i = c1.startIndex
+    var c2i = c2.startIndex
+    var c3i = c3.startIndex
+    var c4i = c4.startIndex
+    var c5i = c5.startIndex
+    var c6i = c6.startIndex
+    var c7i = c7.startIndex
+    var c8i = c8.startIndex
+    var c9i = c9.startIndex
+
     for _ in 0 ..< capacity {
-        results.append(transform(c1[c1i], c2[c2i], c3[c3i], c4[c4i], c5[c5i], c6[c6i], c7[c7i], c8[c8i], c9[c9i]))
-c1.formIndex(after: &c1i)
-c2.formIndex(after: &c2i)
-c3.formIndex(after: &c3i)
-c4.formIndex(after: &c4i)
-c5.formIndex(after: &c5i)
-c6.formIndex(after: &c6i)
-c7.formIndex(after: &c7i)
-c8.formIndex(after: &c8i)
-c9.formIndex(after: &c9i)
+        results.append(transform(
+            c1[c1i],
+            c2[c2i],
+            c3[c3i],
+            c4[c4i],
+            c5[c5i],
+            c6[c6i],
+            c7[c7i],
+            c8[c8i],
+            c9[c9i]
+        ))
+        c1.formIndex(after: &c1i)
+        c2.formIndex(after: &c2i)
+        c3.formIndex(after: &c3i)
+        c4.formIndex(after: &c4i)
+        c5.formIndex(after: &c5i)
+        c6.formIndex(after: &c6i)
+        c7.formIndex(after: &c7i)
+        c8.formIndex(after: &c8i)
+        c9.formIndex(after: &c9i)
     }
-    
+
     return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
 @inlinable
-public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, Result>(_ c1: C1,
-_ c2: C2,
-_ c3: C3,
-_ c4: C4,
-_ c5: C5,
-_ c6: C6,
-_ c7: C7,
-_ c8: C8,
-_ c9: C9,    with transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element, C8.Element, C9.Element) -> Result
-) -> (value: [Result], pullback: ([Result].TangentVector) -> (C1.TangentVector, C2.TangentVector, C3.TangentVector, C4.TangentVector, C5.TangentVector, C6.TangentVector, C7.TangentVector, C8.TangentVector, C9.TangentVector)) where
-C1: DifferentiableCollection,
-C1.Element: Differentiable,
-C2: DifferentiableCollection,
-C2.Element: Differentiable,
-C3: DifferentiableCollection,
-C3.Element: Differentiable,
-C4: DifferentiableCollection,
-C4.Element: Differentiable,
-C5: DifferentiableCollection,
-C5.Element: Differentiable,
-C6: DifferentiableCollection,
-C6.Element: Differentiable,
-C7: DifferentiableCollection,
-C7.Element: Differentiable,
-C8: DifferentiableCollection,
-C8.Element: Differentiable,
-C9: DifferentiableCollection,
-C9.Element: Differentiable,
+public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, Result>(
+    _ c1: C1,
+    _ c2: C2,
+    _ c3: C3,
+    _ c4: C4,
+    _ c5: C5,
+    _ c6: C6,
+    _ c7: C7,
+    _ c8: C8,
+    _ c9: C9,
+    with transform: @differentiable(reverse) (
+        C1.Element,
+        C2.Element,
+        C3.Element,
+        C4.Element,
+        C5.Element,
+        C6.Element,
+        C7.Element,
+        C8.Element,
+        C9.Element
+    ) -> Result
+) -> (
+    value: [Result],
+    pullback: ([Result].TangentVector) -> (
+        C1.TangentVector,
+        C2.TangentVector,
+        C3.TangentVector,
+        C4.TangentVector,
+        C5.TangentVector,
+        C6.TangentVector,
+        C7.TangentVector,
+        C8.TangentVector,
+        C9.TangentVector
+    )
+) where
+    C1: DifferentiableCollection,
+    C1.Element: Differentiable,
+    C2: DifferentiableCollection,
+    C2.Element: Differentiable,
+    C3: DifferentiableCollection,
+    C3.Element: Differentiable,
+    C4: DifferentiableCollection,
+    C4.Element: Differentiable,
+    C5: DifferentiableCollection,
+    C5.Element: Differentiable,
+    C6: DifferentiableCollection,
+    C6.Element: Differentiable,
+    C7: DifferentiableCollection,
+    C7.Element: Differentiable,
+    C8: DifferentiableCollection,
+    C8.Element: Differentiable,
+    C9: DifferentiableCollection,
+    C9.Element: Differentiable,
     Result: Differentiable
 {
-    let count = min(c1.count, c2.count, c3.count, c4.count, c5.count, c6.count, c7.count, c8.count, c9.count)
-    
+    let count = min(
+        c1.count,
+        c2.count,
+        c3.count,
+        c4.count,
+        c5.count,
+        c6.count,
+        c7.count,
+        c8.count,
+        c9.count
+    )
+
     if count == 0 {
-        return (value: [], pullback: { v in (C1.TangentVector(), C2.TangentVector(), C3.TangentVector(), C4.TangentVector(), C5.TangentVector(), C6.TangentVector(), C7.TangentVector(), C8.TangentVector(), C9.TangentVector()) })
+        return (
+            value: [],
+            pullback: { _ in
+                (
+                    C1.TangentVector.zero,
+                    C2.TangentVector.zero,
+                    C3.TangentVector.zero,
+                    C4.TangentVector.zero,
+                    C5.TangentVector.zero,
+                    C6.TangentVector.zero,
+                    C7.TangentVector.zero,
+                    C8.TangentVector.zero,
+                    C9.TangentVector.zero
+                )
+            }
+        )
     }
-    
+
     var results = ContiguousArray<Result>()
     results.reserveCapacity(count)
-    var pullbacks: ContiguousArray<(Result.TangentVector) -> (C1.Element.TangentVector, C2.Element.TangentVector, C3.Element.TangentVector, C4.Element.TangentVector, C5.Element.TangentVector, C6.Element.TangentVector, C7.Element.TangentVector, C8.Element.TangentVector, C9.Element.TangentVector)> = []
+    var pullbacks: ContiguousArray<(Result.TangentVector) -> (
+        C1.Element.TangentVector,
+        C2.Element.TangentVector,
+        C3.Element.TangentVector,
+        C4.Element.TangentVector,
+        C5.Element.TangentVector,
+        C6.Element.TangentVector,
+        C7.Element.TangentVector,
+        C8.Element.TangentVector,
+        C9.Element.TangentVector
+    )> = []
     pullbacks.reserveCapacity(count)
-var c1i = c1.startIndex
-var c2i = c2.startIndex
-var c3i = c3.startIndex
-var c4i = c4.startIndex
-var c5i = c5.startIndex
-var c6i = c6.startIndex
-var c7i = c7.startIndex
-var c8i = c8.startIndex
-var c9i = c9.startIndex    
+
+    var c1i = c1.startIndex
+    var c2i = c2.startIndex
+    var c3i = c3.startIndex
+    var c4i = c4.startIndex
+    var c5i = c5.startIndex
+    var c6i = c6.startIndex
+    var c7i = c7.startIndex
+    var c8i = c8.startIndex
+    var c9i = c9.startIndex
+
     for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(at: c1[c1i], c2[c2i], c3[c3i], c4[c4i], c5[c5i], c6[c6i], c7[c7i], c8[c8i], c9[c9i], of: transform)
-        
+        let (value, pullback) = valueWithPullback(
+            at:
+            c1[c1i],
+            c2[c2i],
+            c3[c3i],
+            c4[c4i],
+            c5[c5i],
+            c6[c6i],
+            c7[c7i],
+            c8[c8i],
+            c9[c9i],
+            of: transform
+        )
+
         results.append(value)
         pullbacks.append(pullback)
-c1.formIndex(after: &c1i)
-c2.formIndex(after: &c2i)
-c3.formIndex(after: &c3i)
-c4.formIndex(after: &c4i)
-c5.formIndex(after: &c5i)
-c6.formIndex(after: &c6i)
-c7.formIndex(after: &c7i)
-c8.formIndex(after: &c8i)
-c9.formIndex(after: &c9i)
+
+        c1.formIndex(after: &c1i)
+        c2.formIndex(after: &c2i)
+        c3.formIndex(after: &c3i)
+        c4.formIndex(after: &c4i)
+        c5.formIndex(after: &c5i)
+        c6.formIndex(after: &c6i)
+        c7.formIndex(after: &c7i)
+        c8.formIndex(after: &c8i)
+        c9.formIndex(after: &c9i)
     }
-    
+
     return (
         value: Array(results),
         pullback: { v in
-var results1 = C1.TangentVector()
-results1.reserveCapacity(v.count)
-var results2 = C2.TangentVector()
-results2.reserveCapacity(v.count)
-var results3 = C3.TangentVector()
-results3.reserveCapacity(v.count)
-var results4 = C4.TangentVector()
-results4.reserveCapacity(v.count)
-var results5 = C5.TangentVector()
-results5.reserveCapacity(v.count)
-var results6 = C6.TangentVector()
-results6.reserveCapacity(v.count)
-var results7 = C7.TangentVector()
-results7.reserveCapacity(v.count)
-var results8 = C8.TangentVector()
-results8.reserveCapacity(v.count)
-var results9 = C9.TangentVector()
-results9.reserveCapacity(v.count)            
+            var results1 = C1.TangentVector()
+            results1.reserveCapacity(v.count)
+            var results2 = C2.TangentVector()
+            results2.reserveCapacity(v.count)
+            var results3 = C3.TangentVector()
+            results3.reserveCapacity(v.count)
+            var results4 = C4.TangentVector()
+            results4.reserveCapacity(v.count)
+            var results5 = C5.TangentVector()
+            results5.reserveCapacity(v.count)
+            var results6 = C6.TangentVector()
+            results6.reserveCapacity(v.count)
+            var results7 = C7.TangentVector()
+            results7.reserveCapacity(v.count)
+            var results8 = C8.TangentVector()
+            results8.reserveCapacity(v.count)
+            var results9 = C9.TangentVector()
+            results9.reserveCapacity(v.count)
             for (tangentElement, pullback) in zip(v, pullbacks) {
                 let (v1, v2, v3, v4, v5, v6, v7, v8, v9) = pullback(tangentElement)
-results1.appendContribution(of: v1)
-results2.appendContribution(of: v2)
-results3.appendContribution(of: v3)
-results4.appendContribution(of: v4)
-results5.appendContribution(of: v5)
-results6.appendContribution(of: v6)
-results7.appendContribution(of: v7)
-results8.appendContribution(of: v8)
-results9.appendContribution(of: v9)
+                results1.appendContribution(of: v1)
+                results2.appendContribution(of: v2)
+                results3.appendContribution(of: v3)
+                results4.appendContribution(of: v4)
+                results5.appendContribution(of: v5)
+                results6.appendContribution(of: v6)
+                results7.appendContribution(of: v7)
+                results8.appendContribution(of: v8)
+                results9.appendContribution(of: v9)
             }
-            
-            return (results1, results2, results3, results4, results5, results6, results7, results8, results9)
+
+            return (
+                results1,
+                results2,
+                results3,
+                results4,
+                results5,
+                results6,
+                results7,
+                results8,
+                results9
+            )
         }
     )
 }
-
 
 #endif
