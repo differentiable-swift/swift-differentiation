@@ -1,38 +1,47 @@
 // MARK: Zip7SequenceDifferentiable@inlinable
-public func differentiableZip<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7>(_ collection1: Collection1,
-_ collection2: Collection2,
-_ collection3: Collection3,
-_ collection4: Collection4,
-_ collection5: Collection5,
-_ collection6: Collection6,
-_ collection7: Collection7
-) -> Zip7SequenceDifferentiable<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7> {
+public func differentiableZip<
+   C1,
+   C2,
+   C3,
+   C4,
+   C5,
+   C6,
+   C7
+>(
+   _ collection1: C1,
+   _ collection2: C2,
+   _ collection3: C3,
+   _ collection4: C4,
+   _ collection5: C5,
+   _ collection6: C6,
+   _ collection7: C7
+) -> Zip7SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7> {
     Zip7SequenceDifferentiable(collection1, collection2, collection3, collection4, collection5, collection6, collection7)
 }
 
 @frozen
-public struct Zip7SequenceDifferentiable<Collection1: Collection, Collection2: Collection, Collection3: Collection, Collection4: Collection, Collection5: Collection, Collection6: Collection, Collection7: Collection> where Collection1.Index == Int, Collection2.Index == Int, Collection3.Index == Int, Collection4.Index == Int, Collection5.Index == Int, Collection6.Index == Int, Collection7.Index == Int {@usableFromInline
-internal var _collection1: Collection1
+public struct Zip7SequenceDifferentiable<C1: Collection, C2: Collection, C3: Collection, C4: Collection, C5: Collection, C6: Collection, C7: Collection> where C1.Index == Int, C2.Index == Int, C3.Index == Int, C4.Index == Int, C5.Index == Int, C6.Index == Int, C7.Index == Int {@usableFromInline
+internal var _collection1: C1
 @usableFromInline
-internal var _collection2: Collection2
+internal var _collection2: C2
 @usableFromInline
-internal var _collection3: Collection3
+internal var _collection3: C3
 @usableFromInline
-internal var _collection4: Collection4
+internal var _collection4: C4
 @usableFromInline
-internal var _collection5: Collection5
+internal var _collection5: C5
 @usableFromInline
-internal var _collection6: Collection6
+internal var _collection6: C6
 @usableFromInline
-internal var _collection7: Collection7
+internal var _collection7: C7
     @inlinable
-    internal init(_ collection1: Collection1,
-_ collection2: Collection2,
-_ collection3: Collection3,
-_ collection4: Collection4,
-_ collection5: Collection5,
-_ collection6: Collection6,
-_ collection7: Collection7    ) {self._collection1 = collection1
+    internal init(_ collection1: C1,
+_ collection2: C2,
+_ collection3: C3,
+_ collection4: C4,
+_ collection5: C5,
+_ collection6: C6,
+_ collection7: C7    ) {self._collection1 = collection1
 self._collection2 = collection2
 self._collection3 = collection3
 self._collection4 = collection4
@@ -43,7 +52,7 @@ self._collection7 = collection7
 }
 
 extension Zip7SequenceDifferentiable: Collection {
-    public typealias Element = (Collection1.Element, Collection2.Element, Collection3.Element, Collection4.Element, Collection5.Element, Collection6.Element, Collection7.Element)
+    public typealias Element = (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element)
     public typealias Index = Int
 
     @inlinable
@@ -70,65 +79,65 @@ extension Zip7SequenceDifferentiable: Collection {
 
 }
 
-extension Zip7SequenceDifferentiable: Sendable where Collection1: Sendable,
-Collection2: Sendable,
-Collection3: Sendable,
-Collection4: Sendable,
-Collection5: Sendable,
-Collection6: Sendable,
-Collection7: Sendable{}
+extension Zip7SequenceDifferentiable: Sendable where C1: Sendable,
+C2: Sendable,
+C3: Sendable,
+C4: Sendable,
+C5: Sendable,
+C6: Sendable,
+C7: Sendable{}
 // MARK: Zip7SequenceDifferentiable + Differentiable
 
 #if canImport(_Differentiation)
 
 @derivative(of: differentiableZip)
 @inlinable
-public func _vjpDifferentiableZip<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7>(_ collection1: Collection1,
-_ collection2: Collection2,
-_ collection3: Collection3,
-_ collection4: Collection4,
-_ collection5: Collection5,
-_ collection6: Collection6,
-_ collection7: Collection7
+public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7>(_ collection1: C1,
+_ collection2: C2,
+_ collection3: C3,
+_ collection4: C4,
+_ collection5: C5,
+_ collection6: C6,
+_ collection7: C7
 ) -> (
-    value: Zip7SequenceDifferentiable<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7>,
-    pullback: (Zip7SequenceDifferentiable<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7>.TangentVector) -> (Collection1.TangentVector, Collection2.TangentVector, Collection3.TangentVector, Collection4.TangentVector, Collection5.TangentVector, Collection6.TangentVector, Collection7.TangentVector)
+    value: Zip7SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7>,
+    pullback: (Zip7SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7>.TangentVector) -> (C1.TangentVector, C2.TangentVector, C3.TangentVector, C4.TangentVector, C5.TangentVector, C6.TangentVector, C7.TangentVector)
 ) where
-Collection1: Differentiable,
-Collection1.Element: Differentiable,
-Collection1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection1.TangentVector.Index == Int,
-Collection1.TangentVector.Element == Collection1.Element.TangentVector,
-Collection2: Differentiable,
-Collection2.Element: Differentiable,
-Collection2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection2.TangentVector.Index == Int,
-Collection2.TangentVector.Element == Collection2.Element.TangentVector,
-Collection3: Differentiable,
-Collection3.Element: Differentiable,
-Collection3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection3.TangentVector.Index == Int,
-Collection3.TangentVector.Element == Collection3.Element.TangentVector,
-Collection4: Differentiable,
-Collection4.Element: Differentiable,
-Collection4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection4.TangentVector.Index == Int,
-Collection4.TangentVector.Element == Collection4.Element.TangentVector,
-Collection5: Differentiable,
-Collection5.Element: Differentiable,
-Collection5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection5.TangentVector.Index == Int,
-Collection5.TangentVector.Element == Collection5.Element.TangentVector,
-Collection6: Differentiable,
-Collection6.Element: Differentiable,
-Collection6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection6.TangentVector.Index == Int,
-Collection6.TangentVector.Element == Collection6.Element.TangentVector,
-Collection7: Differentiable,
-Collection7.Element: Differentiable,
-Collection7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection7.TangentVector.Index == Int,
-Collection7.TangentVector.Element == Collection7.Element.TangentVector{
+C1: Differentiable,
+C1.Element: Differentiable,
+C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C1.TangentVector.Index == Int,
+C1.TangentVector.Element == C1.Element.TangentVector,
+C2: Differentiable,
+C2.Element: Differentiable,
+C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C2.TangentVector.Index == Int,
+C2.TangentVector.Element == C2.Element.TangentVector,
+C3: Differentiable,
+C3.Element: Differentiable,
+C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C3.TangentVector.Index == Int,
+C3.TangentVector.Element == C3.Element.TangentVector,
+C4: Differentiable,
+C4.Element: Differentiable,
+C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C4.TangentVector.Index == Int,
+C4.TangentVector.Element == C4.Element.TangentVector,
+C5: Differentiable,
+C5.Element: Differentiable,
+C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C5.TangentVector.Index == Int,
+C5.TangentVector.Element == C5.Element.TangentVector,
+C6: Differentiable,
+C6.Element: Differentiable,
+C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C6.TangentVector.Index == Int,
+C6.TangentVector.Element == C6.Element.TangentVector,
+C7: Differentiable,
+C7.Element: Differentiable,
+C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C7.TangentVector.Index == Int,
+C7.TangentVector.Element == C7.Element.TangentVector{
     (
         value: differentiableZip(collection1, collection2, collection3, collection4, collection5, collection6, collection7),
         pullback: { v in
@@ -138,41 +147,41 @@ Collection7.TangentVector.Element == Collection7.Element.TangentVector{
 }
 
 extension Zip7SequenceDifferentiable: Differentiable where
-Collection1: Differentiable,
-Collection1.Element: Differentiable,
-Collection1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection1.TangentVector.Index == Int,
-Collection1.TangentVector.Element == Collection1.Element.TangentVector,
-Collection2: Differentiable,
-Collection2.Element: Differentiable,
-Collection2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection2.TangentVector.Index == Int,
-Collection2.TangentVector.Element == Collection2.Element.TangentVector,
-Collection3: Differentiable,
-Collection3.Element: Differentiable,
-Collection3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection3.TangentVector.Index == Int,
-Collection3.TangentVector.Element == Collection3.Element.TangentVector,
-Collection4: Differentiable,
-Collection4.Element: Differentiable,
-Collection4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection4.TangentVector.Index == Int,
-Collection4.TangentVector.Element == Collection4.Element.TangentVector,
-Collection5: Differentiable,
-Collection5.Element: Differentiable,
-Collection5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection5.TangentVector.Index == Int,
-Collection5.TangentVector.Element == Collection5.Element.TangentVector,
-Collection6: Differentiable,
-Collection6.Element: Differentiable,
-Collection6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection6.TangentVector.Index == Int,
-Collection6.TangentVector.Element == Collection6.Element.TangentVector,
-Collection7: Differentiable,
-Collection7.Element: Differentiable,
-Collection7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-Collection7.TangentVector.Index == Int,
-Collection7.TangentVector.Element == Collection7.Element.TangentVector
+C1: Differentiable,
+C1.Element: Differentiable,
+C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C1.TangentVector.Index == Int,
+C1.TangentVector.Element == C1.Element.TangentVector,
+C2: Differentiable,
+C2.Element: Differentiable,
+C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C2.TangentVector.Index == Int,
+C2.TangentVector.Element == C2.Element.TangentVector,
+C3: Differentiable,
+C3.Element: Differentiable,
+C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C3.TangentVector.Index == Int,
+C3.TangentVector.Element == C3.Element.TangentVector,
+C4: Differentiable,
+C4.Element: Differentiable,
+C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C4.TangentVector.Index == Int,
+C4.TangentVector.Element == C4.Element.TangentVector,
+C5: Differentiable,
+C5.Element: Differentiable,
+C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C5.TangentVector.Index == Int,
+C5.TangentVector.Element == C5.Element.TangentVector,
+C6: Differentiable,
+C6.Element: Differentiable,
+C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C6.TangentVector.Index == Int,
+C6.TangentVector.Element == C6.Element.TangentVector,
+C7: Differentiable,
+C7.Element: Differentiable,
+C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
+C7.TangentVector.Index == Int,
+C7.TangentVector.Element == C7.Element.TangentVector
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {_collection1.move(by: offset.collection1)
@@ -184,18 +193,18 @@ _collection6.move(by: offset.collection6)
 _collection7.move(by: offset.collection7)    }
 
     @inlinable
-    public func differentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (Collection1.Element, Collection2.Element, Collection3.Element, Collection4.Element, Collection5.Element, Collection6.Element, Collection7.Element) -> Result
+    public func differentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element) -> Result
     ) -> [Result] {
         self.map(transform)
     }
 
     @derivative(of: differentiableMap)
     @inlinable
-    public func _vjpDifferentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (Collection1.Element, Collection2.Element, Collection3.Element, Collection4.Element, Collection5.Element, Collection6.Element, Collection7.Element) -> Result
+    public func _vjpDifferentiableMap<Result: Differentiable>(_ transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element) -> Result
     ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
         var results: [Result] = []
         results.reserveCapacity(self.count)
-        var pullbacks: [(Result.TangentVector) -> (Collection1.Element.TangentVector, Collection2.Element.TangentVector, Collection3.Element.TangentVector, Collection4.Element.TangentVector, Collection5.Element.TangentVector, Collection6.Element.TangentVector, Collection7.Element.TangentVector)] = []
+        var pullbacks: [(Result.TangentVector) -> (C1.Element.TangentVector, C2.Element.TangentVector, C3.Element.TangentVector, C4.Element.TangentVector, C5.Element.TangentVector, C6.Element.TangentVector, C7.Element.TangentVector)] = []
         pullbacks.reserveCapacity(self.count)
 
         for parameters in self {
@@ -207,19 +216,19 @@ _collection7.move(by: offset.collection7)    }
         return (
             value: results,
             pullback: { v in
-var results1 = Collection1.TangentVector()
+var results1 = C1.TangentVector()
 results1.reserveCapacity(v.count)
-var results2 = Collection2.TangentVector()
+var results2 = C2.TangentVector()
 results2.reserveCapacity(v.count)
-var results3 = Collection3.TangentVector()
+var results3 = C3.TangentVector()
 results3.reserveCapacity(v.count)
-var results4 = Collection4.TangentVector()
+var results4 = C4.TangentVector()
 results4.reserveCapacity(v.count)
-var results5 = Collection5.TangentVector()
+var results5 = C5.TangentVector()
 results5.reserveCapacity(v.count)
-var results6 = Collection6.TangentVector()
+var results6 = C6.TangentVector()
 results6.reserveCapacity(v.count)
-var results7 = Collection7.TangentVector()
+var results7 = C7.TangentVector()
 results7.reserveCapacity(v.count)
     // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
     // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
@@ -240,30 +249,30 @@ results7.appendContribution(of: result7)
     }
 }
 extension Zip7SequenceDifferentiable {
-    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where Collection1: Differentiable,
-Collection1.TangentVector: Collection,
-Collection1.TangentVector.Index == Int,
-Collection2: Differentiable,
-Collection2.TangentVector: Collection,
-Collection2.TangentVector.Index == Int,
-Collection3: Differentiable,
-Collection3.TangentVector: Collection,
-Collection3.TangentVector.Index == Int,
-Collection4: Differentiable,
-Collection4.TangentVector: Collection,
-Collection4.TangentVector.Index == Int,
-Collection5: Differentiable,
-Collection5.TangentVector: Collection,
-Collection5.TangentVector.Index == Int,
-Collection6: Differentiable,
-Collection6.TangentVector: Collection,
-Collection6.TangentVector.Index == Int,
-Collection7: Differentiable,
-Collection7.TangentVector: Collection,
-Collection7.TangentVector.Index == Int
+    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where C1: Differentiable,
+C1.TangentVector: Collection,
+C1.TangentVector.Index == Int,
+C2: Differentiable,
+C2.TangentVector: Collection,
+C2.TangentVector.Index == Int,
+C3: Differentiable,
+C3.TangentVector: Collection,
+C3.TangentVector.Index == Int,
+C4: Differentiable,
+C4.TangentVector: Collection,
+C4.TangentVector.Index == Int,
+C5: Differentiable,
+C5.TangentVector: Collection,
+C5.TangentVector.Index == Int,
+C6: Differentiable,
+C6.TangentVector: Collection,
+C6.TangentVector.Index == Int,
+C7: Differentiable,
+C7.TangentVector: Collection,
+C7.TangentVector.Index == Int
     {
         public typealias TangentVector = Self
-        public typealias Element = (Collection1.TangentVector.Element, Collection2.TangentVector.Element, Collection3.TangentVector.Element, Collection4.TangentVector.Element, Collection5.TangentVector.Element, Collection6.TangentVector.Element, Collection7.TangentVector.Element)
+        public typealias Element = (C1.TangentVector.Element, C2.TangentVector.Element, C3.TangentVector.Element, C4.TangentVector.Element, C5.TangentVector.Element, C6.TangentVector.Element, C7.TangentVector.Element)
         public typealias Index = Int
 
         @inlinable
@@ -288,21 +297,21 @@ Collection7.TangentVector.Index == Int
             i += 1
         }
 @usableFromInline
-var collection1: Collection1.TangentVector
+var collection1: C1.TangentVector
 @usableFromInline
-var collection2: Collection2.TangentVector
+var collection2: C2.TangentVector
 @usableFromInline
-var collection3: Collection3.TangentVector
+var collection3: C3.TangentVector
 @usableFromInline
-var collection4: Collection4.TangentVector
+var collection4: C4.TangentVector
 @usableFromInline
-var collection5: Collection5.TangentVector
+var collection5: C5.TangentVector
 @usableFromInline
-var collection6: Collection6.TangentVector
+var collection6: C6.TangentVector
 @usableFromInline
-var collection7: Collection7.TangentVector
+var collection7: C7.TangentVector
         @inlinable
-        init(_ collection1: Collection1.TangentVector, _ collection2: Collection2.TangentVector, _ collection3: Collection3.TangentVector, _ collection4: Collection4.TangentVector, _ collection5: Collection5.TangentVector, _ collection6: Collection6.TangentVector, _ collection7: Collection7.TangentVector) {self.collection1 = collection1
+        init(_ collection1: C1.TangentVector, _ collection2: C2.TangentVector, _ collection3: C3.TangentVector, _ collection4: C4.TangentVector, _ collection5: C5.TangentVector, _ collection6: C6.TangentVector, _ collection7: C7.TangentVector) {self.collection1 = collection1
 self.collection2 = collection2
 self.collection3 = collection3
 self.collection4 = collection4
@@ -314,28 +323,28 @@ self.collection7 = collection7        }
 }
 
 @inlinable
-public func differentiableZipWith<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Result>(_ c1: Collection1,
-_ c2: Collection2,
-_ c3: Collection3,
-_ c4: Collection4,
-_ c5: Collection5,
-_ c6: Collection6,
-_ c7: Collection7,    with transform: @differentiable(reverse) (Collection1.Element, Collection2.Element, Collection3.Element, Collection4.Element, Collection5.Element, Collection6.Element, Collection7.Element) -> Result
+public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, Result>(_ c1: C1,
+_ c2: C2,
+_ c3: C3,
+_ c4: C4,
+_ c5: C5,
+_ c6: C6,
+_ c7: C7,    with transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element) -> Result
 ) -> [Result] where
-Collection1: DifferentiableCollection,
-Collection1.Element: Differentiable,
-Collection2: DifferentiableCollection,
-Collection2.Element: Differentiable,
-Collection3: DifferentiableCollection,
-Collection3.Element: Differentiable,
-Collection4: DifferentiableCollection,
-Collection4.Element: Differentiable,
-Collection5: DifferentiableCollection,
-Collection5.Element: Differentiable,
-Collection6: DifferentiableCollection,
-Collection6.Element: Differentiable,
-Collection7: DifferentiableCollection,
-Collection7.Element: Differentiable,    Result: Differentiable
+C1: DifferentiableCollection,
+C1.Element: Differentiable,
+C2: DifferentiableCollection,
+C2.Element: Differentiable,
+C3: DifferentiableCollection,
+C3.Element: Differentiable,
+C4: DifferentiableCollection,
+C4.Element: Differentiable,
+C5: DifferentiableCollection,
+C5.Element: Differentiable,
+C6: DifferentiableCollection,
+C6.Element: Differentiable,
+C7: DifferentiableCollection,
+C7.Element: Differentiable,    Result: Differentiable
 {
     let capacity = min(c1.count, c2.count, c3.count, c4.count, c5.count, c6.count, c7.count)
     
@@ -366,39 +375,39 @@ c7.formIndex(after: &c7i)
 
 @derivative(of: differentiableZipWith)
 @inlinable
-public func _vjpDifferentiableZipWith<Collection1, Collection2, Collection3, Collection4, Collection5, Collection6, Collection7, Result>(_ c1: Collection1,
-_ c2: Collection2,
-_ c3: Collection3,
-_ c4: Collection4,
-_ c5: Collection5,
-_ c6: Collection6,
-_ c7: Collection7,    with transform: @differentiable(reverse) (Collection1.Element, Collection2.Element, Collection3.Element, Collection4.Element, Collection5.Element, Collection6.Element, Collection7.Element) -> Result
-) -> (value: [Result], pullback: ([Result].TangentVector) -> (Collection1.TangentVector, Collection2.TangentVector, Collection3.TangentVector, Collection4.TangentVector, Collection5.TangentVector, Collection6.TangentVector, Collection7.TangentVector)) where
-Collection1: DifferentiableCollection,
-Collection1.Element: Differentiable,
-Collection2: DifferentiableCollection,
-Collection2.Element: Differentiable,
-Collection3: DifferentiableCollection,
-Collection3.Element: Differentiable,
-Collection4: DifferentiableCollection,
-Collection4.Element: Differentiable,
-Collection5: DifferentiableCollection,
-Collection5.Element: Differentiable,
-Collection6: DifferentiableCollection,
-Collection6.Element: Differentiable,
-Collection7: DifferentiableCollection,
-Collection7.Element: Differentiable,
+public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, Result>(_ c1: C1,
+_ c2: C2,
+_ c3: C3,
+_ c4: C4,
+_ c5: C5,
+_ c6: C6,
+_ c7: C7,    with transform: @differentiable(reverse) (C1.Element, C2.Element, C3.Element, C4.Element, C5.Element, C6.Element, C7.Element) -> Result
+) -> (value: [Result], pullback: ([Result].TangentVector) -> (C1.TangentVector, C2.TangentVector, C3.TangentVector, C4.TangentVector, C5.TangentVector, C6.TangentVector, C7.TangentVector)) where
+C1: DifferentiableCollection,
+C1.Element: Differentiable,
+C2: DifferentiableCollection,
+C2.Element: Differentiable,
+C3: DifferentiableCollection,
+C3.Element: Differentiable,
+C4: DifferentiableCollection,
+C4.Element: Differentiable,
+C5: DifferentiableCollection,
+C5.Element: Differentiable,
+C6: DifferentiableCollection,
+C6.Element: Differentiable,
+C7: DifferentiableCollection,
+C7.Element: Differentiable,
     Result: Differentiable
 {
     let count = min(c1.count, c2.count, c3.count, c4.count, c5.count, c6.count, c7.count)
     
     if count == 0 {
-        return (value: [], pullback: { v in (Collection1.TangentVector(), Collection2.TangentVector(), Collection3.TangentVector(), Collection4.TangentVector(), Collection5.TangentVector(), Collection6.TangentVector(), Collection7.TangentVector()) })
+        return (value: [], pullback: { v in (C1.TangentVector(), C2.TangentVector(), C3.TangentVector(), C4.TangentVector(), C5.TangentVector(), C6.TangentVector(), C7.TangentVector()) })
     }
     
     var results = ContiguousArray<Result>()
     results.reserveCapacity(count)
-    var pullbacks: ContiguousArray<(Result.TangentVector) -> (Collection1.Element.TangentVector, Collection2.Element.TangentVector, Collection3.Element.TangentVector, Collection4.Element.TangentVector, Collection5.Element.TangentVector, Collection6.Element.TangentVector, Collection7.Element.TangentVector)> = []
+    var pullbacks: ContiguousArray<(Result.TangentVector) -> (C1.Element.TangentVector, C2.Element.TangentVector, C3.Element.TangentVector, C4.Element.TangentVector, C5.Element.TangentVector, C6.Element.TangentVector, C7.Element.TangentVector)> = []
     pullbacks.reserveCapacity(count)
 var c1i = c1.startIndex
 var c2i = c2.startIndex
@@ -424,19 +433,19 @@ c7.formIndex(after: &c7i)
     return (
         value: Array(results),
         pullback: { v in
-var results1 = Collection1.TangentVector()
+var results1 = C1.TangentVector()
 results1.reserveCapacity(v.count)
-var results2 = Collection2.TangentVector()
+var results2 = C2.TangentVector()
 results2.reserveCapacity(v.count)
-var results3 = Collection3.TangentVector()
+var results3 = C3.TangentVector()
 results3.reserveCapacity(v.count)
-var results4 = Collection4.TangentVector()
+var results4 = C4.TangentVector()
 results4.reserveCapacity(v.count)
-var results5 = Collection5.TangentVector()
+var results5 = C5.TangentVector()
 results5.reserveCapacity(v.count)
-var results6 = Collection6.TangentVector()
+var results6 = C6.TangentVector()
 results6.reserveCapacity(v.count)
-var results7 = Collection7.TangentVector()
+var results7 = C7.TangentVector()
 results7.reserveCapacity(v.count)            
             for (tangentElement, pullback) in zip(v, pullbacks) {
                 let (v1, v2, v3, v4, v5, v6, v7) = pullback(tangentElement)
