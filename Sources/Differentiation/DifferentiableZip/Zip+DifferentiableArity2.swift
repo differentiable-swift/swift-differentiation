@@ -1,10 +1,10 @@
 // MARK: Zip2SequenceDifferentiable@inlinable
 public func differentiableZip<
-   C1,
-   C2
+    C1,
+    C2
 >(
-   _ collection1: C1,
-   _ collection2: C2
+    _ collection1: C1,
+    _ collection2: C2
 ) -> Zip2SequenceDifferentiable<C1, C2> {
     Zip2SequenceDifferentiable(collection1, collection2)
 }

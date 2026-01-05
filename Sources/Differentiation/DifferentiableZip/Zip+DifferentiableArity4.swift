@@ -1,14 +1,14 @@
 // MARK: Zip4SequenceDifferentiable@inlinable
 public func differentiableZip<
-   C1,
-   C2,
-   C3,
-   C4
+    C1,
+    C2,
+    C3,
+    C4
 >(
-   _ collection1: C1,
-   _ collection2: C2,
-   _ collection3: C3,
-   _ collection4: C4
+    _ collection1: C1,
+    _ collection2: C2,
+    _ collection3: C3,
+    _ collection4: C4
 ) -> Zip4SequenceDifferentiable<C1, C2, C3, C4> {
     Zip4SequenceDifferentiable(collection1, collection2, collection3, collection4)
 }

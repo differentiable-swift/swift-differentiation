@@ -1,30 +1,30 @@
 // MARK: Zip12SequenceDifferentiable@inlinable
 public func differentiableZip<
-   C1,
-   C2,
-   C3,
-   C4,
-   C5,
-   C6,
-   C7,
-   C8,
-   C9,
-   C10,
-   C11,
-   C12
+    C1,
+    C2,
+    C3,
+    C4,
+    C5,
+    C6,
+    C7,
+    C8,
+    C9,
+    C10,
+    C11,
+    C12
 >(
-   _ collection1: C1,
-   _ collection2: C2,
-   _ collection3: C3,
-   _ collection4: C4,
-   _ collection5: C5,
-   _ collection6: C6,
-   _ collection7: C7,
-   _ collection8: C8,
-   _ collection9: C9,
-   _ collection10: C10,
-   _ collection11: C11,
-   _ collection12: C12
+    _ collection1: C1,
+    _ collection2: C2,
+    _ collection3: C3,
+    _ collection4: C4,
+    _ collection5: C5,
+    _ collection6: C6,
+    _ collection7: C7,
+    _ collection8: C8,
+    _ collection9: C9,
+    _ collection10: C10,
+    _ collection11: C11,
+    _ collection12: C12
 ) -> Zip12SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12> {
     Zip12SequenceDifferentiable(collection1, collection2, collection3, collection4, collection5, collection6, collection7, collection8, collection9, collection10, collection11, collection12)
 }
