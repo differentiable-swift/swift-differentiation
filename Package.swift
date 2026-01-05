@@ -5,9 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "swift-differentiation",
-    platforms: [
-        .macOS(.v13),
-    ],
     products: [
         .library(
             name: "Differentiation",
@@ -15,18 +12,7 @@ let package = Package(
         ),
     ],
     targets: [
-        .target(
-            name: "Differentiation",
-            plugins: [
-                "CodeGeneratorPlugin",
-            ]
-        ),
-        .executableTarget(name: "CodeGeneratorExecutable"),
-        .plugin(
-            name: "CodeGeneratorPlugin",
-            capability: .buildTool,
-            dependencies: ["CodeGeneratorExecutable"]
-        ),
+        .target(name: "Differentiation"),
         .testTarget(
             name: "DifferentiationTests",
             dependencies: ["Differentiation"]
