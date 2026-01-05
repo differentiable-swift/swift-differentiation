@@ -1,22 +1,22 @@
 // MARK: Zip8SequenceDifferentiable@inlinable
 public func differentiableZip<
-   C1,
-   C2,
-   C3,
-   C4,
-   C5,
-   C6,
-   C7,
-   C8
+    C1,
+    C2,
+    C3,
+    C4,
+    C5,
+    C6,
+    C7,
+    C8
 >(
-   _ collection1: C1,
-   _ collection2: C2,
-   _ collection3: C3,
-   _ collection4: C4,
-   _ collection5: C5,
-   _ collection6: C6,
-   _ collection7: C7,
-   _ collection8: C8
+    _ collection1: C1,
+    _ collection2: C2,
+    _ collection3: C3,
+    _ collection4: C4,
+    _ collection5: C5,
+    _ collection6: C6,
+    _ collection7: C7,
+    _ collection8: C8
 ) -> Zip8SequenceDifferentiable<C1, C2, C3, C4, C5, C6, C7, C8> {
     Zip8SequenceDifferentiable(collection1, collection2, collection3, collection4, collection5, collection6, collection7, collection8)
 }

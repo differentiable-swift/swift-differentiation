@@ -1,6 +1,6 @@
 enum ZipSequenceGenerator {
     static func indent(_ indent: Int) -> String {
-        (0 ..< indent).map { _ in "   " }.joined()
+        (0 ..< indent).map { _ in "    " }.joined()
     }
 
     static func generateFor(arity: Int) -> String {
