@@ -2,7 +2,7 @@ import CollectionsBenchmark
 import Differentiation
 import Foundation
 
-// MARK: 1D finite difference/two-point-stencil 
+// MARK: 1D finite difference/two-point-stencil
 
 extension Array where Element == Float {
     @inlinable
@@ -13,8 +13,8 @@ extension Array where Element == Float {
             return []
         }
         var result = Self(repeating: 0.0, count: n - 1)
-        for i in withoutDerivative(at: 0 ..< (n-1)) {
-            result.update(at: i, with: self[i+1] - self[i])
+        for i in withoutDerivative(at: 0 ..< (n - 1)) {
+            result.update(at: i, with: self[i + 1] - self[i])
         }
         return result
     }
