@@ -17,10 +17,14 @@ struct CodeGenerator {
             let zipSequenceFileURL = output.appending(component: "ZipSequence+Arity\(arity).swift")
             let zipSequenceCode = ZipSequenceGenerator.generateFor(arity: arity)
             try zipSequenceCode.write(to: zipSequenceFileURL, atomically: true, encoding: .utf8)
-            
+
             let zipWithFileURL = output.appending(component: "ZipWith+Arity\(arity).swift")
             let zipWithCode = ZipWithGenerator.generateFor(arity: arity)
             try zipWithCode.write(to: zipWithFileURL, atomically: true, encoding: .utf8)
+
+            let zipWithInoutFileURL = output.appending(component: "ZipWithInout+Arity\(arity).swift")
+            let zipWithInoutCode = ZipWithInoutGenerator.generateFor(arity: arity)
+            try zipWithInoutCode.write(to: zipWithInoutFileURL, atomically: true, encoding: .utf8)
         }
     }
 }

@@ -1,4 +1,7 @@
 
+#if canImport(_Differentiation)
+import _Differentiation
+
 @inlinable
 public func differentiableZipWith<C1, C2, C3, C4, Result>(
     _ c1: C1,
@@ -54,8 +57,6 @@ public func differentiableZipWith<C1, C2, C3, C4, Result>(
 
     return Array(results)
 }
-
-#if canImport(_Differentiation)
 
 @derivative(of: differentiableZipWith)
 @inlinable
@@ -147,6 +148,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, Result>(
     return (
         value: Array(results),
         pullback: { v in
+            precondition(v.count == pullbacks.count)
             var results1 = C1.TangentVector()
             results1.reserveCapacity(v.count)
             var results2 = C2.TangentVector()
