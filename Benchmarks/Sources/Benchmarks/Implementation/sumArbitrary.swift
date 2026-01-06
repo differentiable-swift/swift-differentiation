@@ -14,6 +14,19 @@ extension Array where Element == Float {
         }
         return result
     }
+
+    @inlinable
+    @derivative(of: sumArbitrary)
+    func _vjpSumArbitrary(indices: [Index]) -> (value: Float, pullback: (Float) -> TangentVector) {
+        let value = self.sumArbitrary(indices: indices)
+        return (value, { v in
+            var grad = TangentVector(repeating: 0, count: self.count)
+            for i in indices {
+                grad[i] += v
+            }
+            return grad
+        })
+    }
 }
 
 private let benchmarkTitle = "sumArbitrary"
