@@ -14,10 +14,13 @@ struct CodeGenerator {
         }
 
         for arity in 2 ... upToArity {
-            let zipDifferentiableFileURL = output.appending(component: "Zip+DifferentiableArity\(arity).swift")
-
-            let code = ZipSequenceGenerator.generateFor(arity: arity)
-            try code.write(to: zipDifferentiableFileURL, atomically: true, encoding: .utf8)
+            let zipSequenceFileURL = output.appending(component: "ZipSequence+Arity\(arity).swift")
+            let zipSequenceCode = ZipSequenceGenerator.generateFor(arity: arity)
+            try zipSequenceCode.write(to: zipSequenceFileURL, atomically: true, encoding: .utf8)
+            
+            let zipWithFileURL = output.appending(component: "ZipWith+Arity\(arity).swift")
+            let zipWithCode = ZipWithGenerator.generateFor(arity: arity)
+            try zipWithCode.write(to: zipWithFileURL, atomically: true, encoding: .utf8)
         }
     }
 }
@@ -25,4 +28,8 @@ struct CodeGenerator {
 enum CodeGeneratorError: Error {
     case invalidArguments
     case invalidData
+}
+
+func indent(_ indent: Int) -> String {
+    (0 ..< indent).map { _ in "    " }.joined()
 }
