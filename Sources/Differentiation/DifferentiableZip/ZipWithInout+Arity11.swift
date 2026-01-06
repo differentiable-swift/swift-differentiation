@@ -3,8 +3,8 @@
 import _Differentiation
 
 @inlinable
-public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, Result>(
-    _ c1: C1,
+public func differentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11>(
+    _ c1: inout Inout,
     _ c2: C2,
     _ c3: C3,
     _ c4: C4,
@@ -16,7 +16,7 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
     _ c10: C10,
     _ c11: C11,
     with transform: @differentiable(reverse) (
-        C1.Element,
+        Inout.Element,
         C2.Element,
         C3.Element,
         C4.Element,
@@ -27,10 +27,11 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
         C9.Element,
         C10.Element,
         C11.Element
-    ) -> Result
-) -> [Result] where
-    C1: DifferentiableCollection,
-    C1.Element: Differentiable,
+    ) -> Inout.Element
+) -> Void where
+    Inout: MutableCollection,
+    Inout: DifferentiableCollection,
+    Inout.Element: Differentiable,
     C2: DifferentiableCollection,
     C2.Element: Differentiable,
     C3: DifferentiableCollection,
@@ -50,8 +51,7 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
     C10: DifferentiableCollection,
     C10.Element: Differentiable,
     C11: DifferentiableCollection,
-    C11.Element: Differentiable,
-    Result: Differentiable
+    C11.Element: Differentiable
 {
     let capacity = min(
         c1.count,
@@ -67,10 +67,7 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
         c11.count
     )
 
-    if capacity == 0 { return [] }
-
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(capacity)
+    if capacity == 0 { return }
 
     var c1i = c1.startIndex
     var c2i = c2.startIndex
@@ -85,7 +82,7 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
     var c11i = c11.startIndex
 
     for _ in 0 ..< capacity {
-        results.append(transform(
+        c1[c1i] = transform(
             c1[c1i],
             c2[c2i],
             c3[c3i],
@@ -97,7 +94,7 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
             c9[c9i],
             c10[c10i],
             c11[c11i]
-        ))
+        )
         c1.formIndex(after: &c1i)
         c2.formIndex(after: &c2i)
         c3.formIndex(after: &c3i)
@@ -110,14 +107,12 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
         c10.formIndex(after: &c10i)
         c11.formIndex(after: &c11i)
     }
-
-    return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
 @inlinable
-public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, Result>(
-    _ c1: C1,
+public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11>(
+    _ c1: inout Inout,
     _ c2: C2,
     _ c3: C3,
     _ c4: C4,
@@ -129,7 +124,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
     _ c10: C10,
     _ c11: C11,
     with transform: @differentiable(reverse) (
-        C1.Element,
+        Inout.Element,
         C2.Element,
         C3.Element,
         C4.Element,
@@ -140,11 +135,10 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
         C9.Element,
         C10.Element,
         C11.Element
-    ) -> Result
+    ) -> Inout.Element
 ) -> (
-    value: [Result],
-    pullback: ([Result].TangentVector) -> (
-        C1.TangentVector,
+    value: Void,
+    pullback: (inout Inout.TangentVector) -> (
         C2.TangentVector,
         C3.TangentVector,
         C4.TangentVector,
@@ -157,8 +151,10 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
         C11.TangentVector
     )
 ) where
-    C1: DifferentiableCollection,
-    C1.Element: Differentiable,
+    Inout: MutableCollection,
+    Inout.TangentVector: MutableCollection,
+    Inout: DifferentiableCollection,
+    Inout.Element: Differentiable,
     C2: DifferentiableCollection,
     C2.Element: Differentiable,
     C3: DifferentiableCollection,
@@ -178,8 +174,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
     C10: DifferentiableCollection,
     C10.Element: Differentiable,
     C11: DifferentiableCollection,
-    C11.Element: Differentiable,
-    Result: Differentiable
+    C11.Element: Differentiable
 {
     let count = min(
         c1.count,
@@ -197,10 +192,9 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
 
     if count == 0 {
         return (
-            value: [],
+            value: (),
             pullback: { _ in
                 (
-                    C1.TangentVector.zero,
                     C2.TangentVector.zero,
                     C3.TangentVector.zero,
                     C4.TangentVector.zero,
@@ -216,10 +210,8 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
         )
     }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(count)
-    var pullbacks: ContiguousArray<(Result.TangentVector) -> (
-        C1.Element.TangentVector,
+    var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+        Inout.Element.TangentVector,
         C2.Element.TangentVector,
         C3.Element.TangentVector,
         C4.Element.TangentVector,
@@ -262,7 +254,8 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
             of: transform
         )
 
-        results.append(value)
+        c1[c1i] = value
+
         pullbacks.append(pullback)
 
         c1.formIndex(after: &c1i)
@@ -279,11 +272,9 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
     }
 
     return (
-        value: Array(results),
+        value: (),
         pullback: { v in
             precondition(v.count == pullbacks.count)
-            var results1 = C1.TangentVector()
-            results1.reserveCapacity(v.count)
             var results2 = C2.TangentVector()
             results2.reserveCapacity(v.count)
             var results3 = C3.TangentVector()
@@ -304,9 +295,9 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
             results10.reserveCapacity(v.count)
             var results11 = C11.TangentVector()
             results11.reserveCapacity(v.count)
-            for (tangentElement, pullback) in zip(v, pullbacks) {
+            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                 let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) = pullback(tangentElement)
-                results1.appendContribution(of: v1)
+                v[index] = v1
                 results2.appendContribution(of: v2)
                 results3.appendContribution(of: v3)
                 results4.appendContribution(of: v4)
@@ -320,7 +311,6 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C
             }
 
             return (
-                results1,
                 results2,
                 results3,
                 results4,

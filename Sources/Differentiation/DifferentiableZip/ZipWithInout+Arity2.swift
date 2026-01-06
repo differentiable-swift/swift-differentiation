@@ -3,66 +3,61 @@
 import _Differentiation
 
 @inlinable
-public func differentiableZipWith<C1, C2, Result>(
-    _ c1: C1,
+public func differentiableZipWith<Inout, C2>(
+    _ c1: inout Inout,
     _ c2: C2,
     with transform: @differentiable(reverse) (
-        C1.Element,
+        Inout.Element,
         C2.Element
-    ) -> Result
-) -> [Result] where
-    C1: DifferentiableCollection,
-    C1.Element: Differentiable,
+    ) -> Inout.Element
+) -> Void where
+    Inout: MutableCollection,
+    Inout: DifferentiableCollection,
+    Inout.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
-    Result: Differentiable
+    C2.Element: Differentiable
 {
     let capacity = min(
         c1.count,
         c2.count
     )
 
-    if capacity == 0 { return [] }
-
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(capacity)
+    if capacity == 0 { return }
 
     var c1i = c1.startIndex
     var c2i = c2.startIndex
 
     for _ in 0 ..< capacity {
-        results.append(transform(
+        c1[c1i] = transform(
             c1[c1i],
             c2[c2i]
-        ))
+        )
         c1.formIndex(after: &c1i)
         c2.formIndex(after: &c2i)
     }
-
-    return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
 @inlinable
-public func _vjpDifferentiableZipWith<C1, C2, Result>(
-    _ c1: C1,
+public func _vjpDifferentiableZipWith<Inout, C2>(
+    _ c1: inout Inout,
     _ c2: C2,
     with transform: @differentiable(reverse) (
-        C1.Element,
+        Inout.Element,
         C2.Element
-    ) -> Result
+    ) -> Inout.Element
 ) -> (
-    value: [Result],
-    pullback: ([Result].TangentVector) -> (
-        C1.TangentVector,
+    value: Void,
+    pullback: (inout Inout.TangentVector) -> (
         C2.TangentVector
     )
 ) where
-    C1: DifferentiableCollection,
-    C1.Element: Differentiable,
+    Inout: MutableCollection,
+    Inout.TangentVector: MutableCollection,
+    Inout: DifferentiableCollection,
+    Inout.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
-    Result: Differentiable
+    C2.Element: Differentiable
 {
     let count = min(
         c1.count,
@@ -71,20 +66,17 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
 
     if count == 0 {
         return (
-            value: [],
+            value: (),
             pullback: { _ in
                 (
-                    C1.TangentVector.zero,
                     C2.TangentVector.zero
                 )
             }
         )
     }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(count)
-    var pullbacks: ContiguousArray<(Result.TangentVector) -> (
-        C1.Element.TangentVector,
+    var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+        Inout.Element.TangentVector,
         C2.Element.TangentVector
     )> = []
     pullbacks.reserveCapacity(count)
@@ -100,7 +92,8 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
             of: transform
         )
 
-        results.append(value)
+        c1[c1i] = value
+
         pullbacks.append(pullback)
 
         c1.formIndex(after: &c1i)
@@ -108,21 +101,18 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
     }
 
     return (
-        value: Array(results),
+        value: (),
         pullback: { v in
             precondition(v.count == pullbacks.count)
-            var results1 = C1.TangentVector()
-            results1.reserveCapacity(v.count)
             var results2 = C2.TangentVector()
             results2.reserveCapacity(v.count)
-            for (tangentElement, pullback) in zip(v, pullbacks) {
+            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                 let (v1, v2) = pullback(tangentElement)
-                results1.appendContribution(of: v1)
+                v[index] = v1
                 results2.appendContribution(of: v2)
             }
 
             return (
-                results1,
                 results2
             )
         }

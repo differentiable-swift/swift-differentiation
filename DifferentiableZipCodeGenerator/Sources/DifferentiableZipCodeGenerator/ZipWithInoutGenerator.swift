@@ -1,6 +1,6 @@
-enum ZipWithGenerator {
+enum ZipWithInoutGenerator {
     static func generateFor(arity: Int) -> String {
-        let arityRange = 1 ... arity
+        let arityRange = 2 ... arity
         var code = ""
         code += """
 
@@ -8,77 +8,86 @@ enum ZipWithGenerator {
         import _Differentiation
 
         @inlinable
-        public func differentiableZipWith<\(arityRange.map { "C\($0)" }.joined(separator: ", ")), Result>(
+        public func differentiableZipWith<Inout, \(arityRange.map { "C\($0)" }.joined(separator: ", "))>(
+            _ c1: inout Inout,
         \(arityRange.map { "\(indent(1))_ c\($0): C\($0)" }.joined(separator: ",\n")),
             with transform: @differentiable(reverse) (
+                Inout.Element,
         \(arityRange.map { "\(indent(2))C\($0).Element" }.joined(separator: ",\n"))
-            ) -> Result
-        ) -> [Result] where
+            ) -> Inout.Element
+        ) -> Void where
+            Inout: MutableCollection,
+            Inout: DifferentiableCollection,
+            Inout.Element: Differentiable,
 
         """
         code += arityRange.map {
             """
                 C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable,
+                C\($0).Element: Differentiable
             """
-        }.joined(separator: "\n")
+        }.joined(separator: ",\n")
         code += """
 
-            Result: Differentiable
         {
             let capacity = min(
+                c1.count,
         \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
             )
 
-            if capacity == 0 { return [] }
+            if capacity == 0 { return }
 
-            var results = ContiguousArray<Result>()
-            results.reserveCapacity(capacity)
-
+            var c1i = c1.startIndex
         \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
 
             for _ in 0 ..< capacity {
-                results.append(transform(
+                c1[c1i] = transform(
+                    c1[c1i],
         \(arityRange.map { "\(indent(3))c\($0)[c\($0)i]" }.joined(separator: ",\n"))
-                ))
+                )
+                c1.formIndex(after: &c1i)
         \(arityRange.map { "\(indent(2))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
             }
-
-            return Array(results)
         }
 
         @derivative(of: differentiableZipWith)
         @inlinable
-        public func _vjpDifferentiableZipWith<\(arityRange.map { "C\($0)" }.joined(separator: ", ")), Result>(
+        public func _vjpDifferentiableZipWith<Inout, \(arityRange.map { "C\($0)" }.joined(separator: ", "))>(
+            _ c1: inout Inout,
         \(arityRange.map { "\(indent(1))_ c\($0): C\($0)" }.joined(separator: ",\n")),
             with transform: @differentiable(reverse) (
+                Inout.Element,
         \(arityRange.map { "\(indent(2))C\($0).Element" }.joined(separator: ",\n"))
-            ) -> Result
+            ) -> Inout.Element
         ) -> (
-            value: [Result],
-            pullback: ([Result].TangentVector) -> (
+            value: Void,
+            pullback: (inout Inout.TangentVector) -> (
         \(arityRange.map { "\(indent(2))C\($0).TangentVector" }.joined(separator: ",\n"))
             )
         ) where
+            Inout: MutableCollection,
+            Inout.TangentVector: MutableCollection,
+            Inout: DifferentiableCollection,
+            Inout.Element: Differentiable,
 
         """
         code += arityRange.map {
             """
                 C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable,
+                C\($0).Element: Differentiable
             """
-        }.joined(separator: "\n")
+        }.joined(separator: ",\n")
         code += """
 
-            Result: Differentiable
         {
             let count = min(
+                c1.count,
         \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
             )
 
             if count == 0 {
                 return (
-                    value: [],
+                    value: (),
                     pullback: { _ in
                         (
         \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
@@ -87,30 +96,33 @@ enum ZipWithGenerator {
                 )
             }
 
-            var results = ContiguousArray<Result>()
-            results.reserveCapacity(count)
-            var pullbacks: ContiguousArray<(Result.TangentVector) -> (
+            var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+                Inout.Element.TangentVector,
         \(arityRange.map { "\(indent(2))C\($0).Element.TangentVector" }.joined(separator: ",\n"))
             )> = []
             pullbacks.reserveCapacity(count)
 
+            var c1i = c1.startIndex
         \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
 
             for _ in 0 ..< count {
                 let (value, pullback) = valueWithPullback(
                     at:
+                    c1[c1i],
         \(arityRange.map { "\(indent(3))c\($0)[c\($0)i]" }.joined(separator: ",\n")),
                     of: transform
                 )
 
-                results.append(value)
+                c1[c1i] = value
+
                 pullbacks.append(pullback)
 
+                c1.formIndex(after: &c1i)
         \(arityRange.map { "\(indent(2))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
             }
 
             return (
-                value: Array(results),
+                value: (),
                 pullback: { v in
                     precondition(v.count == pullbacks.count)
 
@@ -123,11 +135,13 @@ enum ZipWithGenerator {
         }.joined(separator: "\n")
         code += """
 
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+                    for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
+                        let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+                        v[index] = v1
         \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
                     }
 
+                    // swiftformat:disable:next redundantParens
                     return (
         \(arityRange.map { "\(indent(4))results\($0)" }.joined(separator: ",\n"))
                     )
