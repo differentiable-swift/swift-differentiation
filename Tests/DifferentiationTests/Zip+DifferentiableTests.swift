@@ -137,6 +137,98 @@ struct ZipDifferentiableTests {
         #expect(result == [35, 40, 45])
     }
 
+    @Test
+    func arity5With() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [4, 5, 6]
+        let c: [Double] = [7, 8, 9]
+        let d: [Double] = [10, 11, 12]
+        let e: [Double] = [13, 14, 15]
+
+        let result = differentiableZipWith(a, b, c, d, e) { $0 + $1 + $2 + $3 + $4 }
+        #expect(result == [35, 40, 45])
+    }
+
+    @Test
+    func arity5WithInout() {
+        var a: [Double] = [1, 2, 3]
+        let b: [Double] = [4, 5, 6]
+        let c: [Double] = [7, 8, 9]
+        let d: [Double] = [10, 11, 12]
+        let e: [Double] = [13, 14, 15]
+
+        differentiableZipWith(&a, b, c, d, e) { $0 + $1 + $2 + $3 + $4 }
+        #expect(a == [35, 40, 45])
+    }
+
+    @Test
+    func arity3() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [4, 5, 6]
+        let c: [Double] = [7, 8, 9]
+
+        @differentiable(reverse)
+        func thing(a: [Double], b: [Double], c: [Double]) -> [Double] {
+            differentiableZip(a, b, c).differentiableMap { $0 * $1 * $2 }
+        }
+
+        let (value, pullback) = valueWithPullback(at: a, b, c) { a, b, c in
+            thing(a: a, b: b, c: c)
+        }
+
+        #expect(value == [28, 80, 162])
+        let gradient = pullback([0, 1, 0])
+        #expect(gradient.0.base == [0, 40, 0])
+        #expect(gradient.1.base == [0, 16, 0])
+        #expect(gradient.2.base == [0, 10, 0])
+    }
+
+    @Test
+    func arity3With() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [4, 5, 6]
+        let c: [Double] = [7, 8, 9]
+
+        @differentiable(reverse)
+        func thing(a: [Double], b: [Double], c: [Double]) -> [Double] {
+            differentiableZipWith(a, b, c) { $0 * $1 * $2 }
+        }
+
+        let (value, pullback) = valueWithPullback(at: a, b, c) { a, b, c in
+            thing(a: a, b: b, c: c)
+        }
+
+        #expect(value == [28, 80, 162])
+        let gradient = pullback([0, 1, 0])
+        #expect(gradient.0.base == [0, 40, 0])
+        #expect(gradient.1.base == [0, 16, 0])
+        #expect(gradient.2.base == [0, 10, 0])
+    }
+
+    @Test
+    func arity3WithInout() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [4, 5, 6]
+        let c: [Double] = [7, 8, 9]
+
+        @differentiable(reverse)
+        func thing(a: inout [Double], b: [Double], c: [Double]) {
+            differentiableZipWith(&a, b, c) { $0 * $1 * $2 }
+        }
+
+        let (value, pullback) = valueWithPullback(at: a, b, c) { a, b, c in
+            var a = a
+            thing(a: &a, b: b, c: c)
+            return a
+        }
+
+        #expect(value == [28, 80, 162])
+        let gradient = pullback([0, 1, 0])
+        #expect(gradient.0.base == [0, 40, 0])
+        #expect(gradient.1.base == [0, 16, 0])
+        #expect(gradient.2.base == [0, 10, 0])
+    }
+
     // MARK: Currently not supported.
 
 //    @Test
