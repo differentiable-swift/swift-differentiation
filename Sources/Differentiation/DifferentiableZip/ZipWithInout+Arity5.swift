@@ -178,6 +178,7 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5>(
                 results5.appendContribution(of: v5)
             }
 
+            // swiftformat:disable:next redundantParens
             return (
                 results2,
                 results3,

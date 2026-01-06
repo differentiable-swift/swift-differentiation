@@ -68,9 +68,7 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
         return (
             value: (),
             pullback: { _ in
-                (
-                    C2.TangentVector.zero
-                )
+                C2.TangentVector.zero
             }
         )
     }
@@ -112,6 +110,7 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
                 results2.appendContribution(of: v2)
             }
 
+            // swiftformat:disable:next redundantParens
             return (
                 results2
             )
