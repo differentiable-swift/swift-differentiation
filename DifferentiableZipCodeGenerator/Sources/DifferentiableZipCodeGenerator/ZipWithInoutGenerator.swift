@@ -89,6 +89,7 @@ enum ZipWithInoutGenerator {
                 return (
                     value: (),
                     pullback: { _ in
+                        // swiftformat:disable:next redundantParens
                         (
         \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
                         )

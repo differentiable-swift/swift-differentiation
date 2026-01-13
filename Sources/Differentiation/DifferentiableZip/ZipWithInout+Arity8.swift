@@ -152,6 +152,7 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8>(
         return (
             value: (),
             pullback: { _ in
+                // swiftformat:disable:next redundantParens
                 (
                     C2.TangentVector.zero,
                     C3.TangentVector.zero,
