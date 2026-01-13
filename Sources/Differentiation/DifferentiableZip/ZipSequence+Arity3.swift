@@ -139,6 +139,19 @@ public func _vjpDifferentiableZip<C1, C2, C3>(
     )
 }
 
+extension Zip3SequenceDifferentiable {
+    @inlinable
+    public func differentiableMap<Result: Differentiable>(
+        _ transform: @differentiable(reverse) (
+            C1.Element,
+            C2.Element,
+            C3.Element
+        ) -> Result
+    ) -> [Result] {
+        self.map(transform)
+    }
+}
+
 extension Zip3SequenceDifferentiable: Differentiable where
     C1: Differentiable,
     C1.Element: Differentiable,
@@ -161,17 +174,6 @@ extension Zip3SequenceDifferentiable: Differentiable where
         _collection1.move(by: offset.collection1)
         _collection2.move(by: offset.collection2)
         _collection3.move(by: offset.collection3)
-    }
-
-    @inlinable
-    public func differentiableMap<Result: Differentiable>(
-        _ transform: @differentiable(reverse) (
-            C1.Element,
-            C2.Element,
-            C3.Element
-        ) -> Result
-    ) -> [Result] {
-        self.map(transform)
     }
 
     @derivative(of: differentiableMap)
