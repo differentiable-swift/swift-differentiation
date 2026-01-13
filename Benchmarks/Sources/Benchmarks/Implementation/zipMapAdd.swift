@@ -11,17 +11,17 @@ extension Array where Element == Float {
             type: Self.self,
             regular: { lhs, rhs in
                 { _ in
-                    blackHole(zip(lhs, rhs).differentiableMap { $0 + $1 })
+                    blackHole(differentiableZip(lhs, rhs).differentiableMap { $0 + $1 })
                 }
             },
             forward: { lhs, rhs in
                 { _ in
-                    blackHole(valueWithPullback(at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }).value)
+                    blackHole(valueWithPullback(at: lhs, rhs, of: { differentiableZip($0, $1).differentiableMap { $0 + $1 } }).value)
                 }
             },
             reverse: { lhs, rhs in
                 let pullback = valueWithPullback(
-                    at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }
+                    at: lhs, rhs, of: { differentiableZip($0, $1).differentiableMap { $0 + $1 } }
                 ).pullback
 
                 var basisVector = Array.DifferentiableView([Float](repeating: 0, count: lhs.count))
@@ -40,7 +40,7 @@ extension Array where Element == Float {
             tangent[0] = 1.0
             return { _ in
                 let pullback = valueWithPullback(
-                    at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }
+                    at: lhs, rhs, of: { differentiableZip($0, $1).differentiableMap { $0 + $1 } }
                 ).pullback
 
                 let gradient = pullback(tangent)
