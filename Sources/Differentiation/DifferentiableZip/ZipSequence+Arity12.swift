@@ -181,8 +181,8 @@ extension Zip12SequenceDifferentiable: Collection {
     }
 
     @inlinable
-    public func index(after index: Int) -> Int {
-        index + 1
+    public func index(after i: Int) -> Int {
+        i + 1
     }
 
     @inlinable
@@ -524,6 +524,7 @@ extension Zip12SequenceDifferentiable: Differentiable where
                 // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                 // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
+                assert(v.count == pullbacks.count)
                 for (tangentElement, pullback) in zip(v, pullbacks) {
                     let (
                         result1,
@@ -668,8 +669,8 @@ extension Zip12SequenceDifferentiable {
         }
 
         @inlinable
-        public func index(after index: Int) -> Int {
-            index + 1
+        public func index(after i: Int) -> Int {
+            i + 1
         }
 
         @inlinable
