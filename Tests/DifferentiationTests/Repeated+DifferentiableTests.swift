@@ -11,7 +11,7 @@ struct RepeatedDifferentiableTests {
         let (value, pullback) = valueWithPullback(at: a, b, of: { a, b in
             differentiableZip(a, b).differentiableMap { $0 + $1 }.differentiableReduce(0.0, { result, v in result + v })
         })
-        
+
         #expect(value == 30.0)
         let gradient = pullback(1.0)
         #expect(gradient.0 == Repeated<Double>.TangentVector(base: repeatElement(10.0, count: 10)))
@@ -106,24 +106,24 @@ struct RepeatedDifferentiableTests {
         #expect(gradient.0 == 2.0)
         #expect(gradient.1 == [0.0, 2.0, 0.0])
     }
-    
+
     @Test
     func movingRepeatedTangentByZeroTangent() {
         var someTangent = Repeated<Double>.TangentVector(base: repeatElement(2.0, count: 5))
         let zeroTangent: Repeated<Double>.TangentVector = .zero
-        
+
         someTangent.move(by: zeroTangent)
-        
+
         #expect(someTangent == .init(base: repeatElement(2.0, count: 5)))
     }
-    
+
     @Test
     func movingRepeatedByZeroTangent() {
         var someValue: Repeated<Double> = repeatElement(2.0, count: 5)
         let zeroTangent: Repeated<Double>.TangentVector = .zero
-        
+
         someValue.move(by: zeroTangent)
-        
+
         #expect(someValue.repeatedValue == 2.0)
         #expect(someValue.count == 5)
     }
