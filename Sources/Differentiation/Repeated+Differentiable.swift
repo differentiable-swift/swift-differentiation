@@ -116,6 +116,7 @@ extension Repeated: @retroactive Differentiable where Element: Differentiable {
 
     @inlinable
     public mutating func move(by offset: TangentVector) {
+        if offset.base.isEmpty { return }
         precondition(
             self.count == offset.base.count,
             "Count mismatch: \(self.count) and \(offset.base.count)"

@@ -4,12 +4,14 @@ import Foundation
 struct CodeGenerator {
     static func main() throws {
         guard CommandLine.arguments.count == 3 else {
+            print("expected usage: CodeGenerator <output-directory> <arity>")
             throw CodeGeneratorError.invalidArguments
         }
         // arguments[0] is the path to this command line tool
         let output = URL(filePath: CommandLine.arguments[1])
 
         guard let upToArity = Int(CommandLine.arguments[2]) else {
+            print("expected usage: CodeGenerator <output-directory> <arity>")
             throw CodeGeneratorError.invalidArguments
         }
 
@@ -31,7 +33,6 @@ struct CodeGenerator {
 
 enum CodeGeneratorError: Error {
     case invalidArguments
-    case invalidData
 }
 
 func indent(_ indent: Int) -> String {

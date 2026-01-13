@@ -229,7 +229,7 @@ struct ZipDifferentiableTests {
         #expect(gradient.2.base == [0, 10, 0])
     }
 
-    // MARK: Currently not supported.
+    // MARK: Currently not supported due to language limitations (requires Tuples to be able to conform to `AdditiveArithmetic`)
 
 //    @Test
 //    func nestedZip() {
