@@ -81,8 +81,8 @@ enum ZipSequenceGenerator {
             }
 
             @inlinable
-            public func index(after index: Int) -> Int {
-                index + 1
+            public func index(after i: Int) -> Int {
+                i + 1
             }
 
             @inlinable
@@ -204,6 +204,7 @@ enum ZipSequenceGenerator {
                         // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                         // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
+                        assert(v.count == pullbacks.count)
                         for (tangentElement, pullback) in zip(v, pullbacks) {
                             let (
         \(arityRange.map { "\(indent(6))result\($0)" }.joined(separator: ",\n"))
@@ -261,8 +262,8 @@ enum ZipSequenceGenerator {
                 }
 
                 @inlinable
-                public func index(after index: Int) -> Int {
-                    index + 1
+                public func index(after i: Int) -> Int {
+                    i + 1
                 }
 
                 @inlinable
