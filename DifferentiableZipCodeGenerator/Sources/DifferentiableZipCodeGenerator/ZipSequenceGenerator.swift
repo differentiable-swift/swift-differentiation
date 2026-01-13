@@ -141,6 +141,17 @@ enum ZipSequenceGenerator {
             )
         }
 
+        extension Zip\(arity)SequenceDifferentiable {
+            @inlinable
+            public func differentiableMap<Result: Differentiable>(
+                _ transform: @differentiable(reverse) (
+        \(arityRange.map { "\(indent(3))C\($0).Element" }.joined(separator: ",\n"))
+                ) -> Result
+            ) -> [Result] {
+                self.map(transform)
+            }
+        }
+
         extension Zip\(arity)SequenceDifferentiable: Differentiable where
 
         """
@@ -159,15 +170,6 @@ enum ZipSequenceGenerator {
             @inlinable
             public mutating func move(by offset: TangentVector) {
         \(arityRange.map { "\(indent(2))_collection\($0).move(by: offset.collection\($0))" }.joined(separator: "\n"))
-            }
-
-            @inlinable
-            public func differentiableMap<Result: Differentiable>(
-                _ transform: @differentiable(reverse) (
-        \(arityRange.map { "\(indent(3))C\($0).Element" }.joined(separator: ",\n"))
-                ) -> Result
-            ) -> [Result] {
-                self.map(transform)
             }
 
             @derivative(of: differentiableMap)
