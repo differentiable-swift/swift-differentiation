@@ -9,7 +9,7 @@ import Testing
 struct InlineArrayTests {
     // Test that the zero additive arithmetic gives an array of zeros
     @Test("zero produces repeating zero elements")
-    @available(macOS 26, *)
+    @available(macOS 26, iOS 26, *)
     func zeroProducesZeros() {
         let z = InlineArray<2, Double>.zero
         #expect(z[0] == 0.0)
@@ -18,7 +18,7 @@ struct InlineArrayTests {
 
     // Test + and - work elementwise
     @Test("additive arithmetic + and − are elementwise")
-    @available(macOS 26, *)
+    @available(macOS 26, iOS 26, *)
     func additiveArithmeticAddSubtract() {
         let a = InlineArray<2, Double>(repeating: 1.5) // [1.5, 1.5]
         let b: InlineArray<2, Double> = [2.0, 3.0]
@@ -34,7 +34,7 @@ struct InlineArrayTests {
     /*
      // Test differentiable init(repeating:)
      @Test("vjp of init(repeating:) aggregates tangent inputs correctly")
-     @available(macOS 26, *)
+     @available(macOS 26, iOS 26, *)
      func testVJPInitRepeating() {
          // For differentiable init(repeating:), the pullback should sum all elements of the tangent vector
          let repeated = InlineArray<2, Double>(repeating: 4.0)
@@ -55,7 +55,7 @@ struct InlineArrayTests {
       */
 
     @Test("vjp of read is correct")
-    @available(macOS 26, *)
+    @available(macOS 26, iOS 26, *)
     func testVJPRead() {
         let arr: InlineArray<2, Double> = [5.0, 7.0]
         let index = 1
@@ -70,7 +70,7 @@ struct InlineArrayTests {
     }
 
     @Test("vjp of update mutating works")
-    @available(macOS 26, *)
+    @available(macOS 26, iOS 26, *)
     func testVJPUpdate() {
         let arr: InlineArray<2, Double> = [1.0, 2.0]
         let index = 0
@@ -103,7 +103,7 @@ struct InlineArrayTests {
 
     // You could test move(by:) on the tangent vector space
     @Test("move(by:) translates elements correctly")
-    @available(macOS 26, *)
+    @available(macOS 26, iOS 26, *)
     func testMoveBy() {
         var arr: InlineArray<2, Double> = [1.0, 2.0]
         let offset: InlineArray<2, Double> = [1.0, 2.0]
