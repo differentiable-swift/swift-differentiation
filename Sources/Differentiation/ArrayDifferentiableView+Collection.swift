@@ -13,6 +13,7 @@ extension Array.DifferentiableView:
 {
     public typealias Element = Array.Element
     public typealias Index = Array.Index
+    // TODO: Is this correct? should this be ArraySlice.DifferentiableView perhaps?
     public typealias SubSequence = Array.SubSequence
 
     @inlinable

@@ -27,6 +27,16 @@ extension Array.DifferentiableView: DifferentiableCollectionTangentVector where 
     }
 }
 
+extension ArraySlice: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
+
+extension ArraySlice.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic { }
+
+extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
+    public mutating func appendContribution(of value: Element) {
+        self.append(value)
+    }
+}
+
 extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
 
 extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}

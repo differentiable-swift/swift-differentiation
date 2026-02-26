@@ -48,3 +48,14 @@ func testReplacingSubrange() {
 
     print(gradient1, gradient3)
 }
+
+@Test
+func slice() {
+    @differentiable(reverse)
+    func run(arr: [Double], arr2: [Double], range: Range<Int>) -> [Double] {
+        let subrange = arr2[range]
+        var arr = arr
+        arr.replaceSubrange(range, with: subrange)
+        return arr
+    }
+}
