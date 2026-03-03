@@ -2,18 +2,18 @@
 
 import _Differentiation
 
-extension Array.DifferentiableView:
-    @retroactive Sequence,
-    @retroactive Collection,
-    @retroactive RangeReplaceableCollection,
-    @retroactive RandomAccessCollection,
-    @retroactive BidirectionalCollection,
-    @retroactive MutableCollection
+extension ArraySlice.DifferentiableView:
+    Sequence,
+    Collection,
+    RangeReplaceableCollection,
+    RandomAccessCollection,
+    BidirectionalCollection,
+    MutableCollection
     where Element: Differentiable
 {
-    public typealias Element = Array.Element
-    public typealias Index = Array.Index
-    public typealias SubSequence = Array.SubSequence
+    public typealias Element = ArraySlice.Element
+    public typealias Index = ArraySlice.Index
+    public typealias SubSequence = ArraySlice.SubSequence
 
     @inlinable
     public subscript(position: Index) -> Element {
@@ -34,7 +34,9 @@ extension Array.DifferentiableView:
     public var endIndex: Index { base.endIndex }
 
     @inlinable
-    public init() { self.init(Array<Element>()) }
+    public init() {
+        self.base = .init()
+    }
 
     @inlinable
     public mutating func replaceSubrange<C>(_ subrange: Range<Index>, with newElements: C)
