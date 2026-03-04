@@ -2,18 +2,18 @@
 
 import _Differentiation
 
-extension Array.DifferentiableView:
-    @retroactive Sequence,
-    @retroactive Collection,
-    @retroactive RangeReplaceableCollection,
-    @retroactive RandomAccessCollection,
-    @retroactive BidirectionalCollection,
-    @retroactive MutableCollection
+extension ContiguousArray.DifferentiableView:
+    Sequence,
+    Collection,
+    RangeReplaceableCollection,
+    RandomAccessCollection,
+    BidirectionalCollection,
+    MutableCollection
     where Element: Differentiable
 {
-    public typealias Element = Array.Element
-    public typealias Index = Array.Index
-    public typealias SubSequence = Array.SubSequence
+    public typealias Element = ContiguousArray.Element
+    public typealias Index = ContiguousArray.Index
+    public typealias SubSequence = ContiguousArray.SubSequence
 
     @inlinable
     public subscript(position: Index) -> Element {
@@ -35,7 +35,7 @@ extension Array.DifferentiableView:
 
     @inlinable
     public init() {
-        self.init(Array<Element>())
+        self.init(ContiguousArray<Element>())
     }
 
     @inlinable

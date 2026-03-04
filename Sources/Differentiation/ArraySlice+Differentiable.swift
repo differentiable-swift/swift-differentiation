@@ -17,8 +17,8 @@ extension ArraySlice: @retroactive Differentiable where Element: Differentiable 
             ('direction')
             """
         )
-        for i in offset.base.indices {
-            self[i].move(by: offset.base[i])
+        for (selfIndex, offsetIndex) in zip(self.indices, offset.base.indices) {
+            self[selfIndex].move(by: offset.base[offsetIndex])
         }
     }
 }

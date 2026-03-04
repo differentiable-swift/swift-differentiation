@@ -18,29 +18,8 @@ extension ContiguousArray {
 
 #if canImport(_Differentiation)
 
-extension ContiguousArray where Element: Differentiable {
-    @frozen
-    public struct DifferentiableView {
-        public var base: ContiguousArray<Element>
-
-        @inlinable
-        init(_ base: ContiguousArray<Element>) {
-            self.base = base
-        }
-    }
-}
-
-extension ContiguousArray.DifferentiableView: Differentiable {
+extension ContiguousArray: @retroactive Differentiable where Element: Differentiable {
     public typealias TangentVector = ContiguousArray<Element.TangentVector>.DifferentiableView
-
-    @derivative(of: ContiguousArray.DifferentiableView.init)
-    @inlinable
-    static func _vjpInit(_ base: ContiguousArray<Element>) -> (
-        value: ContiguousArray.DifferentiableView,
-        pullback: (TangentVector) -> TangentVector
-    ) {
-        (ContiguousArray.DifferentiableView(base), { $0 })
-    }
 
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -48,119 +27,8 @@ extension ContiguousArray.DifferentiableView: Differentiable {
             return
         }
         precondition(
-            base.count == offset.base.count, """
-            Count mismatch: \(base.count) ('self') and \(offset.base.count) \
-            ('direction')
+            self.count == offset.base.count,
             """
-        )
-        for i in offset.base.indices {
-            base[i].move(by: offset.base[i])
-        }
-    }
-}
-
-extension ContiguousArray.DifferentiableView: CustomStringConvertible {
-    public var description: String {
-        base.description
-    }
-}
-
-extension ContiguousArray.DifferentiableView: ExpressibleByArrayLiteral
-    where Element: Differentiable
-{
-    @inlinable
-    public init(arrayLiteral elements: Element...) {
-        self.init(ContiguousArray(elements))
-    }
-}
-
-extension ContiguousArray.DifferentiableView: Equatable where Element: Equatable {
-    @inlinable
-    public static func == (lhs: ContiguousArray.DifferentiableView, rhs: ContiguousArray.DifferentiableView) -> Bool {
-        lhs.base == rhs.base
-    }
-}
-
-extension ContiguousArray.DifferentiableView: AdditiveArithmetic where Element: AdditiveArithmetic {
-    @inlinable
-    public static var zero: ContiguousArray.DifferentiableView {
-        ContiguousArray.DifferentiableView([])
-    }
-
-    @inlinable
-    public static func + (
-        lhs: ContiguousArray.DifferentiableView,
-        rhs: ContiguousArray.DifferentiableView
-    ) -> ContiguousArray.DifferentiableView {
-        if lhs.base.count == 0 {
-            return rhs
-        }
-        if rhs.base.count == 0 {
-            return lhs
-        }
-        precondition(
-            lhs.base.count == rhs.base.count,
-            "Count mismatch: \(lhs.base.count) and \(rhs.base.count)"
-        )
-        var result = ContiguousArray()
-        result.reserveCapacity(lhs.base.count)
-        for i in lhs.base.indices {
-            result.append(lhs.base[i] + rhs.base[i])
-        }
-        return ContiguousArray.DifferentiableView(result)
-    }
-
-    @inlinable
-    public static func - (
-        lhs: ContiguousArray.DifferentiableView,
-        rhs: ContiguousArray.DifferentiableView
-    ) -> ContiguousArray.DifferentiableView {
-        if rhs.base.count == 0 {
-            return lhs
-        }
-
-        var result = ContiguousArray()
-        result.reserveCapacity(lhs.base.count)
-
-        if lhs.base.count == 0 {
-            for i in rhs.base.indices {
-                result.append(.zero - rhs.base[i])
-            }
-            return ContiguousArray.DifferentiableView(result)
-        }
-
-        precondition(
-            lhs.base.count == rhs.base.count,
-            "Count mismatch: \(lhs.base.count) and \(rhs.base.count)"
-        )
-
-        for i in rhs.base.indices {
-            result.append(lhs.base[i] - rhs.base[i])
-        }
-        return ContiguousArray.DifferentiableView(result)
-    }
-
-    @inlinable
-    public subscript(_ index: Int) -> Element {
-        if index < base.count {
-            return base[index]
-        }
-        else {
-            return Element.zero
-        }
-    }
-}
-
-extension ContiguousArray: @retroactive Differentiable where Element: Differentiable {
-    public typealias TangentVector = ContiguousArray<Element.TangentVector>.DifferentiableView
-
-    @inlinable
-    public mutating func move(by offset: ContiguousArray<Element.TangentVector>.DifferentiableView) {
-        if offset.base.isEmpty {
-            return
-        }
-        precondition(
-            self.count == offset.base.count, """
             Count mismatch: \(self.count) ('self') and \(offset.base.count) \
             ('direction')
             """
@@ -220,48 +88,6 @@ extension ContiguousArray where Element: Differentiable {
             tangentVector.base[index] = .zero
             return dElement
         })
-    }
-}
-
-extension ContiguousArray.DifferentiableView:
-    Sequence,
-    Collection,
-    RangeReplaceableCollection,
-    RandomAccessCollection,
-    BidirectionalCollection,
-    MutableCollection
-    where Element: Differentiable
-{
-    public typealias Element = ContiguousArray.Element
-    public typealias Index = ContiguousArray.Index
-    public typealias SubSequence = ContiguousArray.SubSequence
-
-    @inlinable
-    public subscript(position: Index) -> Element {
-        _read { yield base[position] }
-        set(newValue) { base[position] = newValue }
-    }
-
-    @inlinable
-    public subscript(bounds: Range<Index>) -> SubSequence {
-        get { base[bounds] }
-        set(newValue) { base[bounds] = newValue }
-    }
-
-    @inlinable
-    public var startIndex: Index { base.startIndex }
-
-    @inlinable
-    public var endIndex: Index { base.endIndex }
-
-    @inlinable
-    public init() { self.init(ContiguousArray<Element>()) }
-
-    @inlinable
-    public mutating func replaceSubrange<C>(_ subrange: Range<Self.Index>, with newElements: C)
-        where C: Collection, Self.Element == C.Element
-    {
-        base.replaceSubrange(subrange, with: newElements)
     }
 }
 

@@ -35,7 +35,7 @@ extension ArraySlice.DifferentiableView:
 
     @inlinable
     public init() {
-        self.base = .init()
+        self.init(ArraySlice<Element>())
     }
 
     @inlinable
