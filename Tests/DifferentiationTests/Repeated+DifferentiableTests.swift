@@ -1,6 +1,7 @@
-import _Differentiation
 @testable import Differentiation
 import Testing
+
+#if canImport(_Differentiation)
 
 @Suite
 struct RepeatedDifferentiableTests {
@@ -128,3 +129,5 @@ struct RepeatedDifferentiableTests {
         #expect(someValue.count == 5)
     }
 }
+
+#endif
