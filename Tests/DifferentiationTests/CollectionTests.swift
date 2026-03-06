@@ -1,4 +1,6 @@
-import _Differentiation
+#if canImport(_Differentiation)
+
+import Differentiation
 import Testing
 
 // MARK: - ArraySlice
@@ -481,3 +483,5 @@ struct CrossTypeConsistencyTests {
         #expect(gradArr.elementsEqual(gradCA))
     }
 }
+
+#endif

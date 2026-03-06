@@ -1,3 +1,5 @@
+#if canImport(_Differentiation)
+
 extension ContiguousArray where Element: Differentiable {
     @inlinable
     @differentiable(reverse, wrt: (self, initialResult))
@@ -45,3 +47,5 @@ extension ContiguousArray where Element: Differentiable {
         )
     }
 }
+
+#endif

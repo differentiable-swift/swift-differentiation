@@ -1,6 +1,7 @@
-import _Differentiation
 @testable import Differentiation
 import Testing
+
+#if canImport(_Differentiation)
 
 @Suite
 struct ZipDifferentiableTests {
@@ -248,3 +249,5 @@ struct ZipDifferentiableTests {
 //        })
 //    }
 }
+
+#endif
