@@ -23,4 +23,37 @@ extension ArraySlice: @retroactive Differentiable where Element: Differentiable 
     }
 }
 
+extension ArraySlice where Element: Differentiable {
+    @inlinable
+    @derivative(of: subscript)
+    func _vjpSubscript(index: Int) -> (
+        value: Element,
+        pullback: (Element.TangentVector) -> TangentVector
+    ) {
+        func pullback(_ v: Element.TangentVector) -> TangentVector {
+            var dSelf = Array<Element.TangentVector>(
+                repeating: .zero,
+                count: count
+            )
+            dSelf[index] = v
+            return TangentVector(dSelf)
+        }
+        return (self[index], pullback)
+    }
+
+    @inlinable
+    @derivative(of: init(repeating:count:))
+    static func _vjpInit(repeating repeatedValue: Element, count: Int) -> (
+        value: ArraySlice<Element>,
+        pullback: (TangentVector) -> Element.TangentVector
+    ) {
+        (
+            value: Self(repeating: repeatedValue, count: count),
+            pullback: { v in
+                v.base.reduce(.zero, +)
+            }
+        )
+    }
+}
+
 #endif

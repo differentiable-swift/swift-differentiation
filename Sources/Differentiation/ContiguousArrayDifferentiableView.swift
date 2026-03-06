@@ -4,7 +4,7 @@ extension ContiguousArray where Element: Differentiable {
     @frozen
     public struct DifferentiableView {
         public var base: ContiguousArray<Element>
-        
+
         @inlinable
         public init(_ base: ContiguousArray<Element>) {
             self.base = base
@@ -24,7 +24,7 @@ extension ContiguousArray.DifferentiableView: AdditiveArithmetic where Element: 
     public static var zero: ContiguousArray.DifferentiableView {
         .init([])
     }
-    
+
     @inlinable
     public static func + (
         lhs: ContiguousArray.DifferentiableView,
@@ -42,7 +42,7 @@ extension ContiguousArray.DifferentiableView: AdditiveArithmetic where Element: 
         )
         return ContiguousArray.DifferentiableView(zip(lhs.base, rhs.base).map(+))
     }
-    
+
     @inlinable
     public static func - (
         lhs: ContiguousArray.DifferentiableView,
