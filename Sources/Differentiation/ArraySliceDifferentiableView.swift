@@ -5,12 +5,12 @@ import _Differentiation
 extension ArraySlice where Element: Differentiable {
     public struct DifferentiableView {
         public var base: ArraySlice<Element>
-        
+
         @inlinable
         public init(_ base: ArraySlice<Element>) {
             self.base = base
         }
-        
+
         @inlinable
         public init(_ base: Array<Element>) {
             self.base = base[...]
@@ -70,7 +70,7 @@ extension ArraySlice.DifferentiableView: AdditiveArithmetic where Element: Addit
 
 extension ArraySlice.DifferentiableView: Differentiable {
     public typealias TangentVector = ArraySlice<Element.TangentVector>.DifferentiableView
-    
+
     @derivative(of: ArraySlice.DifferentiableView.init)
     @inlinable
     static func _vjpInit(_ base: ArraySlice<Element>) -> (
@@ -79,7 +79,7 @@ extension ArraySlice.DifferentiableView: Differentiable {
     ) {
         (ArraySlice.DifferentiableView(base), { $0 })
     }
-    
+
     @derivative(of: ArraySlice.DifferentiableView.init)
     @inlinable
     static func _vjpInit(_ base: Array<Element>) -> (
