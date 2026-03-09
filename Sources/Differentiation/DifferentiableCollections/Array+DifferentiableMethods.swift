@@ -43,4 +43,33 @@ extension Array where Element: Differentiable {
     }
 }
 
+extension Array where Element: Differentiable {
+    // TODO: Can we make this work for all RangeReplaceableCollections?
+    @derivative(of: replaceSubrange)
+    @inlinable
+    public mutating func _vjpReplaceSubrange<C>(
+        _ subrange: Range<Self.Index>,
+        with newElements: C
+    ) -> (
+        value: (),
+        pullback: (inout Self.TangentVector) -> C.TangentVector
+    ) where C: Collection, C: Differentiable, Element == C.Element, C.TangentVector: RangeReplaceableCollection,
+        C.TangentVector.Element == C.Element.TangentVector
+    {
+        let lowerBound = subrange.lowerBound
+        let newElementCount = newElements.count
+        let subrangeCount = subrange.count
+        self.replaceSubrange(subrange, with: newElements)
+        return (
+            value: (),
+            pullback: { v in
+                let newElementsRange = lowerBound ..< lowerBound + newElementCount
+                let dElement = v[newElementsRange]
+                v.replaceSubrange(newElementsRange, with: repeatElement(.zero, count: subrangeCount))
+                return C.TangentVector(dElement)
+            }
+        )
+    }
+}
+
 #endif
