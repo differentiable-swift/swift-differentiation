@@ -1,7 +1,7 @@
 #if canImport(_Differentiation)
 import _Differentiation
 
-public struct Pair<A: Differentiable, B: Differentiable>: Differentiable {
+public struct Pair<A, B> {
     @usableFromInline
     var a: A
     @usableFromInline
@@ -11,6 +11,40 @@ public struct Pair<A: Differentiable, B: Differentiable>: Differentiable {
     init(_ a: A, _ b: B) {
         self.a = a
         self.b = b
+    }
+}
+
+extension Pair: Differentiable where A: Differentiable, B: Differentiable {
+    public typealias TangentVector = Pair<A.TangentVector, B.TangentVector>
+
+    @inlinable
+    public mutating func move(by offset: TangentVector) {
+        a.move(by: offset.a)
+        b.move(by: offset.b)
+    }
+}
+
+extension Pair: Equatable where A: Equatable, B: Equatable {
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.a == rhs.a && lhs.b == rhs.b
+    }
+}
+
+extension Pair: AdditiveArithmetic where A: AdditiveArithmetic, B: AdditiveArithmetic {
+    @inlinable
+    public var zero: Self {
+        .init(.zero, .zero)
+    }
+
+    @inlinable
+    public static func + (lhs: Self, rhs: Self) -> Self {
+        .init(lhs.a + rhs.a, lhs.b + rhs.b)
+    }
+
+    @inlinable
+    public static func - (lhs: Self, rhs: Self) -> Self {
+        .init(lhs.a - rhs.a, lhs.b - rhs.b)
     }
 }
 
