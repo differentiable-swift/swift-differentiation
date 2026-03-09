@@ -1,6 +1,27 @@
 #if canImport(_Differentiation)
 
 extension ArraySlice where Element: Differentiable {
+    @derivative(of: init)
+    @inlinable
+    static func _vjpInit<C: Collection>(_ c: C) -> (
+        value: Self,
+        pullback: (Self.TangentVector) -> C.TangentVector
+    ) where
+        C: Differentiable,
+        C.Element == Element,
+        C.TangentVector: RangeReplaceableCollection,
+        Element.TangentVector == C.TangentVector.Element
+    {
+        (
+            value: .init(c),
+            pullback: { v in
+                C.TangentVector(v)
+            }
+        )
+    }
+}
+
+extension ArraySlice where Element: Differentiable {
     @inlinable
     @differentiable(reverse, wrt: (self, initialResult))
     public func differentiableReduce<Result: Differentiable>(

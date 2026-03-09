@@ -3,6 +3,27 @@
 import _Differentiation
 
 extension Array where Element: Differentiable {
+    @derivative(of: init)
+    @inlinable
+    static func _vjpInit<C: Collection>(_ c: C) -> (
+        value: Self,
+        pullback: (Self.TangentVector) -> C.TangentVector
+    ) where
+        C: Differentiable,
+        C.Element == Element,
+        C.TangentVector: RangeReplaceableCollection,
+        Element.TangentVector == C.TangentVector.Element
+    {
+        (
+            value: .init(c),
+            pullback: { v in
+                C.TangentVector(v)
+            }
+        )
+    }
+}
+
+extension Array where Element: Differentiable {
     // TODO: Make this work more generally
     @derivative(of: Array.subscript.get)
     @inlinable
