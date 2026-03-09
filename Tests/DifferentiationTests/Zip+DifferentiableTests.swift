@@ -230,6 +230,45 @@ struct ZipDifferentiableTests {
         #expect(gradient.2.base == [0, 10, 0])
     }
 
+    @Test
+    func zipContiguousArrayCall() {
+        let a: ContiguousArray<Double> = [1, 2, 3]
+        let b: [Double] = [5, 6, 7]
+
+        let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
+            differentiableZip(s1, s2)
+        })
+
+        #expect(value.map(\.0) == Array(a))
+        #expect(value.map(\.1) == b)
+
+        let va: ContiguousArray<Double>.DifferentiableView = [1, 0, 0]
+        let vb: [Double].DifferentiableView = [0, 0, 0]
+
+        let gradient = pullback(Zip2SequenceDifferentiable.TangentVector(va, vb))
+        #expect(gradient == ([1, 0, 0], [0, 0, 0]))
+    }
+
+    @Test
+    func zipArraySliceCall() {
+        let aArray: [Double] = [1, 2, 3, 4, 5]
+        let a = aArray[1 ..< 4]
+        let b: [Double] = [5, 6, 7]
+
+        let (value, pullback) = valueWithPullback(at: a, b, of: { s1, s2 in
+            differentiableZip(s1, s2)
+        })
+
+        #expect(value.map(\.0) == Array(a))
+        #expect(value.map(\.1) == b)
+
+        let va: ArraySlice<Double>.DifferentiableView = [1, 0, 0]
+        let vb: [Double].DifferentiableView = [0, 0, 0]
+
+        let gradient = pullback(Zip2SequenceDifferentiable.TangentVector(va, vb))
+        #expect(gradient == ([1, 0, 0], [0, 0, 0]))
+    }
+
     // MARK: Currently not supported due to language limitations (requires Tuples to be able to conform to `AdditiveArithmetic`)
 
 //    @Test

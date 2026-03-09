@@ -121,14 +121,14 @@ extension Zip8SequenceDifferentiable: Collection {
     @inlinable
     public subscript(index: Int) -> Element {
         (
-            _collection1[index],
-            _collection2[index],
-            _collection3[index],
-            _collection4[index],
-            _collection5[index],
-            _collection6[index],
-            _collection7[index],
-            _collection8[index]
+            _collection1[_collection1.startIndex.advanced(by: index)],
+            _collection2[_collection2.startIndex.advanced(by: index)],
+            _collection3[_collection3.startIndex.advanced(by: index)],
+            _collection4[_collection4.startIndex.advanced(by: index)],
+            _collection5[_collection5.startIndex.advanced(by: index)],
+            _collection6[_collection6.startIndex.advanced(by: index)],
+            _collection7[_collection7.startIndex.advanced(by: index)],
+            _collection8[_collection8.startIndex.advanced(by: index)]
         )
     }
 

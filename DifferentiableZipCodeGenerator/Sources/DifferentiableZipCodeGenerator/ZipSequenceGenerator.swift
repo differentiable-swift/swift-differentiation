@@ -76,7 +76,7 @@ enum ZipSequenceGenerator {
             @inlinable
             public subscript(index: Int) -> Element {
                 (
-        \(arityRange.map { "\(indent(3))_collection\($0)[index]" }.joined(separator: ",\n"))
+        \(arityRange.map { "\(indent(3))_collection\($0)[_collection\($0).startIndex.advanced(by: index)]" }.joined(separator: ",\n"))
                 )
             }
 
