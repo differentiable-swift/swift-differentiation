@@ -77,10 +77,10 @@ extension Zip4SequenceDifferentiable: Collection {
     @inlinable
     public subscript(index: Int) -> Element {
         (
-            _collection1[index],
-            _collection2[index],
-            _collection3[index],
-            _collection4[index]
+            _collection1[_collection1.startIndex.advanced(by: index)],
+            _collection2[_collection2.startIndex.advanced(by: index)],
+            _collection3[_collection3.startIndex.advanced(by: index)],
+            _collection4[_collection4.startIndex.advanced(by: index)]
         )
     }
 
