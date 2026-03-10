@@ -12,9 +12,8 @@ public protocol DifferentiableCollection: Differentiable & Collection where
 }
 
 public protocol DifferentiableCollectionTangentVector: DifferentiableCollection {
-    init()
-    mutating func reserveCapacity(_ capacity: Int)
-    mutating func appendContribution(of value: Element)
+    init(repeating value: Element, count: Int)
+    mutating func writeTangentContribution(of value: Element, at index: Index)
 }
 
 extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
@@ -22,8 +21,9 @@ extension Array: DifferentiableCollection where Element: Differentiable & Additi
 extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
+    @inlinable
+    public mutating func writeTangentContribution(of value: Element, at index: Index) {
+        self[index] += value
     }
 }
 
@@ -32,12 +32,15 @@ extension Repeated: DifferentiableCollection where Element: Differentiable & Add
 extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public init() { self = .zero }
-    public mutating func reserveCapacity(_: Int) { /* no-op */ }
-    public mutating func appendContribution(of value: Repeated<Element>.Element) {
+    @inlinable
+    public init(repeating value: Element, count: Int) {
+        self = .init(base: repeatElement(value, count: count))
+    }
+
+    @inlinable
+    public mutating func writeTangentContribution(of value: Repeated<Element>.Element, at _: Repeated<Element>.Index) {
         let newValue = self.base.repeatedValue + value
-        let newCount = self.base.count + 1
-        self.base = repeatElement(newValue, count: newCount)
+        self.base = repeatElement(newValue, count: self.count)
     }
 }
 

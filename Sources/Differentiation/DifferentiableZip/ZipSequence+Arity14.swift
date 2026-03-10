@@ -561,35 +561,35 @@ extension Zip14SequenceDifferentiable: Differentiable where
         return (
             value: results,
             pullback: { v in
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
-                var results3 = C3.TangentVector()
-                var results4 = C4.TangentVector()
-                var results5 = C5.TangentVector()
-                var results6 = C6.TangentVector()
-                var results7 = C7.TangentVector()
-                var results8 = C8.TangentVector()
-                var results9 = C9.TangentVector()
-                var results10 = C10.TangentVector()
-                var results11 = C11.TangentVector()
-                var results12 = C12.TangentVector()
-                var results13 = C13.TangentVector()
-                var results14 = C14.TangentVector()
+                var results1 = C1.TangentVector(repeating: .zero, count: v.count)
+                var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+                var results3 = C3.TangentVector(repeating: .zero, count: v.count)
+                var results4 = C4.TangentVector(repeating: .zero, count: v.count)
+                var results5 = C5.TangentVector(repeating: .zero, count: v.count)
+                var results6 = C6.TangentVector(repeating: .zero, count: v.count)
+                var results7 = C7.TangentVector(repeating: .zero, count: v.count)
+                var results8 = C8.TangentVector(repeating: .zero, count: v.count)
+                var results9 = C9.TangentVector(repeating: .zero, count: v.count)
+                var results10 = C10.TangentVector(repeating: .zero, count: v.count)
+                var results11 = C11.TangentVector(repeating: .zero, count: v.count)
+                var results12 = C12.TangentVector(repeating: .zero, count: v.count)
+                var results13 = C13.TangentVector(repeating: .zero, count: v.count)
+                var results14 = C14.TangentVector(repeating: .zero, count: v.count)
 
-                results1.reserveCapacity(v.count)
-                results2.reserveCapacity(v.count)
-                results3.reserveCapacity(v.count)
-                results4.reserveCapacity(v.count)
-                results5.reserveCapacity(v.count)
-                results6.reserveCapacity(v.count)
-                results7.reserveCapacity(v.count)
-                results8.reserveCapacity(v.count)
-                results9.reserveCapacity(v.count)
-                results10.reserveCapacity(v.count)
-                results11.reserveCapacity(v.count)
-                results12.reserveCapacity(v.count)
-                results13.reserveCapacity(v.count)
-                results14.reserveCapacity(v.count)
+                var results1Index = results1.startIndex
+                var results2Index = results2.startIndex
+                var results3Index = results3.startIndex
+                var results4Index = results4.startIndex
+                var results5Index = results5.startIndex
+                var results6Index = results6.startIndex
+                var results7Index = results7.startIndex
+                var results8Index = results8.startIndex
+                var results9Index = results9.startIndex
+                var results10Index = results10.startIndex
+                var results11Index = results11.startIndex
+                var results12Index = results12.startIndex
+                var results13Index = results13.startIndex
+                var results14Index = results14.startIndex
 
                 // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                 // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
@@ -613,20 +613,35 @@ extension Zip14SequenceDifferentiable: Differentiable where
                         result14
                     ) = pullback(tangentElement)
 
-                    results1.appendContribution(of: result1)
-                    results2.appendContribution(of: result2)
-                    results3.appendContribution(of: result3)
-                    results4.appendContribution(of: result4)
-                    results5.appendContribution(of: result5)
-                    results6.appendContribution(of: result6)
-                    results7.appendContribution(of: result7)
-                    results8.appendContribution(of: result8)
-                    results9.appendContribution(of: result9)
-                    results10.appendContribution(of: result10)
-                    results11.appendContribution(of: result11)
-                    results12.appendContribution(of: result12)
-                    results13.appendContribution(of: result13)
-                    results14.appendContribution(of: result14)
+                    results1.writeTangentContribution(of: result1, at: results1Index)
+                    results2.writeTangentContribution(of: result2, at: results2Index)
+                    results3.writeTangentContribution(of: result3, at: results3Index)
+                    results4.writeTangentContribution(of: result4, at: results4Index)
+                    results5.writeTangentContribution(of: result5, at: results5Index)
+                    results6.writeTangentContribution(of: result6, at: results6Index)
+                    results7.writeTangentContribution(of: result7, at: results7Index)
+                    results8.writeTangentContribution(of: result8, at: results8Index)
+                    results9.writeTangentContribution(of: result9, at: results9Index)
+                    results10.writeTangentContribution(of: result10, at: results10Index)
+                    results11.writeTangentContribution(of: result11, at: results11Index)
+                    results12.writeTangentContribution(of: result12, at: results12Index)
+                    results13.writeTangentContribution(of: result13, at: results13Index)
+                    results14.writeTangentContribution(of: result14, at: results14Index)
+
+                    results1.formIndex(after: &results1Index)
+                    results2.formIndex(after: &results2Index)
+                    results3.formIndex(after: &results3Index)
+                    results4.formIndex(after: &results4Index)
+                    results5.formIndex(after: &results5Index)
+                    results6.formIndex(after: &results6Index)
+                    results7.formIndex(after: &results7Index)
+                    results8.formIndex(after: &results8Index)
+                    results9.formIndex(after: &results9Index)
+                    results10.formIndex(after: &results10Index)
+                    results11.formIndex(after: &results11Index)
+                    results12.formIndex(after: &results12Index)
+                    results13.formIndex(after: &results13Index)
+                    results14.formIndex(after: &results14Index)
                 }
 
                 return TangentVector(

@@ -199,9 +199,10 @@ enum ZipSequenceGenerator {
                 return (
                     value: results,
                     pullback: { v in
-        \(arityRange.map { "\(indent(4))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(4))var results\($0) = C\($0).TangentVector(repeating: .zero, count: v.count)" }
+            .joined(separator: "\n"))
 
-        \(arityRange.map { "\(indent(4))results\($0).reserveCapacity(v.count)" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(4))var results\($0)Index = results\($0).startIndex" }.joined(separator: "\n"))
 
                         // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                         // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
@@ -212,7 +213,10 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(6))result\($0)" }.joined(separator: ",\n"))
                             ) = pullback(tangentElement)
 
-        \(arityRange.map { "\(indent(5))results\($0).appendContribution(of: result\($0))" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(5))results\($0).writeTangentContribution(of: result\($0), at: results\($0)Index)" }
+            .joined(separator: "\n"))
+
+        \(arityRange.map { "\(indent(5))results\($0).formIndex(after: &results\($0)Index)" }.joined(separator: "\n"))
                         }
 
                         return TangentVector(
