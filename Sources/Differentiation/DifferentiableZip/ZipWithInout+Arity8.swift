@@ -219,30 +219,39 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8>(
         value: (),
         pullback: { v in
             precondition(v.count == pullbacks.count)
-            var results2 = C2.TangentVector()
-            results2.reserveCapacity(v.count)
-            var results3 = C3.TangentVector()
-            results3.reserveCapacity(v.count)
-            var results4 = C4.TangentVector()
-            results4.reserveCapacity(v.count)
-            var results5 = C5.TangentVector()
-            results5.reserveCapacity(v.count)
-            var results6 = C6.TangentVector()
-            results6.reserveCapacity(v.count)
-            var results7 = C7.TangentVector()
-            results7.reserveCapacity(v.count)
-            var results8 = C8.TangentVector()
-            results8.reserveCapacity(v.count)
+
+            var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+            var results3 = C3.TangentVector(repeating: .zero, count: v.count)
+            var results4 = C4.TangentVector(repeating: .zero, count: v.count)
+            var results5 = C5.TangentVector(repeating: .zero, count: v.count)
+            var results6 = C6.TangentVector(repeating: .zero, count: v.count)
+            var results7 = C7.TangentVector(repeating: .zero, count: v.count)
+            var results8 = C8.TangentVector(repeating: .zero, count: v.count)
+            var results2Index = results2.startIndex
+            var results3Index = results3.startIndex
+            var results4Index = results4.startIndex
+            var results5Index = results5.startIndex
+            var results6Index = results6.startIndex
+            var results7Index = results7.startIndex
+            var results8Index = results8.startIndex
+
             for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                 let (v1, v2, v3, v4, v5, v6, v7, v8) = pullback(tangentElement)
                 v[index] = v1
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
-                results6.appendContribution(of: v6)
-                results7.appendContribution(of: v7)
-                results8.appendContribution(of: v8)
+                results2.writeTangentContribution(of: v2, at: results2Index)
+                results3.writeTangentContribution(of: v3, at: results3Index)
+                results4.writeTangentContribution(of: v4, at: results4Index)
+                results5.writeTangentContribution(of: v5, at: results5Index)
+                results6.writeTangentContribution(of: v6, at: results6Index)
+                results7.writeTangentContribution(of: v7, at: results7Index)
+                results8.writeTangentContribution(of: v8, at: results8Index)
+                results2.formIndex(after: &results2Index)
+                results3.formIndex(after: &results3Index)
+                results4.formIndex(after: &results4Index)
+                results5.formIndex(after: &results5Index)
+                results6.formIndex(after: &results6Index)
+                results7.formIndex(after: &results7Index)
+                results8.formIndex(after: &results8Index)
             }
 
             // swiftformat:disable:next redundantParens
