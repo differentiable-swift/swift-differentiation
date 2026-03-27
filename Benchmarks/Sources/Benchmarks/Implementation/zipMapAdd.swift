@@ -107,30 +107,30 @@ extension Array where Element == Float {
 
 extension DArray where Element == Float {
     static func addZipMapAddBenchmarks(_ benchmark: inout Benchmark) {
-        benchmark.add(
-            title: benchmarkTitle,
-            type: Self.self,
-            regular: { lhs, rhs in
-                { _ in
-                    blackHole(zip(lhs, rhs).differentiableMap { $0 + $1 })
-                }
-            },
-            forward: { lhs, rhs in
-                { _ in
-                    blackHole(valueWithPullback(at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }).value)
-                }
-            },
-            reverse: { lhs, rhs in
-                let pullback = valueWithPullback(
-                    at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }
-                ).pullback
-                var basisVector = Array.DifferentiableView([Float](repeating: 0, count: lhs.count))
-                basisVector.base[0] = 1
-                return { _ in
-                    blackHole(pullback(basisVector))
-                }
-            }
-        )
+//        benchmark.add(
+//            title: benchmarkTitle,
+//            type: Self.self,
+//            regular: { lhs, rhs in
+//                { _ in
+//                    blackHole(zip(lhs, rhs).differentiableMap { $0 + $1 })
+//                }
+//            },
+//            forward: { lhs, rhs in
+//                { _ in
+//                    blackHole(valueWithPullback(at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }).value)
+//                }
+//            },
+//            reverse: { lhs, rhs in
+//                let pullback = valueWithPullback(
+//                    at: lhs, rhs, of: { zip($0, $1).differentiableMap { $0 + $1 } }
+//                ).pullback
+//                var basisVector = Array.DifferentiableView([Float](repeating: 0, count: lhs.count))
+//                basisVector.base[0] = 1
+//                return { _ in
+//                    blackHole(pullback(basisVector))
+//                }
+//            }
+//        )
 
         benchmark.add(
             title: benchmarkTitle + "+Naive",
