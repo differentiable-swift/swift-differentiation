@@ -381,9 +381,15 @@ struct ArrayDifferentiableTests {
             let view = Array<Float>.DifferentiableView([1, 2, 3])
             #expect((view - .zero).base.elementsEqual([1, 2, 3]))
 
-            withKnownIssue("This should be fixed in 6.3") {
-                #expect((Array<Float>.DifferentiableView.zero - view).base.elementsEqual([-1, -2, -3]))
+            let check = (Array<Float>.DifferentiableView.zero - view).base.elementsEqual([-1, -2, -3])
+
+            #if compiler(<6.3)
+            withKnownIssue("This is fixed in Swift 6.3. But currently using Swift<6.3") {
+                #expect(check)
             }
+            #else
+            #expect(check)
+            #endif
         }
 
         @Test("subtracting empty view from non-empty view returns non-empty")
