@@ -37,7 +37,6 @@ struct RepeatedDifferentiableTests {
         let vb: Repeated<Double>.DifferentiableView = .init(base: repeatElement(2.0, count: 3))
 
         let gradient = pullback(Zip2SequenceDifferentiable<[Double], Repeated<Double>>.TangentVector(va, vb))
-        print(gradient)
         #expect(gradient.0 == [1, 0, 0])
         #expect(gradient.1.base.repeatedValue == 2.0)
         #expect(gradient.1.count == 3)
