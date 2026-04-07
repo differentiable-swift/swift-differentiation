@@ -98,8 +98,6 @@ struct CollectionDifferentiableMethodsTests {
         let gradient4 = pullback2([0, 0, 1, 0, 0])
 
         #expect(gradient3 == gradient4)
-
-        print(gradient1, gradient3)
     }
 
     @Test
@@ -130,8 +128,6 @@ struct CollectionDifferentiableMethodsTests {
         let gradient4 = pullback2([0, 0, 1, 0, 0, 0])
 
         #expect(gradient3 == gradient4)
-
-        print(gradient1, gradient3)
     }
 
     @Test
@@ -162,7 +158,5 @@ struct CollectionDifferentiableMethodsTests {
         let gradient4 = pullback2([0, 0, 1, 0])
 
         #expect(gradient3 == gradient4)
-
-        print(gradient1, gradient3)
     }
 }
