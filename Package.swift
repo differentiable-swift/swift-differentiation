@@ -16,9 +16,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/differentiable-swift/swift-differentiation-stdlib.git", from: .tagBasedOnCompilerVersion
-        ),
+        .package(url: "https://github.com/differentiable-swift/swift-differentiation-stdlib.git", from: .tagBasedOnCompilerVersion),
     ],
     targets: [
         .target(
@@ -37,7 +35,7 @@ let package = Package(
 extension Version {
     static var tagBasedOnCompilerVersion: Version {
         #if compiler(<6.3)
-        "602.0.0"
+        "602.0.1"
         #elseif compiler(<6.4)
         "603.0.0"
         #endif
