@@ -273,17 +273,17 @@ extension Zip5SequenceDifferentiable: Differentiable where
         return (
             value: results,
             pullback: { v in
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
-                var results3 = C3.TangentVector()
-                var results4 = C4.TangentVector()
-                var results5 = C5.TangentVector()
+                var results1 = C1.TangentVector(repeating: .zero, count: v.count)
+                var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+                var results3 = C3.TangentVector(repeating: .zero, count: v.count)
+                var results4 = C4.TangentVector(repeating: .zero, count: v.count)
+                var results5 = C5.TangentVector(repeating: .zero, count: v.count)
 
-                results1.reserveCapacity(v.count)
-                results2.reserveCapacity(v.count)
-                results3.reserveCapacity(v.count)
-                results4.reserveCapacity(v.count)
-                results5.reserveCapacity(v.count)
+                var results1Index = results1.startIndex
+                var results2Index = results2.startIndex
+                var results3Index = results3.startIndex
+                var results4Index = results4.startIndex
+                var results5Index = results5.startIndex
 
                 // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                 // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
@@ -298,11 +298,17 @@ extension Zip5SequenceDifferentiable: Differentiable where
                         result5
                     ) = pullback(tangentElement)
 
-                    results1.appendContribution(of: result1)
-                    results2.appendContribution(of: result2)
-                    results3.appendContribution(of: result3)
-                    results4.appendContribution(of: result4)
-                    results5.appendContribution(of: result5)
+                    results1.writeTangentContribution(of: result1, at: results1Index)
+                    results2.writeTangentContribution(of: result2, at: results2Index)
+                    results3.writeTangentContribution(of: result3, at: results3Index)
+                    results4.writeTangentContribution(of: result4, at: results4Index)
+                    results5.writeTangentContribution(of: result5, at: results5Index)
+
+                    results1.formIndex(after: &results1Index)
+                    results2.formIndex(after: &results2Index)
+                    results3.formIndex(after: &results3Index)
+                    results4.formIndex(after: &results4Index)
+                    results5.formIndex(after: &results5Index)
                 }
 
                 return TangentVector(
