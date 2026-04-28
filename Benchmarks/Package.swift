@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Benchmarks",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS("26.0")],
     products: [
         .executable(name: "PackageBenchmarks", targets: ["PackageBenchmarks"])
     ],

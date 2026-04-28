@@ -65,9 +65,9 @@ extension DCTA: HasBenchmarks where Element == Float {}
 
 let types: [HasBenchmarks.Type] = [
     Array<Float>.self,
-    DArray<Float>.self,
+    //DArray<Float>.self,
     ConstantTimeAccessor<Float>.self,
-    DCTA<Float>.self,
+    //DCTA<Float>.self,
 ]
 
 for type in types {
