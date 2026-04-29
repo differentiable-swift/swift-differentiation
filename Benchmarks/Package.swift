@@ -23,6 +23,13 @@ let package = Package(
             ]
         ),
         .executableTarget(
+            name: "CTABenchmarks",
+            dependencies: [
+                .product(name: "Differentiation", package: "swift-differentiation"),
+                .product(name: "CollectionsBenchmark", package: "swift-collections-benchmark"),
+            ]
+        ),
+        .executableTarget(
             name: "PackageBenchmarks",
             dependencies: [
                 .product(name: "Differentiation", package: "swift-differentiation"),
