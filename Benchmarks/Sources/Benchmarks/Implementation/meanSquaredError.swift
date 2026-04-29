@@ -28,15 +28,28 @@ extension Array where Element == Float {
         return mse
     }
     
-    
+    @inlinable
     @differentiable(reverse, wrt: self)
     public func meanSquaredErrorCombinator(to target: Array<Float>) -> Float {
-        differentiableZipWith(self, target) { input, target in
-            let d = input - target
-            return d * d
-            
-        }.differentiableReduce(0.0, +)
+        differentiableZipWith(self, target, with: doThing).differentiableReduce(0.0, addThing)
     }
+}
+
+extension Array where Element == Float {
+    
+}
+
+@inlinable
+@differentiable(reverse)
+public func doThing(_ x: Float, _ y: Float) -> Float {
+    let d = x - y
+    return d * d
+}
+
+@inlinable
+@differentiable(reverse)
+public func addThing(_ x: Float, _ y: Float) -> Float {
+    x + y
 }
 
 extension DArray where Element == Float {
