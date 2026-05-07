@@ -36,8 +36,10 @@ extension Version {
     static var tagBasedOnCompilerVersion: Version {
         #if compiler(<6.3)
         "602.0.1"
-        #elseif compiler(<6.4)
+        #elseif compiler(<6.3.1)
         "603.0.0"
+        #elseif compiler(<6.4)
+        "603.1.0"
         #endif
     }
 }
