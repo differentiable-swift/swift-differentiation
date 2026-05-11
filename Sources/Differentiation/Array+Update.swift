@@ -37,6 +37,7 @@ extension Array where Element: Differentiable {
         return ((), { tangentVector in
             // manual zero tangent initialization
             if tangentVector.base.count < forwardCount {
+                // this overwrites previous accumulation if we update a tangent of the wrong size
                 tangentVector.base = .init(repeating: .zero, count: forwardCount)
             }
             let dElement = tangentVector[index]
