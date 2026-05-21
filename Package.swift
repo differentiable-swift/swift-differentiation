@@ -38,7 +38,7 @@ extension Version {
         "602.0.1"
         #elseif compiler(<6.3.1)
         "603.0.0"
-        #elseif compiler(<6.4)
+        #else
         "603.1.0"
         #endif
     }
