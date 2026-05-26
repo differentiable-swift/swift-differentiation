@@ -3,7 +3,7 @@ import _Differentiation
 /// Adds a differentiable subscript to `Array` using the `cta:` argument label to avoid
 /// clashing with the built-in subscript. The getter is `mutating` so the pullback accumulates
 /// directly into the existing tangent vector instead of allocating a new one per access.
-extension Array where Element: Differentiable, Element: AdditiveArithmetic {
+extension Array where Element: Differentiable {
     @inlinable
     public subscript(cta index: Int) -> Element {
         @differentiable(reverse)
