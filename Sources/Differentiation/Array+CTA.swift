@@ -38,9 +38,12 @@ extension Array where Element: Differentiable {
     public mutating func _vjpSubscriptCTASet(newValue: Element, cta index: Int)
         -> (value: Void, pullback: (inout TangentVector) -> Element.TangentVector)
     {
-        (
+        let forwardCount = self.count
+        return (
             value: self[index] = newValue,
             pullback: { tangentVector in
+                assert(index < forwardCount)
+                guard index < tangentVector.count else { return .zero }
                 let dElement = tangentVector.base[index]
                 tangentVector.base[index] = .zero
                 return dElement
