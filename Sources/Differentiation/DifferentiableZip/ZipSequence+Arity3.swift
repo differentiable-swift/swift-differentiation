@@ -213,14 +213,15 @@ extension Zip3SequenceDifferentiable: Differentiable where
                 var results2 = C2.TangentVector()
                 var results3 = C3.TangentVector()
 
-                results1.reserveCapacity(v.count)
-                results2.reserveCapacity(v.count)
-                results3.reserveCapacity(v.count)
+                results1.reserveCapacity(pullbacks.count)
+                results2.reserveCapacity(pullbacks.count)
+                results3.reserveCapacity(pullbacks.count)
 
                 // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                 // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                assert(v.count == pullbacks.count)
+                precondition(v.count == pullbacks.count)
+
                 for (tangentElement, pullback) in zip(v, pullbacks) {
                     let (
                         result1,
