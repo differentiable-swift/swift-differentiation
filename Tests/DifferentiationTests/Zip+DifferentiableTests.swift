@@ -231,6 +231,53 @@ struct ZipDifferentiableTests {
     }
 
     @Test
+    func zipWithArrayZeroLengthTangentCall() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [1, 2, 3]
+
+        let (value, pullback) = valueWithPullback(at: a, b) { s1, s2 in
+            differentiableZipWith(s1, s2) { $0 + $1 }
+        }
+
+        #expect(value == [2, 4, 6])
+        let gradient = pullback([])
+        #expect(gradient.0 == [0, 0, 0])
+        #expect(gradient.1 == [0, 0, 0])
+    }
+
+    @Test
+    func zipArrayZeroLengthTangentCall() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [1, 2, 3]
+
+        let (value, pullback) = valueWithPullback(at: a, b) { s1, s2 in
+            differentiableZip(s1, s2).differentiableMap { $0 + $1 }
+        }
+
+        #expect(value == [2, 4, 6])
+        let gradient = pullback([])
+        #expect(gradient.0 == [0, 0, 0])
+        #expect(gradient.1 == [0, 0, 0])
+    }
+
+    @Test
+    func zipWithInoutArrayZeroLengthTangentCall() {
+        let a: [Double] = [1, 2, 3]
+        let b: [Double] = [1, 2, 3]
+
+        let (value, pullback) = valueWithPullback(at: a, b) { s1, s2 in
+            var s1 = s1
+            differentiableZipWith(&s1, s2) { $0 + $1 }
+            return s1
+        }
+
+        #expect(value == [2, 4, 6])
+        let gradient = pullback([])
+        #expect(gradient.0 == [0, 0, 0])
+        #expect(gradient.1 == [0, 0, 0])
+    }
+
+    @Test
     func zipContiguousArrayCall() {
         let a: ContiguousArray<Double> = [1, 2, 3]
         let b: [Double] = [5, 6, 7]
