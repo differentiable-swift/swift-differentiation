@@ -241,20 +241,25 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, Result>(
             results6.reserveCapacity(pullbacks.count)
             results7.reserveCapacity(pullbacks.count)
             results8.reserveCapacity(pullbacks.count)
-            
-            precondition(v.count == pullbacks.count)
 
-            for (tangentElement, pullback) in zip(v, pullbacks) {
-                let (v1, v2, v3, v4, v5, v6, v7, v8) = pullback(tangentElement)
+            if v.count == 0 {
+                fatalError("To be implemented")
+            }
+            else {
+                precondition(v.count == pullbacks.count)
 
-                results1.appendContribution(of: v1)
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
-                results6.appendContribution(of: v6)
-                results7.appendContribution(of: v7)
-                results8.appendContribution(of: v8)
+                for (tangentElement, pullback) in zip(v, pullbacks) {
+                    let (v1, v2, v3, v4, v5, v6, v7, v8) = pullback(tangentElement)
+
+                    results1.appendContribution(of: v1)
+                    results2.appendContribution(of: v2)
+                    results3.appendContribution(of: v3)
+                    results4.appendContribution(of: v4)
+                    results5.appendContribution(of: v5)
+                    results6.appendContribution(of: v6)
+                    results7.appendContribution(of: v7)
+                    results8.appendContribution(of: v8)
+                }
             }
 
             return (

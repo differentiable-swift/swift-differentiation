@@ -113,15 +113,20 @@ enum ZipWithGenerator {
                 value: Array(results),
                 pullback: { v in
         \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
-        
-        \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
-                    
-                    precondition(v.count == pullbacks.count)
-        
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
 
-        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
+
+                    if v.count == 0 {
+                        fatalError("To be implemented")
+                    }
+                    else {
+                        precondition(v.count == pullbacks.count)
+
+                        for (tangentElement, pullback) in zip(v, pullbacks) {
+                            let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+
+        \(arityRange.map { "\(indent(5))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+                        }
                     }
 
                     return (
