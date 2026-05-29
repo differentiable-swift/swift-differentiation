@@ -117,7 +117,11 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
             results2.reserveCapacity(pullbacks.count)
 
             if v.count == 0 {
-                fatalError("To be implemented")
+                for pullback in pullbacks {
+                    let (v1, v2) = pullback(.zero)
+                    results1.appendContribution(of: v1)
+                    results2.appendContribution(of: v2)
+                }
             }
             else {
                 precondition(v.count == pullbacks.count)
