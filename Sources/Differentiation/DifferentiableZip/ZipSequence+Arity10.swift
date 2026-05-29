@@ -456,7 +456,19 @@ extension Zip10SequenceDifferentiable: Differentiable where
                 results10.reserveCapacity(pullbacks.count)
 
                 if v.count == 0 {
-                    fatalError("To be implemented")
+                    for pullback in pullbacks {
+                        let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) = pullback(.zero)
+                        results1.appendContribution(of: v1)
+                        results2.appendContribution(of: v2)
+                        results3.appendContribution(of: v3)
+                        results4.appendContribution(of: v4)
+                        results5.appendContribution(of: v5)
+                        results6.appendContribution(of: v6)
+                        results7.appendContribution(of: v7)
+                        results8.appendContribution(of: v8)
+                        results9.appendContribution(of: v9)
+                        results10.appendContribution(of: v10)
+                    }
                 }
                 else {
                     // thoughts:

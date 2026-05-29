@@ -204,7 +204,10 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(4))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
 
                         if v.count == 0 {
-                            fatalError("To be implemented")
+                            for pullback in pullbacks {
+                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(.zero)
+        \(arityRange.map { "\(indent(6))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+                            }
                         }
                         else {
                             // thoughts:

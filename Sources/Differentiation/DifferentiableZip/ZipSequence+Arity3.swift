@@ -218,7 +218,12 @@ extension Zip3SequenceDifferentiable: Differentiable where
                 results3.reserveCapacity(pullbacks.count)
 
                 if v.count == 0 {
-                    fatalError("To be implemented")
+                    for pullback in pullbacks {
+                        let (v1, v2, v3) = pullback(.zero)
+                        results1.appendContribution(of: v1)
+                        results2.appendContribution(of: v2)
+                        results3.appendContribution(of: v3)
+                    }
                 }
                 else {
                     // thoughts:
