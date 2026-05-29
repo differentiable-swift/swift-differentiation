@@ -275,27 +275,30 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
     return (
         value: (),
         pullback: { v in
-            precondition(v.count == pullbacks.count)
             var results2 = C2.TangentVector()
-            results2.reserveCapacity(v.count)
             var results3 = C3.TangentVector()
-            results3.reserveCapacity(v.count)
             var results4 = C4.TangentVector()
-            results4.reserveCapacity(v.count)
             var results5 = C5.TangentVector()
-            results5.reserveCapacity(v.count)
             var results6 = C6.TangentVector()
-            results6.reserveCapacity(v.count)
             var results7 = C7.TangentVector()
-            results7.reserveCapacity(v.count)
             var results8 = C8.TangentVector()
-            results8.reserveCapacity(v.count)
             var results9 = C9.TangentVector()
-            results9.reserveCapacity(v.count)
             var results10 = C10.TangentVector()
-            results10.reserveCapacity(v.count)
             var results11 = C11.TangentVector()
-            results11.reserveCapacity(v.count)
+
+            results2.reserveCapacity(pullbacks.count)
+            results3.reserveCapacity(pullbacks.count)
+            results4.reserveCapacity(pullbacks.count)
+            results5.reserveCapacity(pullbacks.count)
+            results6.reserveCapacity(pullbacks.count)
+            results7.reserveCapacity(pullbacks.count)
+            results8.reserveCapacity(pullbacks.count)
+            results9.reserveCapacity(pullbacks.count)
+            results10.reserveCapacity(pullbacks.count)
+            results11.reserveCapacity(pullbacks.count)
+            
+            precondition(v.count == pullbacks.count)
+
             for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                 let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11) = pullback(tangentElement)
                 v[index] = v1

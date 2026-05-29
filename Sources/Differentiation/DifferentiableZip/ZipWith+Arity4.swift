@@ -148,17 +148,21 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, Result>(
     return (
         value: Array(results),
         pullback: { v in
-            precondition(v.count == pullbacks.count)
             var results1 = C1.TangentVector()
-            results1.reserveCapacity(v.count)
             var results2 = C2.TangentVector()
-            results2.reserveCapacity(v.count)
             var results3 = C3.TangentVector()
-            results3.reserveCapacity(v.count)
             var results4 = C4.TangentVector()
-            results4.reserveCapacity(v.count)
+
+            results1.reserveCapacity(pullbacks.count)
+            results2.reserveCapacity(pullbacks.count)
+            results3.reserveCapacity(pullbacks.count)
+            results4.reserveCapacity(pullbacks.count)
+            
+            precondition(v.count == pullbacks.count)
+
             for (tangentElement, pullback) in zip(v, pullbacks) {
                 let (v1, v2, v3, v4) = pullback(tangentElement)
+
                 results1.appendContribution(of: v1)
                 results2.appendContribution(of: v2)
                 results3.appendContribution(of: v3)
