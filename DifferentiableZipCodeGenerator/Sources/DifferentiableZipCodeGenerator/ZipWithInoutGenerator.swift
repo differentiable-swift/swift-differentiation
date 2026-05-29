@@ -128,9 +128,16 @@ enum ZipWithInoutGenerator {
         \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
 
         \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
-                    
+
+                    if v.count == 0 {
+                        v.reserveCapacity(pullbacks.count)
+                        for _ in 0 ..< pullbacks.count {
+                            v.appendContribution(of: .zero)
+                        }
+                    }
+
                     precondition(v.count == pullbacks.count)
-        
+
                     for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                         let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
                         v[index] = v1
