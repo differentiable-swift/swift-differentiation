@@ -209,13 +209,13 @@ extension Zip3SequenceDifferentiable: Differentiable where
         return (
             value: results,
             pullback: { v in
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
-                var results3 = C3.TangentVector()
+                var results1 = C1.TangentVector(repeating: .zero, count: v.count)
+                var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+                var results3 = C3.TangentVector(repeating: .zero, count: v.count)
 
-                results1.reserveCapacity(v.count)
-                results2.reserveCapacity(v.count)
-                results3.reserveCapacity(v.count)
+                var results1Index = results1.startIndex
+                var results2Index = results2.startIndex
+                var results3Index = results3.startIndex
 
                 // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
                 // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
@@ -228,9 +228,13 @@ extension Zip3SequenceDifferentiable: Differentiable where
                         result3
                     ) = pullback(tangentElement)
 
-                    results1.appendContribution(of: result1)
-                    results2.appendContribution(of: result2)
-                    results3.appendContribution(of: result3)
+                    results1.writeTangentContribution(of: result1, at: results1Index)
+                    results2.writeTangentContribution(of: result2, at: results2Index)
+                    results3.writeTangentContribution(of: result3, at: results3Index)
+
+                    results1.formIndex(after: &results1Index)
+                    results2.formIndex(after: &results2Index)
+                    results3.formIndex(after: &results3Index)
                 }
 
                 return TangentVector(

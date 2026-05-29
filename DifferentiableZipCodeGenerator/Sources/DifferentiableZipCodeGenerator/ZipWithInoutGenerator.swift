@@ -127,19 +127,15 @@ enum ZipWithInoutGenerator {
                 pullback: { v in
                     precondition(v.count == pullbacks.count)
 
-        """
-        code += arityRange.map {
-            """
-            \(indent(3))var results\($0) = C\($0).TangentVector()
-            \(indent(3))results\($0).reserveCapacity(v.count)
-            """
-        }.joined(separator: "\n")
-        code += """
+        \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector(repeating: .zero, count: v.count)" }
+            .joined(separator: "\n"))
+        \(arityRange.map { "\(indent(3))var results\($0)Index = results\($0).startIndex" }.joined(separator: "\n"))
 
                     for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                         let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
                         v[index] = v1
-        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(4))results\($0).writeTangentContribution(of: v\($0), at: results\($0)Index)" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(4))results\($0).formIndex(after: &results\($0)Index)" }.joined(separator: "\n"))
                     }
 
                     // swiftformat:disable:next redundantParens

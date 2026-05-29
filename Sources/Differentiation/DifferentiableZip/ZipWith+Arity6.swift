@@ -187,26 +187,34 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
         value: Array(results),
         pullback: { v in
             precondition(v.count == pullbacks.count)
-            var results1 = C1.TangentVector()
-            results1.reserveCapacity(v.count)
-            var results2 = C2.TangentVector()
-            results2.reserveCapacity(v.count)
-            var results3 = C3.TangentVector()
-            results3.reserveCapacity(v.count)
-            var results4 = C4.TangentVector()
-            results4.reserveCapacity(v.count)
-            var results5 = C5.TangentVector()
-            results5.reserveCapacity(v.count)
-            var results6 = C6.TangentVector()
-            results6.reserveCapacity(v.count)
+
+            var results1 = C1.TangentVector(repeating: .zero, count: v.count)
+            var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+            var results3 = C3.TangentVector(repeating: .zero, count: v.count)
+            var results4 = C4.TangentVector(repeating: .zero, count: v.count)
+            var results5 = C5.TangentVector(repeating: .zero, count: v.count)
+            var results6 = C6.TangentVector(repeating: .zero, count: v.count)
+            var results1Index = results1.startIndex
+            var results2Index = results2.startIndex
+            var results3Index = results3.startIndex
+            var results4Index = results4.startIndex
+            var results5Index = results5.startIndex
+            var results6Index = results6.startIndex
+
             for (tangentElement, pullback) in zip(v, pullbacks) {
                 let (v1, v2, v3, v4, v5, v6) = pullback(tangentElement)
-                results1.appendContribution(of: v1)
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
-                results6.appendContribution(of: v6)
+                results1.writeTangentContribution(of: v1, at: results1Index)
+                results2.writeTangentContribution(of: v2, at: results2Index)
+                results3.writeTangentContribution(of: v3, at: results3Index)
+                results4.writeTangentContribution(of: v4, at: results4Index)
+                results5.writeTangentContribution(of: v5, at: results5Index)
+                results6.writeTangentContribution(of: v6, at: results6Index)
+                results1.formIndex(after: &results1Index)
+                results2.formIndex(after: &results2Index)
+                results3.formIndex(after: &results3Index)
+                results4.formIndex(after: &results4Index)
+                results5.formIndex(after: &results5Index)
+                results6.formIndex(after: &results6Index)
             }
 
             return (

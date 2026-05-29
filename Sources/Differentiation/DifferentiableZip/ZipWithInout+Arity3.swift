@@ -124,15 +124,19 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3>(
         value: (),
         pullback: { v in
             precondition(v.count == pullbacks.count)
-            var results2 = C2.TangentVector()
-            results2.reserveCapacity(v.count)
-            var results3 = C3.TangentVector()
-            results3.reserveCapacity(v.count)
+
+            var results2 = C2.TangentVector(repeating: .zero, count: v.count)
+            var results3 = C3.TangentVector(repeating: .zero, count: v.count)
+            var results2Index = results2.startIndex
+            var results3Index = results3.startIndex
+
             for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
                 let (v1, v2, v3) = pullback(tangentElement)
                 v[index] = v1
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
+                results2.writeTangentContribution(of: v2, at: results2Index)
+                results3.writeTangentContribution(of: v3, at: results3Index)
+                results2.formIndex(after: &results2Index)
+                results3.formIndex(after: &results3Index)
             }
 
             // swiftformat:disable:next redundantParens
