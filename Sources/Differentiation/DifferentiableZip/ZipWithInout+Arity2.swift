@@ -107,7 +107,14 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
             var results2 = C2.TangentVector()
 
             results2.reserveCapacity(pullbacks.count)
-            
+
+            if v.count == 0 {
+                v.reserveCapacity(pullbacks.count)
+                for _ in 0 ..< pullbacks.count {
+                    v.appendContribution(of: .zero)
+                }
+            }
+
             precondition(v.count == pullbacks.count)
 
             for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
