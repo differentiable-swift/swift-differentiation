@@ -455,35 +455,30 @@ extension Zip10SequenceDifferentiable: Differentiable where
                 results9.reserveCapacity(pullbacks.count)
                 results10.reserveCapacity(pullbacks.count)
 
-                // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+                if v.count == 0 {
+                    fatalError("To be implemented")
+                }
+                else {
+                    // thoughts:
+                    // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+                    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                precondition(v.count == pullbacks.count)
+                    precondition(v.count == pullbacks.count)
 
-                for (tangentElement, pullback) in zip(v, pullbacks) {
-                    let (
-                        result1,
-                        result2,
-                        result3,
-                        result4,
-                        result5,
-                        result6,
-                        result7,
-                        result8,
-                        result9,
-                        result10
-                    ) = pullback(tangentElement)
+                    for (tangentElement, pullback) in zip(v, pullbacks) {
+                        let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) = pullback(tangentElement)
 
-                    results1.appendContribution(of: result1)
-                    results2.appendContribution(of: result2)
-                    results3.appendContribution(of: result3)
-                    results4.appendContribution(of: result4)
-                    results5.appendContribution(of: result5)
-                    results6.appendContribution(of: result6)
-                    results7.appendContribution(of: result7)
-                    results8.appendContribution(of: result8)
-                    results9.appendContribution(of: result9)
-                    results10.appendContribution(of: result10)
+                        results1.appendContribution(of: v1)
+                        results2.appendContribution(of: v2)
+                        results3.appendContribution(of: v3)
+                        results4.appendContribution(of: v4)
+                        results5.appendContribution(of: v5)
+                        results6.appendContribution(of: v6)
+                        results7.appendContribution(of: v7)
+                        results8.appendContribution(of: v8)
+                        results9.appendContribution(of: v9)
+                        results10.appendContribution(of: v10)
+                    }
                 }
 
                 return TangentVector(

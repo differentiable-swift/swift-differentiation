@@ -183,19 +183,22 @@ extension Zip2SequenceDifferentiable: Differentiable where
                 results1.reserveCapacity(pullbacks.count)
                 results2.reserveCapacity(pullbacks.count)
 
-                // thoughts should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+                if v.count == 0 {
+                    fatalError("To be implemented")
+                }
+                else {
+                    // thoughts:
+                    // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+                    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                precondition(v.count == pullbacks.count)
+                    precondition(v.count == pullbacks.count)
 
-                for (tangentElement, pullback) in zip(v, pullbacks) {
-                    let (
-                        result1,
-                        result2
-                    ) = pullback(tangentElement)
+                    for (tangentElement, pullback) in zip(v, pullbacks) {
+                        let (v1, v2) = pullback(tangentElement)
 
-                    results1.appendContribution(of: result1)
-                    results2.appendContribution(of: result2)
+                        results1.appendContribution(of: v1)
+                        results2.appendContribution(of: v2)
+                    }
                 }
 
                 return TangentVector(
