@@ -19,6 +19,17 @@ struct ConstantTimeAccessorTests {
         #expect(accessTangent2[1] == 1.0)
     }
 
+    @Test
+    func zeroTangent() {
+        var array: [Float] = [1.0, 2.0, 3.0]
+        let (_, pullback) = array._vjpSubscriptCTASet(newValue: 10.0, cta: 1)
+
+        var mutableTangent = [Float].DifferentiableView.zero
+        let gradient = pullback(&mutableTangent)
+        #expect(gradient == Float.zero)
+        #expect(mutableTangent == .zero)
+    }
+
     @Test func update() {
         var array: [Float] = [1.0, 2.0, 3.0]
         array.update(at: 1, with: 4.0)

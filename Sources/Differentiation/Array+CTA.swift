@@ -39,11 +39,18 @@ extension Array where Element: Differentiable {
         -> (value: Void, pullback: (inout TangentVector) -> Element.TangentVector)
     {
         let forwardCount = self.count
+        self[index] = newValue
         return (
-            value: self[index] = newValue,
+            value: (),
             pullback: { tangentVector in
                 assert(index < forwardCount)
-                guard index < tangentVector.count else { return .zero }
+                guard !tangentVector.isEmpty else {
+                    // this is a zero tangentVector
+                    return .zero
+                }
+
+                assert(tangentVector.count == forwardCount)
+
                 let dElement = tangentVector.base[index]
                 tangentVector.base[index] = .zero
                 return dElement
