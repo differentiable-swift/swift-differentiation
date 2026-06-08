@@ -18,6 +18,17 @@ extension Array where Element == Float {
     }
 }
 
+// MARK: Array.meanSquaredErrorCombinator
+
+extension Array where Element == Float {
+    @differentiable(reverse, wrt: self)
+    public func meanSquaredErrorCombinator(to target: Array<Float>) -> Float {
+        differentiableZip(self, withoutDerivative(at: target))
+            .differentiableMap { let d = $0 - $1; return d * d }
+            .differentiableReduce(Float.zero, +)
+    }
+}
+
 // MARK: Benchmarks
 
 private let benchmarkTitle = "meanSquaredError"
@@ -39,6 +50,30 @@ extension Array where Element == Float {
             },
             reverse: { input, target in
                 let pullback = valueWithPullback(at: input, of: { $0.meanSquaredError(to: target) })
+                    .pullback
+                return { _ in
+                    blackHole(pullback(Float(1.0)))
+                }
+            }
+        )
+    }
+
+    static func addMeanSquaredErrorCombinatorBenchmarks(_ benchmark: inout Benchmark) {
+        benchmark.add(
+            title: "meanSquaredErrorCombinator",
+            type: Self.self,
+            regular: { input, target in
+                { _ in
+                    blackHole(input.meanSquaredErrorCombinator(to: target))
+                }
+            },
+            forward: { input, target in
+                { _ in
+                    blackHole(valueWithPullback(at: input, of: { $0.meanSquaredErrorCombinator(to: target) }))
+                }
+            },
+            reverse: { input, target in
+                let pullback = valueWithPullback(at: input, of: { $0.meanSquaredErrorCombinator(to: target) })
                     .pullback
                 return { _ in
                     blackHole(pullback(Float(1.0)))
