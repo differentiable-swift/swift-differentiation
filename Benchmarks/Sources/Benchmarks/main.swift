@@ -15,6 +15,17 @@ benchmark.registerInputGenerator(for: ([Float], [Float]).self) { size in
     )
 }
 
+benchmark.registerInputGenerator(for: DifferentiableArray<Float>.self) { size in
+    DifferentiableArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+}
+
+benchmark.registerInputGenerator(for: (DifferentiableArray<Float>, DifferentiableArray<Float>).self) { size in
+    (
+        DifferentiableArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) }),
+        DifferentiableArray((0 ..< size).map { _ in Float.random(in: -1.0E10 ... 1.0E10) })
+    )
+}
+
 protocol HasBenchmarks {
     static func addMapReduceBenchmarks(_ benchmark: inout Benchmark)
     static func addZipMapAddBenchmarks(_ benchmark: inout Benchmark)
@@ -40,5 +51,8 @@ for type in types {
     type.addSumArbitraryBenchmarks(&benchmark)
     type.addMutRangeBenchmarks(&benchmark)
 }
+
+Array<Float>.addMeanSquaredErrorCombinatorBenchmarks(&benchmark)
+DifferentiableArray<Float>.addMeanSquaredErrorBenchmarks(&benchmark)
 
 benchmark.main()

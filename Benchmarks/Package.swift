@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Benchmarks",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS("26.0")],
     dependencies: [
         .package(path: ".."),
         .package(url: "https://github.com/apple/swift-collections-benchmark", from: "0.0.4"),
