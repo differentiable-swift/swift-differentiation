@@ -38,8 +38,12 @@ extension Version {
         "602.0.1"
         #elseif compiler(<6.3.1)
         "603.0.0"
-        #else
+        #elseif compiler(<6.4)
         "603.1.0"
+        #elseif compiler(<6.5)
+        "604.0.0-prerelease-2" // TODO: update to 604.0.0 once 6.4 is released
+        #else
+        "604.0.0-prerelease-2" // default to latest
         #endif
     }
 }
