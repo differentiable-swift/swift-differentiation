@@ -11,6 +11,7 @@ extension Array {
     @differentiable(reverse where Element: Differentiable)
     #endif
     @inlinable
+    @available(*, deprecated, message: "Use subscript.set(newValue:cta:) instead")
     public mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
