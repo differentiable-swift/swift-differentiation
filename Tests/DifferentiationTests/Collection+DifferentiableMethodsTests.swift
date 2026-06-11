@@ -18,7 +18,7 @@ struct CollectionDifferentiableMethodsTests {
         let insertCount = withoutDerivative(at: newValues.count)
         let growth = insertCount - eraseCount
         for (subrangeIndex, newValuesIndex) in zip(subrange, 0 ..< withoutDerivative(at: newValues.count)) {
-            arr.update(at: subrangeIndex, with: newValues[newValuesIndex])
+            arr[cta: subrangeIndex] = newValues[newValuesIndex]
         }
 
         if growth > 0 {
@@ -30,20 +30,20 @@ struct CollectionDifferentiableMethodsTests {
                 let newValue = newValues[i + eraseCount]
                 let offsetIndex = i + subrange.upperBound
                 let oldValue = arr[offsetIndex]
-                arr.update(at: offsetIndex, with: newValue)
-                arr.update(at: offsetIndex + growth, with: oldValue)
+                arr[cta: offsetIndex] = newValue
+                arr[cta: offsetIndex + growth] = oldValue
             }
             return arr
         }
         else if growth < 0 {
             for i in 0 ..< abs(growth) {
                 let index = i + subrange.lowerBound + insertCount
-                arr.update(at: index, with: arr[i + subrange.upperBound])
+                arr[cta: index] = arr[i + subrange.upperBound]
             }
             let arrayCount = withoutDerivative(at: arr.count)
             var newArr = Array<Double>(repeating: .zero, count: arrayCount + growth)
             for i in 0 ..< arrayCount + growth {
-                newArr.update(at: i, with: arr[i])
+                newArr[cta: i] = arr[i]
             }
             return newArr
         }

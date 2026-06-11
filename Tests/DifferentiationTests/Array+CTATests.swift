@@ -30,9 +30,9 @@ struct ConstantTimeAccessorTests {
         #expect(mutableTangent == .zero)
     }
 
-    @Test func update() {
+    @Test func subscriptSet() {
         var array: [Float] = [1.0, 2.0, 3.0]
-        array.update(at: 1, with: 4.0)
+        array[cta: 1] = 4.0
         #expect(array[cta: 1] == 4.0)
 
         // Test differentiation.

@@ -6,6 +6,7 @@ import Testing
 @Suite("Array+Update")
 struct ArrayUpdateTests {
     @Test
+    @available(*, deprecated)
     func testUpdateWithValue() throws {
         // let's test a function of an array where we modify the array elements
         // using a mutating closure
