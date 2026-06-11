@@ -29,6 +29,7 @@ extension Array where Element: Differentiable {
     /// - Returns: The object, plus the pullback.
     @derivative(of: update(at:with:))
     @inlinable
+    @available(*, deprecated)
     public mutating func _vjpUpdate(
         at index: Int,
         with newValue: Element
