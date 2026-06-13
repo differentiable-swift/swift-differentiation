@@ -11,6 +11,7 @@ extension ContiguousArray {
     @differentiable(reverse where Element: Differentiable)
     #endif
     @inlinable
+    @available(*, deprecated, message: "Use subscript.set(newValue:cta:) instead")
     public mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
@@ -73,6 +74,7 @@ extension ContiguousArray where Element: Differentiable {
 
     @derivative(of: update(at:with:))
     @inlinable
+    @available(*, deprecated)
     public mutating func _vjpUpdate(
         at index: Int,
         with newValue: Element

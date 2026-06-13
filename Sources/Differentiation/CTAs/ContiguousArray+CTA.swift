@@ -3,13 +3,15 @@ import _Differentiation
 /// Adds a differentiable subscript to `Array` using the `cta:` argument label to avoid
 /// clashing with the built-in subscript. The getter is `mutating` so the pullback accumulates
 /// directly into the existing tangent vector instead of allocating a new one per access.
-extension Array where Element: Differentiable {
+extension ContiguousArray where Element: Differentiable {
     @inlinable
     public subscript(cta index: Int) -> Element {
         @differentiable(reverse)
         mutating get {
             self[index]
         }
+
+        // TODO: this is a workaround while we're unable to define a direct derivative for `subscript._modify`
         @differentiable(reverse)
         set {
             self[index] = newValue
@@ -26,7 +28,7 @@ extension Array where Element: Differentiable {
             value: self[index],
             pullback: { dElement, tangentVector in
                 if tangentVector.isEmpty {
-                    tangentVector.base = [Element.TangentVector](repeating: .zero, count: size)
+                    tangentVector.base = ContiguousArray<Element.TangentVector>(repeating: .zero, count: size)
                 }
                 tangentVector[index] += dElement
             }
