@@ -30,10 +30,8 @@ enum ZipWithInoutGenerator {
         code += """
 
         {
-            let capacity = min(
-                c1.count,
-        \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
-            )
+            var capacity = c1.count
+        \(arityRange.map { "\(indent(1))capacity = Swift.min(capacity, c\($0).count)" }.joined(separator: "\n"))
 
             if capacity == 0 { return }
 
@@ -80,10 +78,8 @@ enum ZipWithInoutGenerator {
         code += """
 
         {
-            let count = min(
-                c1.count,
-        \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
-            )
+            var count = c1.count
+        \(arityRange.map { "\(indent(1))count = Swift.min(count, c\($0).count)" }.joined(separator: "\n"))
 
             if count == 0 {
                 return (

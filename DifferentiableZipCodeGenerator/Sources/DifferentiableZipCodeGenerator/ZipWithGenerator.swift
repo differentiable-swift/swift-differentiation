@@ -26,9 +26,8 @@ enum ZipWithGenerator {
 
             Result: Differentiable
         {
-            let capacity = min(
-        \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
-            )
+            var capacity = c1.count
+        \(arityRange.dropFirst().map { "\(indent(1))capacity = Swift.min(capacity, c\($0).count)" }.joined(separator: "\n"))
 
             if capacity == 0 { return [] }
 
@@ -72,9 +71,8 @@ enum ZipWithGenerator {
 
             Result: Differentiable
         {
-            let count = min(
-        \(arityRange.map { "\(indent(2))c\($0).count" }.joined(separator: ",\n"))
-            )
+            var count = c1.count
+        \(arityRange.dropFirst().map { "\(indent(1))count = Swift.min(count, c\($0).count)" }.joined(separator: "\n"))
 
             if count == 0 {
                 return (

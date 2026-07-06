@@ -68,9 +68,9 @@ enum ZipSequenceGenerator {
             public var startIndex: Int { 0 }
             @inlinable
             public var endIndex: Int {
-                Swift.min(
-        \(arityRange.map { "\(indent(3))_collection\($0).count" }.joined(separator: ",\n"))
-                )
+                var result = _collection1.count
+        \(arityRange.dropFirst().map { "\(indent(2))result = Swift.min(result, _collection\($0).count)" }.joined(separator: "\n"))
+                return result
             }
 
             @inlinable
@@ -259,9 +259,9 @@ enum ZipSequenceGenerator {
                 public var startIndex: Int { 0 }
                 @inlinable
                 public var endIndex: Int {
-                    Swift.min(
-        \(arityRange.map { "\(indent(4))collection\($0).count" }.joined(separator: ",\n"))
-                    )
+                    var result = collection1.count
+        \(arityRange.dropFirst().map { "\(indent(3))result = Swift.min(result, collection\($0).count)" }.joined(separator: "\n"))
+                    return result
                 }
 
                 @inlinable
