@@ -29,13 +29,11 @@ public func differentiableZipWith<Inout, C2, C3, C4, C5>(
     C5: DifferentiableCollection,
     C5.Element: Differentiable
 {
-    let capacity = min(
-        c1.count,
-        c2.count,
-        c3.count,
-        c4.count,
-        c5.count
-    )
+    var capacity = c1.count
+    capacity = Swift.min(capacity, c2.count)
+    capacity = Swift.min(capacity, c3.count)
+    capacity = Swift.min(capacity, c4.count)
+    capacity = Swift.min(capacity, c5.count)
 
     if capacity == 0 { return }
 
@@ -98,13 +96,11 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5>(
     C5: DifferentiableCollection,
     C5.Element: Differentiable
 {
-    let count = min(
-        c1.count,
-        c2.count,
-        c3.count,
-        c4.count,
-        c5.count
-    )
+    var count = c1.count
+    count = Swift.min(count, c2.count)
+    count = Swift.min(count, c3.count)
+    count = Swift.min(count, c4.count)
+    count = Swift.min(count, c5.count)
 
     if count == 0 {
         return (

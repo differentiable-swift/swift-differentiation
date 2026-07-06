@@ -76,13 +76,12 @@ extension Zip5SequenceDifferentiable: Collection {
     public var startIndex: Int { 0 }
     @inlinable
     public var endIndex: Int {
-        Swift.min(
-            _collection1.count,
-            _collection2.count,
-            _collection3.count,
-            _collection4.count,
-            _collection5.count
-        )
+        var result = _collection1.count
+        result = Swift.min(result, _collection2.count)
+        result = Swift.min(result, _collection3.count)
+        result = Swift.min(result, _collection4.count)
+        result = Swift.min(result, _collection5.count)
+        return result
     }
 
     @inlinable
@@ -357,13 +356,12 @@ extension Zip5SequenceDifferentiable {
         public var startIndex: Int { 0 }
         @inlinable
         public var endIndex: Int {
-            Swift.min(
-                collection1.count,
-                collection2.count,
-                collection3.count,
-                collection4.count,
-                collection5.count
-            )
+            var result = collection1.count
+            result = Swift.min(result, collection2.count)
+            result = Swift.min(result, collection3.count)
+            result = Swift.min(result, collection4.count)
+            result = Swift.min(result, collection5.count)
+            return result
         }
 
         @inlinable

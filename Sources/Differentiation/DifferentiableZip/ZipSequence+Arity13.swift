@@ -156,21 +156,20 @@ extension Zip13SequenceDifferentiable: Collection {
     public var startIndex: Int { 0 }
     @inlinable
     public var endIndex: Int {
-        Swift.min(
-            _collection1.count,
-            _collection2.count,
-            _collection3.count,
-            _collection4.count,
-            _collection5.count,
-            _collection6.count,
-            _collection7.count,
-            _collection8.count,
-            _collection9.count,
-            _collection10.count,
-            _collection11.count,
-            _collection12.count,
-            _collection13.count
-        )
+        var result = _collection1.count
+        result = Swift.min(result, _collection2.count)
+        result = Swift.min(result, _collection3.count)
+        result = Swift.min(result, _collection4.count)
+        result = Swift.min(result, _collection5.count)
+        result = Swift.min(result, _collection6.count)
+        result = Swift.min(result, _collection7.count)
+        result = Swift.min(result, _collection8.count)
+        result = Swift.min(result, _collection9.count)
+        result = Swift.min(result, _collection10.count)
+        result = Swift.min(result, _collection11.count)
+        result = Swift.min(result, _collection12.count)
+        result = Swift.min(result, _collection13.count)
+        return result
     }
 
     @inlinable
@@ -685,21 +684,20 @@ extension Zip13SequenceDifferentiable {
         public var startIndex: Int { 0 }
         @inlinable
         public var endIndex: Int {
-            Swift.min(
-                collection1.count,
-                collection2.count,
-                collection3.count,
-                collection4.count,
-                collection5.count,
-                collection6.count,
-                collection7.count,
-                collection8.count,
-                collection9.count,
-                collection10.count,
-                collection11.count,
-                collection12.count,
-                collection13.count
-            )
+            var result = collection1.count
+            result = Swift.min(result, collection2.count)
+            result = Swift.min(result, collection3.count)
+            result = Swift.min(result, collection4.count)
+            result = Swift.min(result, collection5.count)
+            result = Swift.min(result, collection6.count)
+            result = Swift.min(result, collection7.count)
+            result = Swift.min(result, collection8.count)
+            result = Swift.min(result, collection9.count)
+            result = Swift.min(result, collection10.count)
+            result = Swift.min(result, collection11.count)
+            result = Swift.min(result, collection12.count)
+            result = Swift.min(result, collection13.count)
+            return result
         }
 
         @inlinable
