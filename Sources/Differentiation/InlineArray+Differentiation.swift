@@ -31,6 +31,7 @@ extension InlineArray: @retroactive Differentiable where Element: Differentiable
      }
      */
 
+    @available(*, deprecated, message: "Use subscript(ad:) instead")
     @inlinable
     public func read(_ i: Index) -> Element {
         self[i]
@@ -49,6 +50,7 @@ extension InlineArray: @retroactive Differentiable where Element: Differentiable
         )
     }
 
+    @available(*, deprecated, message: "Use subscript(ad:) instead")
     @inlinable
     public mutating func update(at i: Index, with value: Element) {
         self[i] = value
