@@ -25,6 +25,9 @@ extension ArraySlice where Element: Differentiable {
             pullback: (ArraySlice<Element>.TangentVector, inout TangentVector) -> Void
         )
     {
+        // Capture the slice's lowerBound and count at forward time so the pullback
+        // can map absolute slice indices to zero-based tangent positions.
+        let lowerBound = self.startIndex
         let size = self.count
         return (
             value: self[bounds],
@@ -32,10 +35,12 @@ extension ArraySlice where Element: Differentiable {
                 if tangentVector.isEmpty {
                     tangentVector.base = ArraySlice<Element.TangentVector>(repeating: .zero, count: size)
                 }
-                // vSlice.base may use zero-based indices (constructed via Array[...]) —
-                // walk both ranges in lockstep so the accumulation doesn't depend on alignment.
+                // `bounds` uses the slice's absolute indices while `tangentVector.base` is
+                // zero-based, so shift by `lowerBound`. `vSlice.base` may use its own zero-based
+                // indices (constructed via Array[...]) — walk both ranges in lockstep so the
+                // accumulation doesn't depend on alignment.
                 for (arrayIdx, sliceIdx) in zip(bounds, vSlice.base.indices) {
-                    tangentVector.base[arrayIdx] += vSlice.base[sliceIdx]
+                    tangentVector.base[arrayIdx - lowerBound] += vSlice.base[sliceIdx]
                 }
             }
         )
