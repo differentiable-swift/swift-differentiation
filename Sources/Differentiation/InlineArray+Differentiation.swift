@@ -30,46 +30,6 @@ extension InlineArray: @retroactive Differentiable where Element: Differentiable
          )
      }
      */
-
-    @inlinable
-    public func read(_ i: Index) -> Element {
-        self[i]
-    }
-
-    @derivative(of: read)
-    @inlinable
-    public func _vjpRead(_ i: Index) -> (value: Element, pullback: (Element.TangentVector) -> TangentVector) {
-        (
-            value: self[i],
-            pullback: { v in
-                var array = InlineArray<count, Element.TangentVector>(repeating: .zero)
-                array[i] = v
-                return array
-            }
-        )
-    }
-
-    @inlinable
-    public mutating func update(at i: Index, with value: Element) {
-        self[i] = value
-    }
-
-    @derivative(of: update)
-    @inlinable
-    public mutating func _vjpUpdate(
-        at i: Index,
-        with value: Element
-    ) -> (value: Void, pullback: (inout TangentVector) -> Element.TangentVector) {
-        self[i] = value
-        return (
-            value: (),
-            pullback: { (v: inout TangentVector) in
-                let dElement = v[i]
-                v[i] = Element.TangentVector.zero
-                return dElement
-            }
-        )
-    }
 }
 
 @available(macOS 26, iOS 26, *)
