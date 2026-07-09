@@ -51,13 +51,12 @@ struct InlineArrayTests {
          #expect(back == 30.0)
      }
       */
-
-    @Test("vjp of read is correct")
+    @Test("vjp of subscript.get(ad:) is correct")
     @available(macOS 26, iOS 26, *)
-    func testVJPRead() {
+    func testVJPSubscriptGetAD() {
         let arr: InlineArray<2, Double> = [5.0, 7.0]
         let index = 1
-        let (value, pullback) = valueWithPullback(at: arr, of: { value in value.read(index) })
+        let (value, pullback) = valueWithPullback(at: arr, of: { value in value[ad: index] })
         #expect(value == 7.0)
         // Tangent vector for output
         let outTangent = 3.0
@@ -67,25 +66,22 @@ struct InlineArrayTests {
         #expect(backVec[1] == 3.0)
     }
 
-    @Test("vjp of update mutating works")
+    @Test("vjp of subscript.set(ad:) works")
     @available(macOS 26, iOS 26, *)
-    func testVJPUpdate() {
+    func testVJPSubscriptSetAD() {
         let arr: InlineArray<2, Double> = [1.0, 2.0]
         let index = 0
         let newValue = 100.0
 
-        // Apply the derivative via VJP of update
-        // Because update is mutating, the pullback signature is a bit different
-        // Use the manual _vjpUpdate
         let (value, pullback) = valueWithPullback(
             at: arr, newValue,
             of: { arr, newValue in
                 var arr = arr
-                arr.update(at: index, with: newValue)
+                arr[ad: index] = newValue
                 return arr
             }
         )
-        // After update, arr[0] should be newValue
+        // After writing, arr[0] should be newValue
         #expect(value[0] == 100.0)
         #expect(value[1] == 2.0)
 
