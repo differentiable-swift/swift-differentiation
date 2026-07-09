@@ -13,23 +13,23 @@ extension InlineArray: @retroactive Differentiable where Element: Differentiable
         }
     }
 
-    // not available yet due to a compiler issue. This is in main as of 2025/05/25. Part of Swift 6.3
-    /*
-     @derivative(of: init)
-     @_alwaysEmitIntoClient
-     public static func _vjpInit(repeating value: Element) -> (value: Self, pullback: (TangentVector) -> Element.TangentVector) {
-         (
-             value: Self(repeating: value),
-             pullback: { v in
-                 var result: Element.TangentVector = .zero
-                 for i in v.indices {
-                     result += v[i]
-                 }
-                 return result
-             }
-         )
-     }
-     */
+    #if compiler(>=6.3)
+    // This vjp is gated to 6.3+ as it would crash the compiler before 6.3
+    @derivative(of: init)
+    @_alwaysEmitIntoClient
+    public static func _vjpInit(repeating value: Element) -> (value: Self, pullback: (TangentVector) -> Element.TangentVector) {
+        (
+            value: Self(repeating: value),
+            pullback: { v in
+                var result: Element.TangentVector = .zero
+                for i in v.indices {
+                    result += v[i]
+                }
+                return result
+            }
+        )
+    }
+    #endif
 }
 
 @available(macOS 26, iOS 26, *)
