@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 // copied and modified from
@@ -56,4 +54,3 @@ extension Dictionary where Value: Differentiable {
         })
     }
 }
-#endif

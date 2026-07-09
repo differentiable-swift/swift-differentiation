@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -16,5 +14,3 @@ struct OptionalDifferentiableMapTests {
         #expect(pullback(at: 0.0, of: testFunc)(.init(1.0)) == .init(0.0))
     }
 }
-
-#endif

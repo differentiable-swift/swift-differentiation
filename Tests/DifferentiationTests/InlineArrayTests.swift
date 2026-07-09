@@ -1,8 +1,6 @@
 import Differentiation
 import Testing
 
-#if canImport(_Differentiation)
-
 #if swift(>=6.2)
 
 @Suite
@@ -113,7 +111,5 @@ struct InlineArrayTests {
         #expect(arr[1] == 4.0)
     }
 }
-
-#endif
 
 #endif

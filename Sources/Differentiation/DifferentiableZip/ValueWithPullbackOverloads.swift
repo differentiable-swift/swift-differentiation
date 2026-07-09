@@ -1,4 +1,3 @@
-#if canImport(_Differentiation)
 import _Differentiation
 
 public struct Pair<A, B> {
@@ -565,5 +564,3 @@ func valueWithPullback<L, M, N, O, P, Q, S, T, U, V, W, X, Y, Z, R>(
         }
     )
 }
-
-#endif

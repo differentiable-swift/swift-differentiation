@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension ContiguousArray.DifferentiableView:
@@ -45,5 +43,3 @@ extension ContiguousArray.DifferentiableView:
         base.replaceSubrange(subrange, with: newElements)
     }
 }
-
-#endif

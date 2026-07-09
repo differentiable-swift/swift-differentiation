@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -109,5 +107,3 @@ struct DictionaryDifferentiationTests {
         #expect(vwg.gradient == (["s1": 0.0, "s2": 1.0, "s3": 1.0], ["s1": 1.0]))
     }
 }
-
-#endif

@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -489,5 +487,3 @@ struct CrossTypeConsistencyTests {
         #expect(gradArr.elementsEqual(gradCA))
     }
 }
-
-#endif

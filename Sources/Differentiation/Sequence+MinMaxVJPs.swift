@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension Sequence where
@@ -74,5 +72,3 @@ extension Sequence where
         )
     }
 }
-
-#endif

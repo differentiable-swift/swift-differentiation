@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 @derivative(of: repeatElement)
@@ -166,5 +164,3 @@ extension Repeated where Element: Differentiable {
         )
     }
 }
-
-#endif

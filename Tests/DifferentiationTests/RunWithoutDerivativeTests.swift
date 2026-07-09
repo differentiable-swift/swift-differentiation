@@ -1,8 +1,6 @@
 import Differentiation
 import Testing
 
-#if canImport(_Differentiation)
-
 @Suite
 struct RunWithoutDerivativeTests {
     @Test
@@ -38,5 +36,3 @@ struct RunWithoutDerivativeTests {
         #expect(gradient == 1.0) // instead of the normally expected 5.0
     }
 }
-
-#endif

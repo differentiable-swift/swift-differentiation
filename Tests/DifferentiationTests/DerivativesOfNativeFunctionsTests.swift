@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -55,5 +53,3 @@ struct DerivativesOfNativeFunctionsTests {
         #expect(vwgNegative.gradient == -1.0)
     }
 }
-
-#endif

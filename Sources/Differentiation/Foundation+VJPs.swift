@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 import Foundation
 
@@ -14,5 +12,3 @@ public func _vjpAtan2(
         pullback: { ($0 * x / (x * x + y * y), -$0 * y / (x * x + y * y)) }
     )
 }
-
-#endif

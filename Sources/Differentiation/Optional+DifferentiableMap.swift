@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension Optional where Wrapped: Differentiable {
@@ -49,5 +47,3 @@ extension Optional where Wrapped: Differentiable {
         return (value: vwpb?.value, differential: differential)
     }
 }
-
-#endif

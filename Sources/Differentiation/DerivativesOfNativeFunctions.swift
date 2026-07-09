@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 /// For min(): "Returns: The lesser of `x` and `y`. If `x` is equal to `y`, returns `x`."
@@ -31,5 +29,3 @@ public func _vjpAbs<T: SignedNumeric & Comparable & Differentiable>(_ x: T)
 {
     x < 0 ? (value: -x, pullback: { v in .zero - v }) : (value: x, pullback: { v in v })
 }
-
-#endif

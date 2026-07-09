@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -39,5 +37,3 @@ struct SequenceMinMaxVJPs {
         #expect(gradient == [0.0, 0.0, 30.0])
     }
 }
-
-#endif

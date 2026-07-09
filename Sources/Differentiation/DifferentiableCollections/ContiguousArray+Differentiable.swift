@@ -1,23 +1,16 @@
-#if canImport(_Differentiation)
 import _Differentiation
-
-#endif
 
 extension ContiguousArray {
     /// A Differentiable alternative to `Array.subscript.modify`.
     /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
     /// https://github.com/swiftlang/swift/issues/55256
-    #if canImport(_Differentiation)
     @differentiable(reverse where Element: Differentiable)
-    #endif
     @inlinable
     @available(*, deprecated, message: "Use subscript.set(newValue:cta:) instead")
     public mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
 }
-
-#if canImport(_Differentiation)
 
 extension ContiguousArray: @retroactive Differentiable where Element: Differentiable {
     public typealias TangentVector = ContiguousArray<Element.TangentVector>.DifferentiableView
@@ -92,5 +85,3 @@ extension ContiguousArray where Element: Differentiable {
         })
     }
 }
-
-#endif

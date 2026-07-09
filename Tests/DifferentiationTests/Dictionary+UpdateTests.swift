@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -30,5 +28,3 @@ struct DictionaryUpdateTests {
         #expect(valAndGrad.gradient == (["a": 0, "b": 0], aMultiplier, bMultiplier))
     }
 }
-
-#endif

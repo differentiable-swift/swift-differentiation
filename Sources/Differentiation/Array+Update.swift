@@ -1,23 +1,15 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
-
-#endif
 
 extension Array {
     /// A Differentiable alternative to `Array.subscript.modify`.
     /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
-    #if canImport(_Differentiation)
     @differentiable(reverse where Element: Differentiable)
-    #endif
     @inlinable
     @available(*, deprecated, message: "Use subscript.set(newValue:cta:) instead")
     public mutating func update(at index: Int, with newValue: Element) {
         self[index] = newValue
     }
 }
-
-#if canImport(_Differentiation)
 
 extension Array where Element: Differentiable {
     /// This function defines a derivative for AutoDiff to use when update() is called. It's not meant to be called directly in most
@@ -48,5 +40,3 @@ extension Array where Element: Differentiable {
         })
     }
 }
-
-#endif

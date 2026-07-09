@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension ArraySlice where Element: Differentiable {
@@ -118,5 +116,3 @@ extension ArraySlice.DifferentiableView: ExpressibleByArrayLiteral {
         self.init(elements)
     }
 }
-
-#endif

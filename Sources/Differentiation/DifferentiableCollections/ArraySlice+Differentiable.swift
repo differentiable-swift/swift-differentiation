@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension ArraySlice: @retroactive Differentiable where Element: Differentiable {
@@ -55,5 +53,3 @@ extension ArraySlice where Element: Differentiable {
         )
     }
 }
-
-#endif
