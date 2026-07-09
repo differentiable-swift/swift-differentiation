@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 extension ContiguousArray where Element: Differentiable {
     @derivative(of: init)
     @inlinable
@@ -68,5 +66,3 @@ extension ContiguousArray where Element: Differentiable {
         )
     }
 }
-
-#endif

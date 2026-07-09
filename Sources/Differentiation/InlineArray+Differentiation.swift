@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 #if swift(>=6.2)
 
 import _Differentiation
@@ -146,7 +144,5 @@ extension InlineArray: @retroactive Equatable where Element: Equatable {
         return true
     }
 }
-
-#endif
 
 #endif

@@ -181,8 +181,6 @@ extension Zip10SequenceDifferentiable: Sendable where
 
 // MARK: Zip10SequenceDifferentiable + Differentiable
 
-#if canImport(_Differentiation)
-
 @derivative(of: differentiableZip)
 @inlinable
 public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10>(
@@ -646,5 +644,3 @@ extension Zip10SequenceDifferentiable {
         }
     }
 }
-
-#endif

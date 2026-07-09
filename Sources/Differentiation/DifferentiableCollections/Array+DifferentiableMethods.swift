@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension Array where Element: Differentiable {
@@ -71,5 +69,3 @@ extension Array where Element: Differentiable {
         )
     }
 }
-
-#endif

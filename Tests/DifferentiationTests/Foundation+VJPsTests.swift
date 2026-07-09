@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Foundation
 import Testing
@@ -19,5 +17,3 @@ struct FoundationVJPsTests {
         #expect(vwg.gradient == (0.5, -0.5))
     }
 }
-
-#endif

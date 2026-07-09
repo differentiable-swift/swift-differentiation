@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 extension ArraySlice where Element: Differentiable {
     @derivative(of: init)
     @inlinable
@@ -68,5 +66,3 @@ extension ArraySlice where Element: Differentiable {
         )
     }
 }
-
-#endif

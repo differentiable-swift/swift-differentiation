@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 public protocol DifferentiableCollection: Differentiable & Collection where
@@ -88,5 +86,3 @@ extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector whe
 //        fatalError("Incomplete")
 //    }
 // }
-
-#endif

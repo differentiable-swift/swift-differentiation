@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 extension ContiguousArray where Element: Differentiable {
     @frozen
     public struct DifferentiableView {
@@ -103,5 +101,3 @@ extension ContiguousArray.DifferentiableView: ExpressibleByArrayLiteral {
         self.init(ContiguousArray(elements))
     }
 }
-
-#endif

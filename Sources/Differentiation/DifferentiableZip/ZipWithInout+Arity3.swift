@@ -1,5 +1,4 @@
 
-#if canImport(_Differentiation)
 import _Differentiation
 
 @inlinable
@@ -149,5 +148,3 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3>(
         }
     )
 }
-
-#endif

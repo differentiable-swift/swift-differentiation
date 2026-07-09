@@ -1,22 +1,14 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
-
-#endif
 
 extension Dictionary {
     /// A Differentiable alternative to `Dictionary.subscript.modify`
     /// Differentiation does not yet support `Dictionary.subscript.modify` because it is a coroutine.
-    #if canImport(_Differentiation)
     @differentiable(reverse where Value: Differentiable)
-    #endif
     @inlinable
     public mutating func update(at key: Key, with newValue: Value) {
         self[key] = newValue
     }
 }
-
-#if canImport(_Differentiation)
 
 extension Dictionary where Value: Differentiable {
     /// This function defines a derivative for AutoDiff to use when update() is called. It's not meant to be called directly in most
@@ -58,5 +50,3 @@ extension Dictionary where Value: Differentiable {
         })
     }
 }
-
-#endif

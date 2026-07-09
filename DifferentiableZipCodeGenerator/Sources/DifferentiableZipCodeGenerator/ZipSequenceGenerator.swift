@@ -103,8 +103,6 @@ enum ZipSequenceGenerator {
         code += """
         // MARK: Zip\(arity)SequenceDifferentiable + Differentiable
 
-        #if canImport(_Differentiation)
-
         @derivative(of: differentiableZip)
         @inlinable
         public func _vjpDifferentiableZip<\(arityRange.map { "C\($0)" }.joined(separator: ", "))>(
@@ -299,8 +297,6 @@ enum ZipSequenceGenerator {
                 }
             }
         }
-
-        #endif
 
         """
         return code

@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import Differentiation
 import Testing
 
@@ -28,5 +26,3 @@ struct ArrayUpdateTests {
         #expect(obtainedGradientOfFOfArray == expectedGradientOfFOfArray)
     }
 }
-
-#endif

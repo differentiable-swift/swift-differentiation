@@ -4,7 +4,6 @@ enum ZipWithInoutGenerator {
         var code = ""
         code += """
 
-        #if canImport(_Differentiation)
         import _Differentiation
 
         @inlinable
@@ -147,8 +146,6 @@ enum ZipWithInoutGenerator {
                 }
             )
         }
-
-        #endif
 
         """
         return code

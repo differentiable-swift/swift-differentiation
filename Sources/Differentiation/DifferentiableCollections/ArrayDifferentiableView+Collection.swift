@@ -1,5 +1,3 @@
-#if canImport(_Differentiation)
-
 import _Differentiation
 
 extension Array.DifferentiableView:
@@ -45,5 +43,3 @@ extension Array.DifferentiableView:
         base.replaceSubrange(subrange, with: newElements)
     }
 }
-
-#endif
