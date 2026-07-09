@@ -1,17 +1,5 @@
 import _Differentiation
 
-extension ContiguousArray {
-    /// A Differentiable alternative to `Array.subscript.modify`.
-    /// Differentiation does not yet support `Array.subscript.modify` because it is a coroutine.
-    /// https://github.com/swiftlang/swift/issues/55256
-    @differentiable(reverse where Element: Differentiable)
-    @inlinable
-    @available(*, deprecated, message: "Use subscript.set(newValue:cta:) instead")
-    public mutating func update(at index: Int, with newValue: Element) {
-        self[index] = newValue
-    }
-}
-
 extension ContiguousArray: @retroactive Differentiable where Element: Differentiable {
     public typealias TangentVector = ContiguousArray<Element.TangentVector>.DifferentiableView
 
@@ -63,25 +51,5 @@ extension ContiguousArray where Element: Differentiable {
                 v.base.reduce(.zero, +)
             }
         )
-    }
-
-    @derivative(of: update(at:with:))
-    @inlinable
-    @available(*, deprecated)
-    public mutating func _vjpUpdate(
-        at index: Int,
-        with newValue: Element
-    ) -> (value: Void, pullback: (inout TangentVector) -> (Element.TangentVector)) {
-        update(at: index, with: newValue)
-        let forwardCount = self.count
-        return ((), { tangentVector in
-            // manual zero tangent initialization
-            if tangentVector.base.count < forwardCount {
-                tangentVector.base = .init(repeating: .zero, count: forwardCount)
-            }
-            let dElement = tangentVector[index]
-            tangentVector.base[index] = .zero
-            return dElement
-        })
     }
 }
