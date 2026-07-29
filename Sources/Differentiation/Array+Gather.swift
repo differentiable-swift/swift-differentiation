@@ -4,14 +4,15 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// Reads `self[indices[i]]` for every `i`. Output length is `indices.count`.
     @inlinable
     @differentiable(reverse, wrt: self)
-    public func gather(at indices: [Int]) -> [Element] {
-        let result = Array(unsafeUninitializedCapacity: indices.count) { buffer, initializedCount in
-            for (i, idx) in indices.enumerated() {
-                buffer.initializeElement(at: i, to: self[idx])
+    public func gather<C>(at indices: C) -> [Element]
+        where C: RandomAccessCollection<Int>, C.Index == Index
+    {
+        Array(unsafeUninitializedCapacity: indices.count) { buffer, initializedCount in
+            for i in 0 ..< indices.count {
+                buffer.initializeElement(at: i, to: self[indices[i]])
             }
             initializedCount = indices.count
         }
-        return result
     }
 
     /// A custom VJP for `gather` that allocates a single pullback closure that captures `(indices, sourceCount)`
@@ -19,10 +20,10 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// pullback storage, regardless of `indices.count`.
     @inlinable
     @derivative(of: gather, wrt: self)
-    public func _vjpGather(at indices: [Int]) -> (
+    public func _vjpGather<C>(at indices: C) -> (
         value: [Element],
         pullback: ([Element].TangentVector) -> [Element].TangentVector
-    ) {
+    ) where C: RandomAccessCollection<Index>, C.Index == Index {
         let sourceCount = self.count
         return (
             value: self.gather(at: indices),
