@@ -8,8 +8,8 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
         where C: RandomAccessCollection<Int>, C.Index == Index
     {
         Array(unsafeUninitializedCapacity: indices.count) { buffer, initializedCount in
-            for i in 0 ..< indices.count {
-                buffer.initializeElement(at: i, to: self[indices[i]])
+            for (i, index) in indices.enumerated() {
+                buffer.initializeElement(at: i, to: self[index])
             }
             initializedCount = indices.count
         }
@@ -29,9 +29,9 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
             value: self.gather(at: indices),
             pullback: { v in
                 var dBase = [Element].TangentVector(repeating: .zero, count: sourceCount)
-                // The incoming tangent is either the zero tangent (empty base) meaning
-                // gather's output didn't contribute, so the source tangent stays zero, or
-                // it has exactly `indices.count` elements.
+                // The incoming tangent is either the zero tangent (empty base), meaning gather's output
+                // didn't contribute and the source tangent stays zero, or it has exactly `indices.count`
+                // elements (gather's output length) to scatter back into the source.
                 if v.base.isEmpty {
                     return dBase
                 }
@@ -39,9 +39,9 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
                     v.base.count == indices.count,
                     "gather pullback received a tangent of length \(v.base.count), expected \(indices.count)"
                 )
-                for i in 0 ..< indices.count {
-                    dBase.base[indices[i]] += v.base[i]
-                }
+
+                dBase.base.scatteringAdd(at: indices, values: v.base)
+
                 return dBase
             }
         )
