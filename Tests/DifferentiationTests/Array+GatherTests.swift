@@ -41,4 +41,46 @@ struct ArrayGatherTests {
         let gradient = vwpb.pullback(1.0)
         #expect(gradient == [1.0, 0.0, 2.0, 0.0])
     }
+
+    @Test func gatherOutOfRange() {
+        func example(_ array: [Double]) -> Double {
+            let gathered = array.gather(at: [2, 5])
+            return gathered[0] + gathered[1]
+        }
+
+        let testArray: [Double] = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+        let vwpb = valueWithPullback(at: testArray, of: example)
+
+        #expect(vwpb.value == 9.0)
+        let gradient = vwpb.pullback(1.0)
+        #expect(gradient == [0.0, 0.0, 1.0, 0.0, 0.0, 1.0])
+    }
+
+    @Test func gatherEmptyTangent() {
+        func example(array: [Double], indices: [Int]) -> [Double] {
+            array.gather(at: indices)
+        }
+        let indices = [1, 0, 5]
+        let vwpb = valueWithPullback(at: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]) { arr in
+            arr.gather(at: indices)
+        }
+        #expect(vwpb.value == [2.0, 1.0, 6.0])
+        #expect(vwpb.pullback([]) == [0, 0, 0, 0, 0, 0])
+    }
+
+    @Test func gatherWrongSizedTangent() async {
+        func example(array: [Double], indices: [Int]) -> [Double] {
+            array.gather(at: indices)
+        }
+
+        await #expect(processExitsWith: .failure) {
+            let indices = [1, 0, 5]
+            let vwpb = valueWithPullback(at: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]) { arr in
+                arr.gather(at: indices)
+            }
+            #expect(vwpb.value == [2.0, 1.0, 6.0])
+            _ = vwpb.pullback([1.0])
+        }
+    }
 }
