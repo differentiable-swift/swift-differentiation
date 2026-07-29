@@ -1,6 +1,7 @@
 import Differentiation
 import Testing
 
+@Suite
 struct ArrayGatherTests {
     @Test func gather() {
         let array: [Float] = [1.0, 2.0, 3.0, 4.0]
@@ -69,11 +70,23 @@ struct ArrayGatherTests {
         #expect(vwpb.pullback([]) == [0, 0, 0, 0, 0, 0])
     }
 
-    @Test func gatherWrongSizedTangent() async {
-        func example(array: [Double], indices: [Int]) -> [Double] {
-            array.gather(at: indices)
-        }
+    @Test func gatherSlicedIndices() {
+        let array: [Float] = [1.0, 2.0, 3.0, 4.0]
 
+        // A slice with a non-zero start index: elements [2, 0, 2], but startIndex == 1.
+        // Positional indexing (indices[0]) would trap or read the wrong element here.
+        let backing = [9, 2, 0, 2, 9]
+        let indices = backing[1 ..< 4]
+        #expect(indices.startIndex == 1)
+
+        let (value, pullback) = array._vjpGather(at: indices)
+        #expect(value == [3.0, 1.0, 3.0])
+
+        let dBase = pullback([10.0, 20.0, 30.0])
+        #expect(dBase == [20.0, 0.0, 40.0, 0.0])
+    }
+
+    @Test func gatherWrongSizedTangent() async {
         await #expect(processExitsWith: .failure) {
             let indices = [1, 0, 5]
             let vwpb = valueWithPullback(at: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]) { arr in
