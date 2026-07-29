@@ -46,7 +46,7 @@ struct DictionaryDifferentiationTests {
         func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
             for key in withoutDerivative(at: otherDict.keys) {
                 let otherValue = otherDict[key]!
-                mainDict.update(at: key, with: otherValue)
+                mainDict[ad: key] = otherValue
             }
         }
 
@@ -77,7 +77,7 @@ struct DictionaryDifferentiationTests {
         func combineByReplacingDictionaryValues(of mainDict: inout [String: Double], with otherDict: [String: Double]) {
             for key in withoutDerivative(at: otherDict.keys) {
                 let otherValue = otherDict[key]!
-                mainDict.update(at: key, with: otherValue)
+                mainDict[ad: key] = otherValue
             }
         }
 
