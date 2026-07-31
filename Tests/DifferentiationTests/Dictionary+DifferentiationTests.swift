@@ -66,9 +66,9 @@ struct DictionaryDifferentiationTests {
 
         #expect(vwpb.value == ["s1": 2.0, "s2": 20.0, "s3": 30.0])
         // we need to provide a full tangentvector to the pullback hence the keys with zero entries.
-        #expect(vwpb.pullback(["s1": 1.0, "s2": 0.0, "s3": 0.0]) == (["s1": 0.0, "s2": 0.0, "s3": 0.0], ["s1": 1.0]))
-        #expect(vwpb.pullback(["s1": 0.0, "s2": 1.0, "s3": 0.0]) == (["s1": 0.0, "s2": 1.0, "s3": 0.0], ["s1": 0.0]))
-        #expect(vwpb.pullback(["s1": 0.0, "s2": 0.0, "s3": 1.0]) == (["s1": 0.0, "s2": 0.0, "s3": 1.0], ["s1": 0.0]))
+        #expect(vwpb.pullback(["s1": 1.0, "s2": 0.0, "s3": 0.0]) == (["s2": 0.0, "s3": 0.0], ["s1": 1.0]))
+        #expect(vwpb.pullback(["s1": 0.0, "s2": 1.0, "s3": 0.0]) == (["s2": 1.0, "s3": 0.0], ["s1": 0.0]))
+        #expect(vwpb.pullback(["s1": 0.0, "s2": 0.0, "s3": 1.0]) == (["s2": 0.0, "s3": 1.0], ["s1": 0.0]))
     }
 
     @Test
@@ -104,6 +104,34 @@ struct DictionaryDifferentiationTests {
         )
 
         #expect(vwg.value == 52.0)
-        #expect(vwg.gradient == (["s1": 0.0, "s2": 1.0, "s3": 1.0], ["s1": 1.0]))
+        #expect(vwg.gradient == (["s2": 1.0, "s3": 1.0], ["s1": 1.0]))
+    }
+
+    // Writing to a key that isn't present in the base dictionary would previously make the
+    // setter pullback insert `key: .zero` into the base tangent (it zeroes the overwritten
+    // slot in place). That stray zero entry would survive into the gradient, so applying it
+    // back with `move(by:)` would previously hit `fatalMissingComponent` because the primal
+    // dictionary had no such key.
+    //
+    // Setting the slot to `nil` instead of `.zero` in `_vjpSubscriptSet` would drop the entry
+    // (a missing key is definitionally zero) and this now no longer crashes.
+    @Test
+    func testWritingNewKeyLeavesStrayZeroThatCrashesMove() {
+        @differentiable(reverse)
+        func insertNewKey(dict: [String: Double]) -> [String: Double] {
+            var copy = dict
+            copy[ad: "new"] = 5.0 // "new" is absent from the base dictionary
+            return copy
+        }
+
+        var params = ["a": 1.0]
+        let vwpb = valueWithPullback(at: params, of: insertNewKey)
+
+        // Pullback zeroes "new" in place, so the base gradient is ["a": 1.0, "new": 0.0]
+        // rather than the sparse ["a": 1.0].
+        let gradient = vwpb.pullback(["a": 1.0, "new": 1.0])
+
+        // `params` has no "new" key, so `move(by:)` trips `fatalMissingComponent`.
+        params.move(by: gradient)
     }
 }
