@@ -62,7 +62,7 @@ struct DictionaryADTests {
         #expect(vwg.value == 3 * aMultiplier + 7 * bMultiplier)
         // Both keys of the input are overwritten, so the input's gradient is zero;
         // the gradients flow to newA/newB instead.
-        #expect(vwg.gradient.0 == ["a": 0, "b": 0])
+        #expect(vwg.gradient.0 == [:])
         #expect(vwg.gradient.1 == aMultiplier)
         #expect(vwg.gradient.2 == bMultiplier)
     }
@@ -84,7 +84,7 @@ struct DictionaryADTests {
         let vwg = valueWithGradient(at: dictionary, 5.0, of: writeAReadB)
 
         #expect(vwg.value == 2)
-        #expect(vwg.gradient.0 == ["a": 0, "b": 2])
+        #expect(vwg.gradient.0 == ["b": 2])
         #expect(vwg.gradient.1 == 0)
     }
 }

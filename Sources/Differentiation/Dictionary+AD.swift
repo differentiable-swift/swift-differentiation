@@ -32,15 +32,15 @@ extension Dictionary where Value: Differentiable {
         newValue: Value?,
         ad key: Key
     ) -> (value: Void, pullback: (inout TangentVector) -> (Value?.TangentVector)) {
-        self[ad: key] = newValue
+        self[key] = newValue
 
         return ((), { tangentVector in
             // The write overwrites the value at `key`, so the base's incoming adjoint at
             // `key` flows out to `newValue`, and the base's pre-write adjoint at `key` is
-            // zeroed. All other keys pass through untouched. A missing key is definitionally
+            // removed. All other keys pass through untouched. A missing key is definitionally
             // zero in `Dictionary.TangentVector`, so this stays sparse.
             let dElement = tangentVector[key]
-            tangentVector[key] = .zero
+            tangentVector[key] = nil
             return Optional<Value>.TangentVector(dElement)
         })
     }
