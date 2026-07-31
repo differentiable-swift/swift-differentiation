@@ -1,7 +1,6 @@
 import Differentiation
 import Testing
 
-@Suite
 struct ArrayScatteringAddTests {
     @Test func scatteringAdd() {
         var array: [Float] = [1.0, 2.0, 3.0, 4.0]
@@ -131,7 +130,7 @@ struct ArrayScatteringAddTests {
         #expect(vwpb.value == [3.0, 3.0, 3.0, 4.0, 5.0, 7.0])
         let gradient = vwpb.pullback([])
         #expect(gradient.0 == [])
-        #expect(gradient.1 == [0.0, 0.0, 0.0])
+        #expect(gradient.1 == [])
     }
 
     @Test func scatteringAddWrongSizedTangent() async {

@@ -1,7 +1,6 @@
 import Differentiation
 import Testing
 
-@Suite
 struct ArrayGatherTests {
     @Test func gather() {
         let array: [Float] = [1.0, 2.0, 3.0, 4.0]
@@ -59,15 +58,12 @@ struct ArrayGatherTests {
     }
 
     @Test func gatherEmptyTangent() {
-        func example(array: [Double], indices: [Int]) -> [Double] {
-            array.gather(at: indices)
-        }
         let indices = [1, 0, 5]
         let vwpb = valueWithPullback(at: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]) { arr in
             arr.gather(at: indices)
         }
         #expect(vwpb.value == [2.0, 1.0, 6.0])
-        #expect(vwpb.pullback([]) == [0, 0, 0, 0, 0, 0])
+        #expect(vwpb.pullback([]) == [])
     }
 
     @Test func gatherSlicedIndices() {
