@@ -19,11 +19,8 @@ extension Dictionary where Value: Differentiable {
         }
     }
 
-    /// This function defines a derivative for AutoDiff to use when update() is called. It's not meant to be called directly in most
-    /// situations.
-    ///
     /// - Parameters:
-    ///     - key: The key to update the value at.
+    ///     - key: The key to write the value at.
     ///     - newValue: The value to write.
     /// - Returns: The object, plus the pullback.
     @derivative(of: subscript(ad:).set)
