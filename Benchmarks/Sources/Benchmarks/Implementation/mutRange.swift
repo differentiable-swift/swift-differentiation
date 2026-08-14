@@ -14,6 +14,29 @@ extension Array where Element: Differentiable {
             self.update(at: i, with: transform(self[i]))
         }
     }
+
+    @inlinable
+    @derivative(of: mutRange)
+    mutating func _vjpMutRange(
+        start: Int, end: Int, _ transform: @differentiable(reverse) (Element) -> Element
+    ) -> (value: Void, pullback: (inout TangentVector) -> Void) {
+        // Capture pullbacks for each transformed element
+        var pullbacks: [(Element.TangentVector) -> Element.TangentVector] = []
+        pullbacks.reserveCapacity(end - start)
+
+        for i in start ..< end {
+            let (newValue, pb) = valueWithPullback(at: self[i], of: transform)
+            pullbacks.append(pb)
+            self[i] = newValue
+        }
+
+        return ((), { tangent in
+            // Apply each transform's pullback to the corresponding gradient
+            for (j, i) in (start ..< end).enumerated() {
+                tangent[i] = pullbacks[j](tangent[i])
+            }
+        })
+    }
 }
 
 private let benchmarkTitle = "mutRange"
