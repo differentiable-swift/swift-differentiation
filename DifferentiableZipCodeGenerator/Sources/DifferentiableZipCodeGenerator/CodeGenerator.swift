@@ -38,3 +38,13 @@ enum CodeGeneratorError: Error {
 func indent(_ indent: Int) -> String {
     (0 ..< indent).map { _ in "    " }.joined()
 }
+
+/// Renders a tuple expression. A single element is emitted *without* enclosing parentheses —
+/// SwiftFormat's `redundantParens` rule rejects `(x)` — while multiple elements render as a
+/// parenthesized, one-per-line tuple. `parenIndent` is the indent level of the parentheses;
+/// elements sit one level deeper.
+func tupleExpression(_ elements: [String], parenIndent: Int) -> String {
+    guard elements.count > 1 else { return elements[0] }
+    let inner = elements.map { "\(indent(parenIndent + 1))\($0)" }.joined(separator: ",\n")
+    return "(\n\(inner)\n\(indent(parenIndent)))"
+}

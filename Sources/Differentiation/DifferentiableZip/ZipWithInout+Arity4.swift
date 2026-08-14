@@ -91,7 +91,6 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4>(
         return (
             value: (),
             pullback: { _ in
-                // swiftformat:disable:next redundantParens
                 (
                     C2.TangentVector.zero,
                     C3.TangentVector.zero,
@@ -137,36 +136,49 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4>(
     return (
         value: (),
         pullback: { v in
-            var results2 = C2.TangentVector()
-            var results3 = C3.TangentVector()
-            var results4 = C4.TangentVector()
-
-            results2.reserveCapacity(pullbacks.count)
-            results3.reserveCapacity(pullbacks.count)
-            results4.reserveCapacity(pullbacks.count)
+            let n = pullbacks.count
 
             if v.count == 0 {
-                v.reserveCapacity(pullbacks.count)
-                for _ in 0 ..< pullbacks.count {
-                    v.appendContribution(of: .zero)
+                return (
+                    C2.TangentVector.zero,
+                    C3.TangentVector.zero,
+                    C4.TangentVector.zero
+                )
+            }
+
+            precondition(v.count == n)
+
+            // `tangents2` is the driver: it runs each element pullback once, writes the `Inout`
+            // tangent back into `v` in place (along `v`'s native indices — its index type need not be
+            // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
+            // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
+            // because of `init(count:_:)`'s once-per-index, in-order contract: every scratch slot is
+            // initialized during the driver pass before it is moved (see
+            // `DifferentiableCollectionTangentVector`).
+            let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
+            let scratch4 = UnsafeMutableBufferPointer<C4.Element.TangentVector>.allocate(capacity: n)
+            defer { scratch3.deallocate() }
+            defer { scratch4.deallocate() }
+
+            var vi = v.startIndex
+            let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                C2.TangentVector(count: n) { index in
+                    let (v1, v2, v3, v4) = pullbackBuffer[index](v[vi])
+                    v[vi] = v1
+                    scratch3.initializeElement(at: index, to: v3)
+                    scratch4.initializeElement(at: index, to: v4)
+                    v.formIndex(after: &vi)
+                    return v2
                 }
             }
 
-            precondition(v.count == pullbacks.count)
+            let tangents3 = C3.TangentVector(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector(count: n) { i in scratch4.moveElement(from: i) }
 
-            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                let (v1, v2, v3, v4) = pullback(tangentElement)
-                v[index] = v1
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-            }
-
-            // swiftformat:disable:next redundantParens
             return (
-                results2,
-                results3,
-                results4
+                tangents2,
+                tangents3,
+                tangents4
             )
         }
     )
