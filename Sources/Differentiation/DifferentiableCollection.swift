@@ -10,17 +10,13 @@ public protocol DifferentiableCollection: Differentiable & Collection where
 }
 
 public protocol DifferentiableCollectionTangentVector: DifferentiableCollection {
-    init()
-    mutating func reserveCapacity(_ capacity: Int)
-    mutating func appendContribution(of value: Element)
-
     /// Build a dense tangent of `count` elements, where element `i` is `element(i)`.
     ///
     /// The fast path for constructing a tangent in a pullback: the conformer owns the loop, so
-    /// contiguous types fill their storage directly (no per-element `appendContribution` dispatch)
-    /// while non-contiguous types (e.g. `Repeated`) fold the elements in without allocating any
-    /// intermediate storage. There is no default implementation, so a new conformer that forgets
-    /// this gets a compile error rather than silently falling back to a slow path.
+    /// contiguous types fill their storage directly while non-contiguous types (e.g. `Repeated`)
+    /// fold the elements in without allocating any intermediate storage.
+    /// There is no default implementation, so a new conformer that forgets this gets a compile error
+    /// rather than silently falling back to a slow path.
     ///
     /// - Important: This is a **conformance requirement**, not merely a convention. A conformer
     ///   MUST invoke `element` exactly once for every index in `0 ..< count`, in strictly increasing
@@ -38,10 +34,6 @@ extension Array: DifferentiableCollection where Element: Differentiable & Additi
 extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -58,10 +50,6 @@ extension ContiguousArray: DifferentiableCollection where Element: Differentiabl
 extension ContiguousArray.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init(ContiguousArray<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -78,10 +66,6 @@ extension ArraySlice: DifferentiableCollection where Element: Differentiable & A
 extension ArraySlice.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init(ArraySlice([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -98,14 +82,6 @@ extension Repeated: DifferentiableCollection where Element: Differentiable & Add
 extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    public init() { self = .zero }
-    public mutating func reserveCapacity(_: Int) { /* no-op */ }
-    public mutating func appendContribution(of value: Repeated<Element>.Element) {
-        let newValue = self.base.repeatedValue + value
-        let newCount = self.base.count + 1
-        self.base = repeatElement(newValue, count: newCount)
-    }
-
     /// `Repeated` collapses to a single repeated value, so it sums the pulled elements into one
     /// accumulator and builds the `Repeated` object once.
     @inlinable
@@ -130,18 +106,4 @@ extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector whe
 // extension Zip2SequenceDifferentiable.TangentVector: DifferentiableSequenceTangentVector where
 //    Sequence1: DifferentiableSequence,
 //    Sequence2: DifferentiableSequence
-// {
-//    public init() {
-//        self.sequence1 = .init()
-//        self.sequence2 = .init()
-//    }
-//
-//    public mutating func reserveCapacity(_ capacity: Int) {
-//        sequence1.reserveCapacity(capacity)
-//        sequence2.reserveCapacity(capacity)
-//    }
-//
-//    public mutating func appendContribution(of value: (Sequence1.TangentVector.Element, Sequence2.TangentVector.Element)) {
-//        fatalError("Incomplete")
-//    }
-// }
+// {}
