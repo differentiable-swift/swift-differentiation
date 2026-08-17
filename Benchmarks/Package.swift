@@ -5,10 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "Benchmarks",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS("26.0")],
     dependencies: [
         .package(path: ".."),
         .package(url: "https://github.com/apple/swift-collections-benchmark", from: "0.0.4"),
+        .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.4.0"),
     ],
     targets: [
         .executableTarget(
@@ -18,10 +19,29 @@ let package = Package(
                 .product(name: "CollectionsBenchmark", package: "swift-collections-benchmark"),
             ]
         ),
+        .target(
+            name: "DifferentiableOperators",
+            dependencies: [
+                .product(name: "Differentiation", package: "swift-differentiation"),
+            ]
+        ),
+        .executableTarget(
+            name: "FusedZipWithBenchmarks",
+            dependencies: [
+                .product(name: "Benchmark", package: "package-benchmark"),
+                .product(name: "Differentiation", package: "swift-differentiation"),
+                "DifferentiableOperators",
+            ],
+            path: "Benchmarks/FusedZipWithBenchmarks",
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "package-benchmark"),
+            ]
+        ),
         .testTarget(
             name: "BenchmarkTests",
             dependencies: [
                 "Benchmarks",
+                "DifferentiableOperators",
             ]
         ),
     ]
