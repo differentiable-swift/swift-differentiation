@@ -15,13 +15,9 @@ public func differentiableZipWith<C1, C2, C3, C4, Result>(
     ) -> Result
 ) -> [Result] where
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
     Result: Differentiable
 {
     var capacity = c1.count
@@ -78,13 +74,9 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, Result>(
     )
 ) where
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
     Result: Differentiable
 {
     var count = c1.count

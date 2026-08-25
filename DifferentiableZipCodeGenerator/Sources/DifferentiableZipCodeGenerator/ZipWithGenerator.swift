@@ -13,16 +13,7 @@ enum ZipWithGenerator {
         \(arityRange.map { "\(indent(2))C\($0).Element" }.joined(separator: ",\n"))
             ) -> Result
         ) -> [Result] where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable,
-            """
-        }.joined(separator: "\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection," }.joined(separator: "\n"))
             Result: Differentiable
         {
             var capacity = c1.count
@@ -58,16 +49,7 @@ enum ZipWithGenerator {
         \(arityRange.map { "\(indent(2))C\($0).TangentVector" }.joined(separator: ",\n"))
             )
         ) where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable,
-            """
-        }.joined(separator: "\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection," }.joined(separator: "\n"))
             Result: Differentiable
         {
             var count = c1.count

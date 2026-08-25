@@ -1,5 +1,8 @@
 import _Differentiation
 
+// `DifferentiableCollection` is just a collection of conformances and has no requirements of it's own. This mainly exists to show the end
+// goal, which is working with a collection that is differentiable. Even though the requirements for that mainly rest on the collection's
+// tangentvector.
 public protocol DifferentiableCollection: Differentiable & Collection where
     Element: Differentiable,
     TangentVector: DifferentiableCollectionTangentVector,
@@ -9,7 +12,8 @@ public protocol DifferentiableCollection: Differentiable & Collection where
     associatedtype TangentVector
 }
 
-public protocol DifferentiableCollectionTangentVector: DifferentiableCollection {
+public protocol DifferentiableCollectionTangentVector {
+    associatedtype Element
     /// Build a dense tangent of `count` elements, where element `i` is `element(i)`.
     ///
     /// The fast path for constructing a tangent in a pullback: the conformer owns the loop, so
@@ -29,11 +33,9 @@ public protocol DifferentiableCollectionTangentVector: DifferentiableCollection 
     init(count: Int, _ element: (Int) -> Element)
 }
 
-extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
+extension Array: DifferentiableCollection where Element: Differentiable {}
 
-extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
-
-extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
+extension Array.DifferentiableView: DifferentiableCollectionTangentVector {
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -45,11 +47,9 @@ extension Array.DifferentiableView: DifferentiableCollectionTangentVector where 
     }
 }
 
-extension ContiguousArray: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
+extension ContiguousArray: DifferentiableCollection where Element: Differentiable {}
 
-extension ContiguousArray.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
-
-extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
+extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVector {
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init(ContiguousArray<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -61,11 +61,9 @@ extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVec
     }
 }
 
-extension ArraySlice: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
+extension ArraySlice: DifferentiableCollection where Element: Differentiable {}
 
-extension ArraySlice.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
-
-extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
+extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector {
     @inlinable
     public init(count: Int, _ element: (Int) -> Element) {
         self.init(ArraySlice([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -77,9 +75,7 @@ extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector w
     }
 }
 
-extension Repeated: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
-
-extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
+extension Repeated: DifferentiableCollection where Element: Differentiable {}
 
 extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     /// `Repeated` collapses to a single repeated value, so it sums the pulled elements into one

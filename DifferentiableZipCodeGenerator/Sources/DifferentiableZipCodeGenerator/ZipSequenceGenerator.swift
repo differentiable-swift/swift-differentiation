@@ -113,19 +113,7 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(2))C\($0).TangentVector" }.joined(separator: ",\n"))
             )
         ) where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             (
                 value: differentiableZip(
@@ -151,19 +139,7 @@ enum ZipSequenceGenerator {
         }
 
         extension Zip\(arity)SequenceDifferentiable: Differentiable where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             @inlinable
             public mutating func move(by offset: TangentVector) {
@@ -217,7 +193,7 @@ enum ZipSequenceGenerator {
                             precondition(v.count == n)
                         }
 
-                        // Scratch is initialized while building `results1` and moved out while building the
+                        // Scratch is initialized while building `tangents1` and moved out while building the
                         // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
                         // (see `DifferentiableCollectionTangentVector`).
         \(arityRange.dropFirst()
@@ -265,50 +241,10 @@ enum ZipSequenceGenerator {
         code += """
 
         extension Zip\(arity)SequenceDifferentiable {
-            public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
-
-        """
-        code += arityRange.map {
-            """
-            \(indent(2))C\($0): Differentiable,
-            \(indent(2))C\($0).TangentVector: Collection,
-            \(indent(2))C\($0).TangentVector.Index == Int
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+            public struct TangentVector: Differentiable & AdditiveArithmetic where
+        \(arityRange.map { "\(indent(2))C\($0): Differentiable" }.joined(separator: ",\n"))
             {
                 public typealias TangentVector = Self
-                public typealias Element = (
-        \(arityRange.map { "\(indent(3))C\($0).TangentVector.Element" }.joined(separator: ",\n"))
-                )
-                public typealias Index = Int
-
-                @inlinable
-                public var startIndex: Int { 0 }
-                @inlinable
-                public var endIndex: Int {
-                    var result = collection1.count
-        \(arityRange.dropFirst().map { "\(indent(3))result = Swift.min(result, collection\($0).count)" }.joined(separator: "\n"))
-                    return result
-                }
-
-                @inlinable
-                public subscript(index: Int) -> Element {
-                    (
-        \(arityRange.map { "\(indent(4))collection\($0)[index]" }.joined(separator: ",\n"))
-                    )
-                }
-
-                @inlinable
-                public func index(after i: Int) -> Int {
-                    i + 1
-                }
-
-                @inlinable
-                public func formIndex(after i: inout Int) {
-                    i += 1
-                }
 
 
         """

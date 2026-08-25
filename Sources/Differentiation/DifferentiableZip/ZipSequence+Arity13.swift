@@ -254,71 +254,19 @@ public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
         C13.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector,
-    C6: Differentiable,
-    C6.Element: Differentiable,
-    C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C6.TangentVector.Index == Int,
-    C6.TangentVector.Element == C6.Element.TangentVector,
-    C7: Differentiable,
-    C7.Element: Differentiable,
-    C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C7.TangentVector.Index == Int,
-    C7.TangentVector.Element == C7.Element.TangentVector,
-    C8: Differentiable,
-    C8.Element: Differentiable,
-    C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C8.TangentVector.Index == Int,
-    C8.TangentVector.Element == C8.Element.TangentVector,
-    C9: Differentiable,
-    C9.Element: Differentiable,
-    C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C9.TangentVector.Index == Int,
-    C9.TangentVector.Element == C9.Element.TangentVector,
-    C10: Differentiable,
-    C10.Element: Differentiable,
-    C10.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C10.TangentVector.Index == Int,
-    C10.TangentVector.Element == C10.Element.TangentVector,
-    C11: Differentiable,
-    C11.Element: Differentiable,
-    C11.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C11.TangentVector.Index == Int,
-    C11.TangentVector.Element == C11.Element.TangentVector,
-    C12: Differentiable,
-    C12.Element: Differentiable,
-    C12.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C12.TangentVector.Index == Int,
-    C12.TangentVector.Element == C12.Element.TangentVector,
-    C13: Differentiable,
-    C13.Element: Differentiable,
-    C13.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C13.TangentVector.Index == Int,
-    C13.TangentVector.Element == C13.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection,
+    C6: DifferentiableCollection,
+    C7: DifferentiableCollection,
+    C8: DifferentiableCollection,
+    C9: DifferentiableCollection,
+    C10: DifferentiableCollection,
+    C11: DifferentiableCollection,
+    C12: DifferentiableCollection,
+    C13: DifferentiableCollection
 {
     (
         value: differentiableZip(
@@ -380,71 +328,19 @@ extension Zip13SequenceDifferentiable {
 }
 
 extension Zip13SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector,
-    C6: Differentiable,
-    C6.Element: Differentiable,
-    C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C6.TangentVector.Index == Int,
-    C6.TangentVector.Element == C6.Element.TangentVector,
-    C7: Differentiable,
-    C7.Element: Differentiable,
-    C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C7.TangentVector.Index == Int,
-    C7.TangentVector.Element == C7.Element.TangentVector,
-    C8: Differentiable,
-    C8.Element: Differentiable,
-    C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C8.TangentVector.Index == Int,
-    C8.TangentVector.Element == C8.Element.TangentVector,
-    C9: Differentiable,
-    C9.Element: Differentiable,
-    C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C9.TangentVector.Index == Int,
-    C9.TangentVector.Element == C9.Element.TangentVector,
-    C10: Differentiable,
-    C10.Element: Differentiable,
-    C10.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C10.TangentVector.Index == Int,
-    C10.TangentVector.Element == C10.Element.TangentVector,
-    C11: Differentiable,
-    C11.Element: Differentiable,
-    C11.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C11.TangentVector.Index == Int,
-    C11.TangentVector.Element == C11.Element.TangentVector,
-    C12: Differentiable,
-    C12.Element: Differentiable,
-    C12.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C12.TangentVector.Index == Int,
-    C12.TangentVector.Element == C12.Element.TangentVector,
-    C13: Differentiable,
-    C13.Element: Differentiable,
-    C13.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C13.TangentVector.Index == Int,
-    C13.TangentVector.Element == C13.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection,
+    C6: DifferentiableCollection,
+    C7: DifferentiableCollection,
+    C8: DifferentiableCollection,
+    C9: DifferentiableCollection,
+    C10: DifferentiableCollection,
+    C11: DifferentiableCollection,
+    C12: DifferentiableCollection,
+    C13: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -582,7 +478,7 @@ extension Zip13SequenceDifferentiable: Differentiable where
                     precondition(v.count == n)
                 }
 
-                // Scratch is initialized while building `results1` and moved out while building the
+                // Scratch is initialized while building `tangents1` and moved out while building the
                 // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
                 // (see `DifferentiableCollectionTangentVector`).
                 let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
@@ -688,113 +584,22 @@ extension Zip13SequenceDifferentiable: Differentiable where
 }
 
 extension Zip13SequenceDifferentiable {
-    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
+    public struct TangentVector: Differentiable & AdditiveArithmetic where
         C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
         C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int,
         C3: Differentiable,
-        C3.TangentVector: Collection,
-        C3.TangentVector.Index == Int,
         C4: Differentiable,
-        C4.TangentVector: Collection,
-        C4.TangentVector.Index == Int,
         C5: Differentiable,
-        C5.TangentVector: Collection,
-        C5.TangentVector.Index == Int,
         C6: Differentiable,
-        C6.TangentVector: Collection,
-        C6.TangentVector.Index == Int,
         C7: Differentiable,
-        C7.TangentVector: Collection,
-        C7.TangentVector.Index == Int,
         C8: Differentiable,
-        C8.TangentVector: Collection,
-        C8.TangentVector.Index == Int,
         C9: Differentiable,
-        C9.TangentVector: Collection,
-        C9.TangentVector.Index == Int,
         C10: Differentiable,
-        C10.TangentVector: Collection,
-        C10.TangentVector.Index == Int,
         C11: Differentiable,
-        C11.TangentVector: Collection,
-        C11.TangentVector.Index == Int,
         C12: Differentiable,
-        C12.TangentVector: Collection,
-        C12.TangentVector.Index == Int,
-        C13: Differentiable,
-        C13.TangentVector: Collection,
-        C13.TangentVector.Index == Int
+        C13: Differentiable
     {
         public typealias TangentVector = Self
-        public typealias Element = (
-            C1.TangentVector.Element,
-            C2.TangentVector.Element,
-            C3.TangentVector.Element,
-            C4.TangentVector.Element,
-            C5.TangentVector.Element,
-            C6.TangentVector.Element,
-            C7.TangentVector.Element,
-            C8.TangentVector.Element,
-            C9.TangentVector.Element,
-            C10.TangentVector.Element,
-            C11.TangentVector.Element,
-            C12.TangentVector.Element,
-            C13.TangentVector.Element
-        )
-        public typealias Index = Int
-
-        @inlinable
-        public var startIndex: Int { 0 }
-        @inlinable
-        public var endIndex: Int {
-            var result = collection1.count
-            result = Swift.min(result, collection2.count)
-            result = Swift.min(result, collection3.count)
-            result = Swift.min(result, collection4.count)
-            result = Swift.min(result, collection5.count)
-            result = Swift.min(result, collection6.count)
-            result = Swift.min(result, collection7.count)
-            result = Swift.min(result, collection8.count)
-            result = Swift.min(result, collection9.count)
-            result = Swift.min(result, collection10.count)
-            result = Swift.min(result, collection11.count)
-            result = Swift.min(result, collection12.count)
-            result = Swift.min(result, collection13.count)
-            return result
-        }
-
-        @inlinable
-        public subscript(index: Int) -> Element {
-            (
-                collection1[index],
-                collection2[index],
-                collection3[index],
-                collection4[index],
-                collection5[index],
-                collection6[index],
-                collection7[index],
-                collection8[index],
-                collection9[index],
-                collection10[index],
-                collection11[index],
-                collection12[index],
-                collection13[index]
-            )
-        }
-
-        @inlinable
-        public func index(after i: Int) -> Int {
-            i + 1
-        }
-
-        @inlinable
-        public func formIndex(after i: inout Int) {
-            i += 1
-        }
 
         @usableFromInline
         var collection1: C1.TangentVector

@@ -134,31 +134,11 @@ public func _vjpDifferentiableZip<C1, C2, C3, C4, C5>(
         C5.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection
 {
     (
         value: differentiableZip(
@@ -196,31 +176,11 @@ extension Zip5SequenceDifferentiable {
 }
 
 extension Zip5SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -302,7 +262,7 @@ extension Zip5SequenceDifferentiable: Differentiable where
                     precondition(v.count == n)
                 }
 
-                // Scratch is initialized while building `results1` and moved out while building the
+                // Scratch is initialized while building `tangents1` and moved out while building the
                 // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
                 // (see `DifferentiableCollectionTangentVector`).
                 let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
@@ -360,65 +320,14 @@ extension Zip5SequenceDifferentiable: Differentiable where
 }
 
 extension Zip5SequenceDifferentiable {
-    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
+    public struct TangentVector: Differentiable & AdditiveArithmetic where
         C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
         C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int,
         C3: Differentiable,
-        C3.TangentVector: Collection,
-        C3.TangentVector.Index == Int,
         C4: Differentiable,
-        C4.TangentVector: Collection,
-        C4.TangentVector.Index == Int,
-        C5: Differentiable,
-        C5.TangentVector: Collection,
-        C5.TangentVector.Index == Int
+        C5: Differentiable
     {
         public typealias TangentVector = Self
-        public typealias Element = (
-            C1.TangentVector.Element,
-            C2.TangentVector.Element,
-            C3.TangentVector.Element,
-            C4.TangentVector.Element,
-            C5.TangentVector.Element
-        )
-        public typealias Index = Int
-
-        @inlinable
-        public var startIndex: Int { 0 }
-        @inlinable
-        public var endIndex: Int {
-            var result = collection1.count
-            result = Swift.min(result, collection2.count)
-            result = Swift.min(result, collection3.count)
-            result = Swift.min(result, collection4.count)
-            result = Swift.min(result, collection5.count)
-            return result
-        }
-
-        @inlinable
-        public subscript(index: Int) -> Element {
-            (
-                collection1[index],
-                collection2[index],
-                collection3[index],
-                collection4[index],
-                collection5[index]
-            )
-        }
-
-        @inlinable
-        public func index(after i: Int) -> Int {
-            i + 1
-        }
-
-        @inlinable
-        public func formIndex(after i: inout Int) {
-            i += 1
-        }
 
         @usableFromInline
         var collection1: C1.TangentVector
