@@ -428,8 +428,8 @@ extension Zip12SequenceDifferentiable: Differentiable where
         return (
             value: results,
             pullback: { v in
-                let n = pullbacks.count
-                if n == 0 {
+                // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
+                if v.count == 0 {
                     return TangentVector(
                         C1.TangentVector.zero,
                         C2.TangentVector.zero,
@@ -446,10 +446,8 @@ extension Zip12SequenceDifferentiable: Differentiable where
                     )
                 }
 
-                let zeroUpstream = v.count == 0
-                if !zeroUpstream {
-                    precondition(v.count == n)
-                }
+                let n = pullbacks.count
+                precondition(v.count == n)
 
                 // Scratch is initialized while building `tangents1` and moved out while building the
                 // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
@@ -477,11 +475,10 @@ extension Zip12SequenceDifferentiable: Differentiable where
                 defer { scratch11.deallocate() }
                 defer { scratch12.deallocate() }
 
-                let tangents1: C1.TangentVector
-                if zeroUpstream {
-                    tangents1 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
                         C1.TangentVector(count: n) { index in
-                            let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) = pullbackBuffer[index](.zero)
+                            let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) = pullbackBuffer[index](vBuffer[index])
                             scratch2.initializeElement(at: index, to: v2)
                             scratch3.initializeElement(at: index, to: v3)
                             scratch4.initializeElement(at: index, to: v4)
@@ -494,27 +491,6 @@ extension Zip12SequenceDifferentiable: Differentiable where
                             scratch11.initializeElement(at: index, to: v11)
                             scratch12.initializeElement(at: index, to: v12)
                             return v1
-                        }
-                    }
-                }
-                else {
-                    tangents1 = v.withUnsafeContiguousStorage { vBuffer in
-                        pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                            C1.TangentVector(count: n) { index in
-                                let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12) = pullbackBuffer[index](vBuffer[index])
-                                scratch2.initializeElement(at: index, to: v2)
-                                scratch3.initializeElement(at: index, to: v3)
-                                scratch4.initializeElement(at: index, to: v4)
-                                scratch5.initializeElement(at: index, to: v5)
-                                scratch6.initializeElement(at: index, to: v6)
-                                scratch7.initializeElement(at: index, to: v7)
-                                scratch8.initializeElement(at: index, to: v8)
-                                scratch9.initializeElement(at: index, to: v9)
-                                scratch10.initializeElement(at: index, to: v10)
-                                scratch11.initializeElement(at: index, to: v11)
-                                scratch12.initializeElement(at: index, to: v12)
-                                return v1
-                            }
                         }
                     }
                 }

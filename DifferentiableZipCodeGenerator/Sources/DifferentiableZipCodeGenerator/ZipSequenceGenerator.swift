@@ -181,17 +181,15 @@ enum ZipSequenceGenerator {
                 return (
                     value: results,
                     pullback: { v in
-                        let n = pullbacks.count
-                        if n == 0 {
+                        // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
+                        if v.count == 0 {
                             return TangentVector(
         \(arityRange.map { "\(indent(6))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
                             )
                         }
 
-                        let zeroUpstream = v.count == 0
-                        if !zeroUpstream {
-                            precondition(v.count == n)
-                        }
+                        let n = pullbacks.count
+                        precondition(v.count == n)
 
                         // Scratch is initialized while building `tangents1` and moved out while building the
                         // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
@@ -201,25 +199,13 @@ enum ZipSequenceGenerator {
             .joined(separator: "\n"))
         \(arityRange.dropFirst().map { "\(indent(4))defer { scratch\($0).deallocate() }" }.joined(separator: "\n"))
 
-                        let tangents1: C1.TangentVector
-                        if zeroUpstream {
-                            tangents1 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                            pullbacks.withUnsafeBufferPointer { pullbackBuffer in
                                 C1.TangentVector(count: n) { index in
-                                    let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](.zero)
-        \(arityRange.dropFirst().map { "\(indent(7))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
-                                    return v1
-                                }
-                            }
-                        }
-                        else {
-                            tangents1 = v.withUnsafeContiguousStorage { vBuffer in
-                                pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                                    C1.TangentVector(count: n) { index in
-                                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](vBuffer[index])
-        \(arityRange.dropFirst().map { "\(indent(8))scratch\($0).initializeElement(at: index, to: v\($0))" }
+                                    let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](vBuffer[index])
+        \(arityRange.dropFirst().map { "\(indent(7))scratch\($0).initializeElement(at: index, to: v\($0))" }
             .joined(separator: "\n"))
-                                        return v1
-                                    }
+                                    return v1
                                 }
                             }
                         }

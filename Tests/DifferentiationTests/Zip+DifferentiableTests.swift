@@ -239,8 +239,8 @@ struct ZipDifferentiableTests {
 
         #expect(value == [2, 4, 6])
         let gradient = pullback([])
-        #expect(gradient.0 == [0, 0, 0])
-        #expect(gradient.1 == [0, 0, 0])
+        #expect(gradient.0 == [])
+        #expect(gradient.1 == [])
     }
 
     @Test
@@ -254,8 +254,8 @@ struct ZipDifferentiableTests {
 
         #expect(value == [2, 4, 6])
         let gradient = pullback([])
-        #expect(gradient.0 == [0, 0, 0])
-        #expect(gradient.1 == [0, 0, 0])
+        #expect(gradient.0 == [])
+        #expect(gradient.1 == [])
     }
 
     @Test

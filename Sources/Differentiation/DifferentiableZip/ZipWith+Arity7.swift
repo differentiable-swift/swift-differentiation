@@ -188,13 +188,21 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, Result>(
     return (
         value: results,
         pullback: { v in
-            // `count == 0` already returned early above, so here `n >= 1`
-            let n = pullbacks.count
-
-            let zeroUpstream = v.count == 0
-            if !zeroUpstream {
-                precondition(v.count == n)
+            // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
+            if v.count == 0 {
+                return (
+                    C1.TangentVector.zero,
+                    C2.TangentVector.zero,
+                    C3.TangentVector.zero,
+                    C4.TangentVector.zero,
+                    C5.TangentVector.zero,
+                    C6.TangentVector.zero,
+                    C7.TangentVector.zero
+                )
             }
+
+            let n = pullbacks.count
+            precondition(v.count == n)
 
             // Scratch is initialized while building `tangents1` and moved out while building the
             // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
@@ -212,11 +220,10 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, Result>(
             defer { scratch6.deallocate() }
             defer { scratch7.deallocate() }
 
-            let tangents1: C1.TangentVector
-            if zeroUpstream {
-                tangents1 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+            let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                pullbacks.withUnsafeBufferPointer { pullbackBuffer in
                     C1.TangentVector(count: n) { index in
-                        let (v1, v2, v3, v4, v5, v6, v7) = pullbackBuffer[index](.zero)
+                        let (v1, v2, v3, v4, v5, v6, v7) = pullbackBuffer[index](vBuffer[index])
                         scratch2.initializeElement(at: index, to: v2)
                         scratch3.initializeElement(at: index, to: v3)
                         scratch4.initializeElement(at: index, to: v4)
@@ -224,22 +231,6 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, Result>(
                         scratch6.initializeElement(at: index, to: v6)
                         scratch7.initializeElement(at: index, to: v7)
                         return v1
-                    }
-                }
-            }
-            else {
-                tangents1 = v.withUnsafeContiguousStorage { vBuffer in
-                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                        C1.TangentVector(count: n) { index in
-                            let (v1, v2, v3, v4, v5, v6, v7) = pullbackBuffer[index](vBuffer[index])
-                            scratch2.initializeElement(at: index, to: v2)
-                            scratch3.initializeElement(at: index, to: v3)
-                            scratch4.initializeElement(at: index, to: v4)
-                            scratch5.initializeElement(at: index, to: v5)
-                            scratch6.initializeElement(at: index, to: v6)
-                            scratch7.initializeElement(at: index, to: v7)
-                            return v1
-                        }
                     }
                 }
             }

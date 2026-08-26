@@ -103,13 +103,16 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
     return (
         value: results,
         pullback: { v in
-            // `count == 0` already returned early above, so here `n >= 1`
-            let n = pullbacks.count
-
-            let zeroUpstream = v.count == 0
-            if !zeroUpstream {
-                precondition(v.count == n)
+            // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
+            if v.count == 0 {
+                return (
+                    C1.TangentVector.zero,
+                    C2.TangentVector.zero
+                )
             }
+
+            let n = pullbacks.count
+            precondition(v.count == n)
 
             // Scratch is initialized while building `tangents1` and moved out while building the
             // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
@@ -117,24 +120,12 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
             let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
             defer { scratch2.deallocate() }
 
-            let tangents1: C1.TangentVector
-            if zeroUpstream {
-                tangents1 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+            let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                pullbacks.withUnsafeBufferPointer { pullbackBuffer in
                     C1.TangentVector(count: n) { index in
-                        let (v1, v2) = pullbackBuffer[index](.zero)
+                        let (v1, v2) = pullbackBuffer[index](vBuffer[index])
                         scratch2.initializeElement(at: index, to: v2)
                         return v1
-                    }
-                }
-            }
-            else {
-                tangents1 = v.withUnsafeContiguousStorage { vBuffer in
-                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                        C1.TangentVector(count: n) { index in
-                            let (v1, v2) = pullbackBuffer[index](vBuffer[index])
-                            scratch2.initializeElement(at: index, to: v2)
-                            return v1
-                        }
                     }
                 }
             }
