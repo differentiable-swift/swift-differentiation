@@ -115,14 +115,14 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
             precondition(v.count == n)
 
             // Scratch is initialized while building `tangents1` and moved out while building the
-            // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
+            // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
             // (see `DifferentiableCollectionTangentVector`).
             let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
             defer { scratch2.deallocate() }
 
             let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
                 pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                    C1.TangentVector(count: n) { index in
+                    C1.TangentVector.building(count: n) { index in
                         let (v1, v2) = pullbackBuffer[index](vBuffer[index])
                         scratch2.initializeElement(at: index, to: v2)
                         return v1
@@ -130,7 +130,7 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
                 }
             }
 
-            let tangents2 = C2.TangentVector(count: n) { i in scratch2.moveElement(from: i) }
+            let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
 
             return (
                 tangents1,

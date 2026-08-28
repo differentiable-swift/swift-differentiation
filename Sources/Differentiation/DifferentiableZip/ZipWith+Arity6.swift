@@ -187,7 +187,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
             precondition(v.count == n)
 
             // Scratch is initialized while building `tangents1` and moved out while building the
-            // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
+            // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
             // (see `DifferentiableCollectionTangentVector`).
             let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
             let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
@@ -202,7 +202,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
 
             let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
                 pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                    C1.TangentVector(count: n) { index in
+                    C1.TangentVector.building(count: n) { index in
                         let (v1, v2, v3, v4, v5, v6) = pullbackBuffer[index](vBuffer[index])
                         scratch2.initializeElement(at: index, to: v2)
                         scratch3.initializeElement(at: index, to: v3)
@@ -214,11 +214,11 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
                 }
             }
 
-            let tangents2 = C2.TangentVector(count: n) { i in scratch2.moveElement(from: i) }
-            let tangents3 = C3.TangentVector(count: n) { i in scratch3.moveElement(from: i) }
-            let tangents4 = C4.TangentVector(count: n) { i in scratch4.moveElement(from: i) }
-            let tangents5 = C5.TangentVector(count: n) { i in scratch5.moveElement(from: i) }
-            let tangents6 = C6.TangentVector(count: n) { i in scratch6.moveElement(from: i) }
+            let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
+            let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector.building(count: n) { i in scratch4.moveElement(from: i) }
+            let tangents5 = C5.TangentVector.building(count: n) { i in scratch5.moveElement(from: i) }
+            let tangents6 = C6.TangentVector.building(count: n) { i in scratch6.moveElement(from: i) }
 
             return (
                 tangents1,

@@ -106,13 +106,13 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
             // tangent back into `v` in place (along `v`'s native indices — its index type need not be
             // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
             // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
-            // because of `init(count:_:)`'s once-per-index, in-order contract: every scratch slot is
+            // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
             // initialized during the driver pass before it is moved (see
             // `DifferentiableCollectionTangentVector`).
 
             var vi = v.startIndex
             let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                C2.TangentVector(count: n) { index in
+                C2.TangentVector.building(count: n) { index in
                     let (v1, v2) = pullbackBuffer[index](v[vi])
                     v[vi] = v1
 

@@ -111,7 +111,7 @@ enum ZipWithInoutGenerator {
                     // tangent back into `v` in place (along `v`'s native indices — its index type need not be
                     // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
                     // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
-                    // because of `init(count:_:)`'s once-per-index, in-order contract: every scratch slot is
+                    // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
                     // initialized during the driver pass before it is moved (see
                     // `DifferentiableCollectionTangentVector`).
         \(arityRange.dropFirst()
@@ -121,7 +121,7 @@ enum ZipWithInoutGenerator {
 
                     var vi = v.startIndex
                     let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                        C2.TangentVector(count: n) { index in
+                        C2.TangentVector.building(count: n) { index in
                             let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](v[vi])
                             v[vi] = v1
         \(arityRange.dropFirst().map { "\(indent(5))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
@@ -131,7 +131,7 @@ enum ZipWithInoutGenerator {
                     }
 
         \(arityRange.dropFirst()
-            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
             .joined(separator: "\n"))
 
                     return \(tupleExpression(arityRange.map { "tangents\($0)" }, parenIndent: 3))

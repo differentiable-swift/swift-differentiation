@@ -326,7 +326,7 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
             // tangent back into `v` in place (along `v`'s native indices — its index type need not be
             // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
             // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
-            // because of `init(count:_:)`'s once-per-index, in-order contract: every scratch slot is
+            // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
             // initialized during the driver pass before it is moved (see
             // `DifferentiableCollectionTangentVector`).
             let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
@@ -356,7 +356,7 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
 
             var vi = v.startIndex
             let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                C2.TangentVector(count: n) { index in
+                C2.TangentVector.building(count: n) { index in
                     let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14) = pullbackBuffer[index](v[vi])
                     v[vi] = v1
                     scratch3.initializeElement(at: index, to: v3)
@@ -376,18 +376,18 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
                 }
             }
 
-            let tangents3 = C3.TangentVector(count: n) { i in scratch3.moveElement(from: i) }
-            let tangents4 = C4.TangentVector(count: n) { i in scratch4.moveElement(from: i) }
-            let tangents5 = C5.TangentVector(count: n) { i in scratch5.moveElement(from: i) }
-            let tangents6 = C6.TangentVector(count: n) { i in scratch6.moveElement(from: i) }
-            let tangents7 = C7.TangentVector(count: n) { i in scratch7.moveElement(from: i) }
-            let tangents8 = C8.TangentVector(count: n) { i in scratch8.moveElement(from: i) }
-            let tangents9 = C9.TangentVector(count: n) { i in scratch9.moveElement(from: i) }
-            let tangents10 = C10.TangentVector(count: n) { i in scratch10.moveElement(from: i) }
-            let tangents11 = C11.TangentVector(count: n) { i in scratch11.moveElement(from: i) }
-            let tangents12 = C12.TangentVector(count: n) { i in scratch12.moveElement(from: i) }
-            let tangents13 = C13.TangentVector(count: n) { i in scratch13.moveElement(from: i) }
-            let tangents14 = C14.TangentVector(count: n) { i in scratch14.moveElement(from: i) }
+            let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector.building(count: n) { i in scratch4.moveElement(from: i) }
+            let tangents5 = C5.TangentVector.building(count: n) { i in scratch5.moveElement(from: i) }
+            let tangents6 = C6.TangentVector.building(count: n) { i in scratch6.moveElement(from: i) }
+            let tangents7 = C7.TangentVector.building(count: n) { i in scratch7.moveElement(from: i) }
+            let tangents8 = C8.TangentVector.building(count: n) { i in scratch8.moveElement(from: i) }
+            let tangents9 = C9.TangentVector.building(count: n) { i in scratch9.moveElement(from: i) }
+            let tangents10 = C10.TangentVector.building(count: n) { i in scratch10.moveElement(from: i) }
+            let tangents11 = C11.TangentVector.building(count: n) { i in scratch11.moveElement(from: i) }
+            let tangents12 = C12.TangentVector.building(count: n) { i in scratch12.moveElement(from: i) }
+            let tangents13 = C13.TangentVector.building(count: n) { i in scratch13.moveElement(from: i) }
+            let tangents14 = C14.TangentVector.building(count: n) { i in scratch14.moveElement(from: i) }
 
             return (
                 tangents2,

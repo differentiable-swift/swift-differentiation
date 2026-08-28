@@ -104,7 +104,7 @@ enum ZipWithGenerator {
                     precondition(v.count == n)
 
                     // Scratch is initialized while building `tangents1` and moved out while building the
-                    // rest. This is memory-safe because of `init(count:_:)`'s once-per-index, in-order contract
+                    // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
                     // (see `DifferentiableCollectionTangentVector`).
         \(arityRange.dropFirst()
             .map { "\(indent(3))let scratch\($0) = UnsafeMutableBufferPointer<C\($0).Element.TangentVector>.allocate(capacity: n)" }
@@ -113,7 +113,7 @@ enum ZipWithGenerator {
 
                     let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
                         pullbacks.withUnsafeBufferPointer { pullbackBuffer in
-                            C1.TangentVector(count: n) { index in
+                            C1.TangentVector.building(count: n) { index in
                                 let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](vBuffer[index])
         \(arityRange.dropFirst().map { "\(indent(6))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
                                 return v1
@@ -122,7 +122,7 @@ enum ZipWithGenerator {
                     }
 
         \(arityRange.dropFirst()
-            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
             .joined(separator: "\n"))
 
                     return (
