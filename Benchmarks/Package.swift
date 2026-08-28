@@ -9,6 +9,7 @@ let package = Package(
     dependencies: [
         .package(path: ".."),
         .package(url: "https://github.com/apple/swift-collections-benchmark", from: "0.0.4"),
+        .package(url: "https://github.com/ordo-one/benchmark", from: "1.36.2"),
     ],
     targets: [
         .executableTarget(
@@ -16,6 +17,17 @@ let package = Package(
             dependencies: [
                 .product(name: "Differentiation", package: "swift-differentiation"),
                 .product(name: "CollectionsBenchmark", package: "swift-collections-benchmark"),
+            ]
+        ),
+        .executableTarget(
+            name: "DifferentiationBenchmarks",
+            dependencies: [
+                .product(name: "Differentiation", package: "swift-differentiation"),
+                .product(name: "Benchmark", package: "benchmark"),
+            ],
+            path: "Benchmarks/DifferentiationBenchmarks",
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "benchmark"),
             ]
         ),
         .testTarget(
