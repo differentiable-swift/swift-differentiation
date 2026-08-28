@@ -20,7 +20,7 @@ extension Array where Element == Float {
             return result
         }
         for i in withoutDerivative(at: 1 ..< n - 1) {
-            result.update(at: i, with: self.laplace(i))
+            result[cta: i] = self.laplace(i)
         }
         return result
     }
