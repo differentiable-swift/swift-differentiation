@@ -32,6 +32,31 @@ extension Array.DifferentiableView:
     public var endIndex: Index { base.endIndex }
 
     @inlinable
+    public func index(after i: Int) -> Int {
+        base.index(after: i)
+    }
+
+    @inlinable
+    public func formIndex(after i: inout Int) {
+        base.formIndex(after: &i)
+    }
+
+    @inlinable
+    public func index(before i: Int) -> Int {
+        base.index(before: i)
+    }
+
+    @inlinable
+    public func formIndex(before i: inout Int) {
+        base.formIndex(before: &i)
+    }
+
+    @inlinable
+    public func index(_ i: Int, offsetBy distance: Int) -> Int {
+        base.index(i, offsetBy: distance)
+    }
+
+    @inlinable
     public init() {
         self.init(Array<Element>())
     }
@@ -41,5 +66,26 @@ extension Array.DifferentiableView:
         where C: Collection, Element == C.Element
     {
         base.replaceSubrange(subrange, with: newElements)
+    }
+
+    @inlinable
+    public mutating func reserveCapacity(_ n: Int) {
+        base.reserveCapacity(n)
+    }
+
+    @inlinable
+    public mutating func append(_ newElement: Element) {
+        base.append(newElement)
+    }
+
+    @inlinable
+    public mutating func append<S: Sequence>(contentsOf newElements: S) where S.Element == Element {
+        base.append(contentsOf: newElements)
+    }
+
+    @inlinable
+    @discardableResult
+    public mutating func remove(at index: Int) -> Element {
+        base.remove(at: index)
     }
 }
