@@ -89,16 +89,8 @@ public func _vjpDifferentiableZip<C1, C2>(
         C2.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection
 {
     (
         value: differentiableZip(
@@ -127,16 +119,8 @@ extension Zip2SequenceDifferentiable {
 }
 
 extension Zip2SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -152,59 +136,70 @@ extension Zip2SequenceDifferentiable: Differentiable where
             C2.Element
         ) -> Result
     ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
-        var results: [Result] = []
-        results.reserveCapacity(self.count)
-        var pullbacks: [(Result.TangentVector) -> (
+        let count = self.count
+        var pullbacks: ContiguousArray<(Result.TangentVector) -> (
             C1.Element.TangentVector,
             C2.Element.TangentVector
-        )] = []
-        pullbacks.reserveCapacity(self.count)
+        )> = []
+        pullbacks.reserveCapacity(count)
 
-        for parameters in self {
-            let (value, pullback) = valueWithPullback(
-                at:
-                parameters.0,
-                parameters.1,
-                of: transform
-            )
-            results.append(value)
-            pullbacks.append(pullback)
+        let results = [Result](unsafeUninitializedCapacity: count) { buffer, initializedCount in
+            var c1i = _collection1.startIndex
+            var c2i = _collection2.startIndex
+
+            for i in 0 ..< count {
+                let (value, pullback) = valueWithPullback(
+                    at:
+                    _collection1[c1i],
+                    _collection2[c2i],
+                    of: transform
+                )
+
+                buffer.initializeElement(at: i, to: value)
+                pullbacks.append(pullback)
+
+                _collection1.formIndex(after: &c1i)
+                _collection2.formIndex(after: &c2i)
+            }
+
+            initializedCount = count
         }
 
         return (
             value: results,
             pullback: { v in
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
-
-                results1.reserveCapacity(pullbacks.count)
-                results2.reserveCapacity(pullbacks.count)
-
+                // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
                 if v.count == 0 {
-                    for pullback in pullbacks {
-                        let (v1, v2) = pullback(.zero)
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
+                    return TangentVector(
+                        C1.TangentVector.zero,
+                        C2.TangentVector.zero
+                    )
+                }
+
+                let n = pullbacks.count
+                precondition(v.count == n)
+
+                // Scratch is initialized while building `tangents1` and moved out while building the
+                // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
+                // (see `DifferentiableCollectionTangentVector`).
+                let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
+                defer { scratch2.deallocate() }
+
+                let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        C1.TangentVector.building(count: n) { index in
+                            let (v1, v2) = pullbackBuffer[index](vBuffer[index])
+                            scratch2.initializeElement(at: index, to: v2)
+                            return v1
+                        }
                     }
                 }
-                else {
-                    // thoughts:
-                    // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                    precondition(v.count == pullbacks.count)
-
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (v1, v2) = pullback(tangentElement)
-
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
-                    }
-                }
+                let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
 
                 return TangentVector(
-                    results1,
-                    results2
+                    tangents1,
+                    tangents2
                 )
             }
         )
@@ -212,47 +207,11 @@ extension Zip2SequenceDifferentiable: Differentiable where
 }
 
 extension Zip2SequenceDifferentiable {
-    public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
+    public struct TangentVector: Differentiable & AdditiveArithmetic where
         C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
-        C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int
+        C2: Differentiable
     {
         public typealias TangentVector = Self
-        public typealias Element = (
-            C1.TangentVector.Element,
-            C2.TangentVector.Element
-        )
-        public typealias Index = Int
-
-        @inlinable
-        public var startIndex: Int { 0 }
-        @inlinable
-        public var endIndex: Int {
-            var result = collection1.count
-            result = Swift.min(result, collection2.count)
-            return result
-        }
-
-        @inlinable
-        public subscript(index: Int) -> Element {
-            (
-                collection1[index],
-                collection2[index]
-            )
-        }
-
-        @inlinable
-        public func index(after i: Int) -> Int {
-            i + 1
-        }
-
-        @inlinable
-        public func formIndex(after i: inout Int) {
-            i += 1
-        }
 
         @usableFromInline
         var collection1: C1.TangentVector

@@ -113,19 +113,7 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(2))C\($0).TangentVector" }.joined(separator: ",\n"))
             )
         ) where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             (
                 value: differentiableZip(
@@ -151,19 +139,7 @@ enum ZipSequenceGenerator {
         }
 
         extension Zip\(arity)SequenceDifferentiable: Differentiable where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             @inlinable
             public mutating func move(by offset: TangentVector) {
@@ -177,52 +153,69 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(3))C\($0).Element" }.joined(separator: ",\n"))
                 ) -> Result
             ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
-                var results: [Result] = []
-                results.reserveCapacity(self.count)
-                var pullbacks: [(Result.TangentVector) -> (
+                let count = self.count
+                var pullbacks: ContiguousArray<(Result.TangentVector) -> (
         \(arityRange.map { "\(indent(3))C\($0).Element.TangentVector" }.joined(separator: ",\n"))
-                )] = []
-                pullbacks.reserveCapacity(self.count)
+                )> = []
+                pullbacks.reserveCapacity(count)
 
-                for parameters in self {
-                    let (value, pullback) = valueWithPullback(
-                        at:
-        \(arityRange.map { "\(indent(4))parameters.\($0 - 1)" }.joined(separator: ",\n")),
-                        of: transform
-                    )
-                    results.append(value)
-                    pullbacks.append(pullback)
+                let results = [Result](unsafeUninitializedCapacity: count) { buffer, initializedCount in
+        \(arityRange.map { "\(indent(3))var c\($0)i = _collection\($0).startIndex" }.joined(separator: "\n"))
+
+                    for i in 0 ..< count {
+                        let (value, pullback) = valueWithPullback(
+                            at:
+        \(arityRange.map { "\(indent(5))_collection\($0)[c\($0)i]" }.joined(separator: ",\n")),
+                            of: transform
+                        )
+
+                        buffer.initializeElement(at: i, to: value)
+                        pullbacks.append(pullback)
+
+        \(arityRange.map { "\(indent(4))_collection\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+                    }
+
+                    initializedCount = count
                 }
 
                 return (
                     value: results,
                     pullback: { v in
-        \(arityRange.map { "\(indent(4))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
-
-        \(arityRange.map { "\(indent(4))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
-
+                        // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
                         if v.count == 0 {
-                            for pullback in pullbacks {
-                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(.zero)
-        \(arityRange.map { "\(indent(6))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+                            return TangentVector(
+        \(arityRange.map { "\(indent(6))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
+                            )
+                        }
+
+                        let n = pullbacks.count
+                        precondition(v.count == n)
+
+                        // Scratch is initialized while building `tangents1` and moved out while building the
+                        // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
+                        // (see `DifferentiableCollectionTangentVector`).
+        \(arityRange.dropFirst()
+            .map { "\(indent(4))let scratch\($0) = UnsafeMutableBufferPointer<C\($0).Element.TangentVector>.allocate(capacity: n)" }
+            .joined(separator: "\n"))
+        \(arityRange.dropFirst().map { "\(indent(4))defer { scratch\($0).deallocate() }" }.joined(separator: "\n"))
+
+                        let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                            pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                                C1.TangentVector.building(count: n) { index in
+                                    let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](vBuffer[index])
+        \(arityRange.dropFirst().map { "\(indent(7))scratch\($0).initializeElement(at: index, to: v\($0))" }
+            .joined(separator: "\n"))
+                                    return v1
+                                }
                             }
                         }
-                        else {
-                            // thoughts:
-                            // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                            // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                            precondition(v.count == pullbacks.count)
-
-                            for (tangentElement, pullback) in zip(v, pullbacks) {
-                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
-
-        \(arityRange.map { "\(indent(6))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                            }
-                        }
+        \(arityRange.dropFirst()
+            .map { "\(indent(4))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .joined(separator: "\n"))
 
                         return TangentVector(
-        \(arityRange.map { "\(indent(5))results\($0)" }.joined(separator: ",\n"))
+        \(arityRange.map { "\(indent(5))tangents\($0)" }.joined(separator: ",\n"))
                         )
                     }
                 )
@@ -234,50 +227,10 @@ enum ZipSequenceGenerator {
         code += """
 
         extension Zip\(arity)SequenceDifferentiable {
-            public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
-
-        """
-        code += arityRange.map {
-            """
-            \(indent(2))C\($0): Differentiable,
-            \(indent(2))C\($0).TangentVector: Collection,
-            \(indent(2))C\($0).TangentVector.Index == Int
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+            public struct TangentVector: Differentiable & AdditiveArithmetic where
+        \(arityRange.map { "\(indent(2))C\($0): Differentiable" }.joined(separator: ",\n"))
             {
                 public typealias TangentVector = Self
-                public typealias Element = (
-        \(arityRange.map { "\(indent(3))C\($0).TangentVector.Element" }.joined(separator: ",\n"))
-                )
-                public typealias Index = Int
-
-                @inlinable
-                public var startIndex: Int { 0 }
-                @inlinable
-                public var endIndex: Int {
-                    var result = collection1.count
-        \(arityRange.dropFirst().map { "\(indent(3))result = Swift.min(result, collection\($0).count)" }.joined(separator: "\n"))
-                    return result
-                }
-
-                @inlinable
-                public subscript(index: Int) -> Element {
-                    (
-        \(arityRange.map { "\(indent(4))collection\($0)[index]" }.joined(separator: ",\n"))
-                    )
-                }
-
-                @inlinable
-                public func index(after i: Int) -> Int {
-                    i + 1
-                }
-
-                @inlinable
-                public func formIndex(after i: inout Int) {
-                    i += 1
-                }
 
 
         """

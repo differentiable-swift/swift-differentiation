@@ -18,16 +18,7 @@ enum ZipWithInoutGenerator {
             Inout: MutableCollection,
             Inout: DifferentiableCollection,
             Inout.Element: Differentiable,
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             var capacity = c1.count
         \(arityRange.map { "\(indent(1))capacity = Swift.min(capacity, c\($0).count)" }.joined(separator: "\n"))
@@ -66,16 +57,7 @@ enum ZipWithInoutGenerator {
             Inout.TangentVector: MutableCollection,
             Inout: DifferentiableCollection,
             Inout.Element: Differentiable,
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): DifferentiableCollection,
-                C\($0).Element: Differentiable
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             var count = c1.count
         \(arityRange.map { "\(indent(1))count = Swift.min(count, c\($0).count)" }.joined(separator: "\n"))
@@ -84,10 +66,7 @@ enum ZipWithInoutGenerator {
                 return (
                     value: (),
                     pullback: { _ in
-                        // swiftformat:disable:next redundantParens
-                        (
-        \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
-                        )
+                        \(tupleExpression(arityRange.map { "C\($0).TangentVector.zero" }, parenIndent: 4))
                     }
                 )
             }
@@ -120,29 +99,42 @@ enum ZipWithInoutGenerator {
             return (
                 value: (),
                 pullback: { v in
-        \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
-
-        \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
+                    let n = pullbacks.count
 
                     if v.count == 0 {
-                        v.reserveCapacity(pullbacks.count)
-                        for _ in 0 ..< pullbacks.count {
-                            v.appendContribution(of: .zero)
+                        return \(tupleExpression(arityRange.map { "C\($0).TangentVector.zero" }, parenIndent: 4))
+                    }
+
+                    precondition(v.count == n)
+
+                    // `tangents2` is the driver: it runs each element pullback once, writes the `Inout`
+                    // tangent back into `v` in place (along `v`'s native indices — its index type need not be
+                    // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
+                    // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
+                    // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
+                    // initialized during the driver pass before it is moved (see
+                    // `DifferentiableCollectionTangentVector`).
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let scratch\($0) = UnsafeMutableBufferPointer<C\($0).Element.TangentVector>.allocate(capacity: n)" }
+            .joined(separator: "\n"))
+        \(arityRange.dropFirst().map { "\(indent(3))defer { scratch\($0).deallocate() }" }.joined(separator: "\n"))
+
+                    var vi = v.startIndex
+                    let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        C2.TangentVector.building(count: n) { index in
+                            let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](v[vi])
+                            v[vi] = v1
+        \(arityRange.dropFirst().map { "\(indent(5))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
+                            v.formIndex(after: &vi)
+                            return v2
                         }
                     }
 
-                    precondition(v.count == pullbacks.count)
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .joined(separator: "\n"))
 
-                    for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                        let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
-                        v[index] = v1
-        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                    }
-
-                    // swiftformat:disable:next redundantParens
-                    return (
-        \(arityRange.map { "\(indent(4))results\($0)" }.joined(separator: ",\n"))
-                    )
+                    return \(tupleExpression(arityRange.map { "tangents\($0)" }, parenIndent: 3))
                 }
             )
         }

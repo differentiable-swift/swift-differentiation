@@ -43,3 +43,12 @@ extension Array.DifferentiableView:
         base.replaceSubrange(subrange, with: newElements)
     }
 }
+
+extension Array.DifferentiableView {
+    @inlinable
+    public func withUnsafeContiguousStorage<R>(
+        _ body: (UnsafeBufferPointer<Element>) -> R
+    ) -> R {
+        base.withUnsafeBufferPointer { body($0) }
+    }
+}

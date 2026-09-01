@@ -11,9 +11,7 @@ public func differentiableZipWith<C1, C2, Result>(
     ) -> Result
 ) -> [Result] where
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     Result: Differentiable
 {
     var capacity = c1.count
@@ -21,22 +19,22 @@ public func differentiableZipWith<C1, C2, Result>(
 
     if capacity == 0 { return [] }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(capacity)
+    return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
+        for i in 0 ..< capacity {
+            let value = transform(
+                c1[c1i],
+                c2[c2i]
+            )
+            buffer.initializeElement(at: i, to: value)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+        }
 
-    for _ in 0 ..< capacity {
-        results.append(transform(
-            c1[c1i],
-            c2[c2i]
-        ))
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
+        initializedCount = capacity
     }
-
-    return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
@@ -56,9 +54,7 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
     )
 ) where
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     Result: Differentiable
 {
     var count = c1.count
@@ -76,62 +72,69 @@ public func _vjpDifferentiableZipWith<C1, C2, Result>(
         )
     }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(count)
     var pullbacks: ContiguousArray<(Result.TangentVector) -> (
         C1.Element.TangentVector,
         C2.Element.TangentVector
     )> = []
     pullbacks.reserveCapacity(count)
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
+    let results = [Result](unsafeUninitializedCapacity: count) { buffer, initializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
 
-    for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(
-            at:
-            c1[c1i],
-            c2[c2i],
-            of: transform
-        )
+        for i in 0 ..< count {
+            let (value, pullback) = valueWithPullback(
+                at:
+                c1[c1i],
+                c2[c2i],
+                of: transform
+            )
 
-        results.append(value)
-        pullbacks.append(pullback)
+            buffer.initializeElement(at: i, to: value)
+            pullbacks.append(pullback)
 
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+        }
+
+        initializedCount = count
     }
 
     return (
-        value: Array(results),
+        value: results,
         pullback: { v in
-            var results1 = C1.TangentVector()
-            var results2 = C2.TangentVector()
-
-            results1.reserveCapacity(pullbacks.count)
-            results2.reserveCapacity(pullbacks.count)
-
+            // if the incoming tangent is empty (ie. .zero) we can exit early due to the linear nature of the pullback.
             if v.count == 0 {
-                for pullback in pullbacks {
-                    let (v1, v2) = pullback(.zero)
-                    results1.appendContribution(of: v1)
-                    results2.appendContribution(of: v2)
+                return (
+                    C1.TangentVector.zero,
+                    C2.TangentVector.zero
+                )
+            }
+
+            let n = pullbacks.count
+            precondition(v.count == n)
+
+            // Scratch is initialized while building `tangents1` and moved out while building the
+            // rest. This is memory-safe because `building(count:_:)` guarantees a once-per-index, in-order visit
+            // (see `DifferentiableCollectionTangentVector`).
+            let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
+            defer { scratch2.deallocate() }
+
+            let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                    C1.TangentVector.building(count: n) { index in
+                        let (v1, v2) = pullbackBuffer[index](vBuffer[index])
+                        scratch2.initializeElement(at: index, to: v2)
+                        return v1
+                    }
                 }
             }
-            else {
-                precondition(v.count == pullbacks.count)
 
-                for (tangentElement, pullback) in zip(v, pullbacks) {
-                    let (v1, v2) = pullback(tangentElement)
-
-                    results1.appendContribution(of: v1)
-                    results2.appendContribution(of: v2)
-                }
-            }
+            let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
 
             return (
-                results1,
-                results2
+                tangents1,
+                tangents2
             )
         }
     )

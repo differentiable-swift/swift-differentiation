@@ -13,8 +13,7 @@ public func differentiableZipWith<Inout, C2>(
     Inout: MutableCollection,
     Inout: DifferentiableCollection,
     Inout.Element: Differentiable,
-    C2: DifferentiableCollection,
-    C2.Element: Differentiable
+    C2: DifferentiableCollection
 {
     var capacity = c1.count
     capacity = Swift.min(capacity, c2.count)
@@ -53,8 +52,7 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
     Inout.TangentVector: MutableCollection,
     Inout: DifferentiableCollection,
     Inout.Element: Differentiable,
-    C2: DifferentiableCollection,
-    C2.Element: Differentiable
+    C2: DifferentiableCollection
 {
     var count = c1.count
     count = Swift.min(count, c2.count)
@@ -63,10 +61,7 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
         return (
             value: (),
             pullback: { _ in
-                // swiftformat:disable:next redundantParens
-                (
-                    C2.TangentVector.zero
-                )
+                C2.TangentVector.zero
             }
         )
     }
@@ -99,29 +94,34 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
     return (
         value: (),
         pullback: { v in
-            var results2 = C2.TangentVector()
-
-            results2.reserveCapacity(pullbacks.count)
+            let n = pullbacks.count
 
             if v.count == 0 {
-                v.reserveCapacity(pullbacks.count)
-                for _ in 0 ..< pullbacks.count {
-                    v.appendContribution(of: .zero)
+                return C2.TangentVector.zero
+            }
+
+            precondition(v.count == n)
+
+            // `tangents2` is the driver: it runs each element pullback once, writes the `Inout`
+            // tangent back into `v` in place (along `v`'s native indices — its index type need not be
+            // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
+            // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
+            // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
+            // initialized during the driver pass before it is moved (see
+            // `DifferentiableCollectionTangentVector`).
+
+            var vi = v.startIndex
+            let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                C2.TangentVector.building(count: n) { index in
+                    let (v1, v2) = pullbackBuffer[index](v[vi])
+                    v[vi] = v1
+
+                    v.formIndex(after: &vi)
+                    return v2
                 }
             }
 
-            precondition(v.count == pullbacks.count)
-
-            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                let (v1, v2) = pullback(tangentElement)
-                v[index] = v1
-                results2.appendContribution(of: v2)
-            }
-
-            // swiftformat:disable:next redundantParens
-            return (
-                results2
-            )
+            return tangents2
         }
     )
 }

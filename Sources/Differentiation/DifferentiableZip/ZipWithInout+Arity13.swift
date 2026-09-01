@@ -36,29 +36,17 @@ public func differentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10, C1
     Inout: DifferentiableCollection,
     Inout.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
     C5: DifferentiableCollection,
-    C5.Element: Differentiable,
     C6: DifferentiableCollection,
-    C6.Element: Differentiable,
     C7: DifferentiableCollection,
-    C7.Element: Differentiable,
     C8: DifferentiableCollection,
-    C8.Element: Differentiable,
     C9: DifferentiableCollection,
-    C9.Element: Differentiable,
     C10: DifferentiableCollection,
-    C10.Element: Differentiable,
     C11: DifferentiableCollection,
-    C11.Element: Differentiable,
     C12: DifferentiableCollection,
-    C12.Element: Differentiable,
-    C13: DifferentiableCollection,
-    C13.Element: Differentiable
+    C13: DifferentiableCollection
 {
     var capacity = c1.count
     capacity = Swift.min(capacity, c2.count)
@@ -175,29 +163,17 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
     Inout: DifferentiableCollection,
     Inout.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
     C5: DifferentiableCollection,
-    C5.Element: Differentiable,
     C6: DifferentiableCollection,
-    C6.Element: Differentiable,
     C7: DifferentiableCollection,
-    C7.Element: Differentiable,
     C8: DifferentiableCollection,
-    C8.Element: Differentiable,
     C9: DifferentiableCollection,
-    C9.Element: Differentiable,
     C10: DifferentiableCollection,
-    C10.Element: Differentiable,
     C11: DifferentiableCollection,
-    C11.Element: Differentiable,
     C12: DifferentiableCollection,
-    C12.Element: Differentiable,
-    C13: DifferentiableCollection,
-    C13.Element: Differentiable
+    C13: DifferentiableCollection
 {
     var count = c1.count
     count = Swift.min(count, c2.count)
@@ -217,7 +193,6 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
         return (
             value: (),
             pullback: { _ in
-                // swiftformat:disable:next redundantParens
                 (
                     C2.TangentVector.zero,
                     C3.TangentVector.zero,
@@ -308,72 +283,103 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
     return (
         value: (),
         pullback: { v in
-            var results2 = C2.TangentVector()
-            var results3 = C3.TangentVector()
-            var results4 = C4.TangentVector()
-            var results5 = C5.TangentVector()
-            var results6 = C6.TangentVector()
-            var results7 = C7.TangentVector()
-            var results8 = C8.TangentVector()
-            var results9 = C9.TangentVector()
-            var results10 = C10.TangentVector()
-            var results11 = C11.TangentVector()
-            var results12 = C12.TangentVector()
-            var results13 = C13.TangentVector()
-
-            results2.reserveCapacity(pullbacks.count)
-            results3.reserveCapacity(pullbacks.count)
-            results4.reserveCapacity(pullbacks.count)
-            results5.reserveCapacity(pullbacks.count)
-            results6.reserveCapacity(pullbacks.count)
-            results7.reserveCapacity(pullbacks.count)
-            results8.reserveCapacity(pullbacks.count)
-            results9.reserveCapacity(pullbacks.count)
-            results10.reserveCapacity(pullbacks.count)
-            results11.reserveCapacity(pullbacks.count)
-            results12.reserveCapacity(pullbacks.count)
-            results13.reserveCapacity(pullbacks.count)
+            let n = pullbacks.count
 
             if v.count == 0 {
-                v.reserveCapacity(pullbacks.count)
-                for _ in 0 ..< pullbacks.count {
-                    v.appendContribution(of: .zero)
+                return (
+                    C2.TangentVector.zero,
+                    C3.TangentVector.zero,
+                    C4.TangentVector.zero,
+                    C5.TangentVector.zero,
+                    C6.TangentVector.zero,
+                    C7.TangentVector.zero,
+                    C8.TangentVector.zero,
+                    C9.TangentVector.zero,
+                    C10.TangentVector.zero,
+                    C11.TangentVector.zero,
+                    C12.TangentVector.zero,
+                    C13.TangentVector.zero
+                )
+            }
+
+            precondition(v.count == n)
+
+            // `tangents2` is the driver: it runs each element pullback once, writes the `Inout`
+            // tangent back into `v` in place (along `v`'s native indices — its index type need not be
+            // `Int`), and stashes the remaining tangents (`C3` here; `C3…CN` in general) into scratch
+            // buffers. The remaining tangents are then built by moving out of those buffers. Memory-safe
+            // because `building(count:_:)` guarantees a once-per-index, in-order visit: every scratch slot is
+            // initialized during the driver pass before it is moved (see
+            // `DifferentiableCollectionTangentVector`).
+            let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
+            let scratch4 = UnsafeMutableBufferPointer<C4.Element.TangentVector>.allocate(capacity: n)
+            let scratch5 = UnsafeMutableBufferPointer<C5.Element.TangentVector>.allocate(capacity: n)
+            let scratch6 = UnsafeMutableBufferPointer<C6.Element.TangentVector>.allocate(capacity: n)
+            let scratch7 = UnsafeMutableBufferPointer<C7.Element.TangentVector>.allocate(capacity: n)
+            let scratch8 = UnsafeMutableBufferPointer<C8.Element.TangentVector>.allocate(capacity: n)
+            let scratch9 = UnsafeMutableBufferPointer<C9.Element.TangentVector>.allocate(capacity: n)
+            let scratch10 = UnsafeMutableBufferPointer<C10.Element.TangentVector>.allocate(capacity: n)
+            let scratch11 = UnsafeMutableBufferPointer<C11.Element.TangentVector>.allocate(capacity: n)
+            let scratch12 = UnsafeMutableBufferPointer<C12.Element.TangentVector>.allocate(capacity: n)
+            let scratch13 = UnsafeMutableBufferPointer<C13.Element.TangentVector>.allocate(capacity: n)
+            defer { scratch3.deallocate() }
+            defer { scratch4.deallocate() }
+            defer { scratch5.deallocate() }
+            defer { scratch6.deallocate() }
+            defer { scratch7.deallocate() }
+            defer { scratch8.deallocate() }
+            defer { scratch9.deallocate() }
+            defer { scratch10.deallocate() }
+            defer { scratch11.deallocate() }
+            defer { scratch12.deallocate() }
+            defer { scratch13.deallocate() }
+
+            var vi = v.startIndex
+            let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                C2.TangentVector.building(count: n) { index in
+                    let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13) = pullbackBuffer[index](v[vi])
+                    v[vi] = v1
+                    scratch3.initializeElement(at: index, to: v3)
+                    scratch4.initializeElement(at: index, to: v4)
+                    scratch5.initializeElement(at: index, to: v5)
+                    scratch6.initializeElement(at: index, to: v6)
+                    scratch7.initializeElement(at: index, to: v7)
+                    scratch8.initializeElement(at: index, to: v8)
+                    scratch9.initializeElement(at: index, to: v9)
+                    scratch10.initializeElement(at: index, to: v10)
+                    scratch11.initializeElement(at: index, to: v11)
+                    scratch12.initializeElement(at: index, to: v12)
+                    scratch13.initializeElement(at: index, to: v13)
+                    v.formIndex(after: &vi)
+                    return v2
                 }
             }
 
-            precondition(v.count == pullbacks.count)
+            let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector.building(count: n) { i in scratch4.moveElement(from: i) }
+            let tangents5 = C5.TangentVector.building(count: n) { i in scratch5.moveElement(from: i) }
+            let tangents6 = C6.TangentVector.building(count: n) { i in scratch6.moveElement(from: i) }
+            let tangents7 = C7.TangentVector.building(count: n) { i in scratch7.moveElement(from: i) }
+            let tangents8 = C8.TangentVector.building(count: n) { i in scratch8.moveElement(from: i) }
+            let tangents9 = C9.TangentVector.building(count: n) { i in scratch9.moveElement(from: i) }
+            let tangents10 = C10.TangentVector.building(count: n) { i in scratch10.moveElement(from: i) }
+            let tangents11 = C11.TangentVector.building(count: n) { i in scratch11.moveElement(from: i) }
+            let tangents12 = C12.TangentVector.building(count: n) { i in scratch12.moveElement(from: i) }
+            let tangents13 = C13.TangentVector.building(count: n) { i in scratch13.moveElement(from: i) }
 
-            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13) = pullback(tangentElement)
-                v[index] = v1
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
-                results6.appendContribution(of: v6)
-                results7.appendContribution(of: v7)
-                results8.appendContribution(of: v8)
-                results9.appendContribution(of: v9)
-                results10.appendContribution(of: v10)
-                results11.appendContribution(of: v11)
-                results12.appendContribution(of: v12)
-                results13.appendContribution(of: v13)
-            }
-
-            // swiftformat:disable:next redundantParens
             return (
-                results2,
-                results3,
-                results4,
-                results5,
-                results6,
-                results7,
-                results8,
-                results9,
-                results10,
-                results11,
-                results12,
-                results13
+                tangents2,
+                tangents3,
+                tangents4,
+                tangents5,
+                tangents6,
+                tangents7,
+                tangents8,
+                tangents9,
+                tangents10,
+                tangents11,
+                tangents12,
+                tangents13
             )
         }
     )
