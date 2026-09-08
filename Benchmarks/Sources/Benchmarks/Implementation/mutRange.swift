@@ -11,7 +11,7 @@ extension Array where Element: Differentiable {
         start: Int, end: Int, _ transform: @differentiable(reverse) (Element) -> Element
     ) {
         for i in start ..< end {
-            self.update(at: i, with: transform(self[i]))
+            self[cta: i] = transform(self[cta: i])
         }
     }
 }
