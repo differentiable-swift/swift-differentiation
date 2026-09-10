@@ -238,6 +238,14 @@ extension Zip4SequenceDifferentiable: Differentiable where
         return (
             value: results,
             pullback: { v in
+                guard v.count != 0 else {
+                    return TangentVector(
+                        C1.TangentVector.zero,
+                        C2.TangentVector.zero,
+                        C3.TangentVector.zero,
+                        C4.TangentVector.zero
+                    )
+                }
                 var results1 = C1.TangentVector()
                 var results2 = C2.TangentVector()
                 var results3 = C3.TangentVector()
@@ -248,30 +256,19 @@ extension Zip4SequenceDifferentiable: Differentiable where
                 results3.reserveCapacity(pullbacks.count)
                 results4.reserveCapacity(pullbacks.count)
 
-                if v.count == 0 {
-                    for pullback in pullbacks {
-                        let (v1, v2, v3, v4) = pullback(.zero)
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
-                        results3.appendContribution(of: v3)
-                        results4.appendContribution(of: v4)
-                    }
-                }
-                else {
-                    // thoughts:
-                    // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+                // thoughts:
+                // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+                // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                    precondition(v.count == pullbacks.count)
+                precondition(v.count == pullbacks.count)
 
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (v1, v2, v3, v4) = pullback(tangentElement)
+                for (tangentElement, pullback) in zip(v, pullbacks) {
+                    let (v1, v2, v3, v4) = pullback(tangentElement)
 
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
-                        results3.appendContribution(of: v3)
-                        results4.appendContribution(of: v4)
-                    }
+                    results1.appendContribution(of: v1)
+                    results2.appendContribution(of: v2)
+                    results3.appendContribution(of: v3)
+                    results4.appendContribution(of: v4)
                 }
 
                 return TangentVector(
