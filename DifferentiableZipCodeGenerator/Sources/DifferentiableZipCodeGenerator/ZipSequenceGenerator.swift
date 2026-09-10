@@ -197,28 +197,25 @@ enum ZipSequenceGenerator {
                 return (
                     value: results,
                     pullback: { v in
+                        guard v.count != 0 else {
+                            return TangentVector(
+        \(arityRange.map { "\(indent(6))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
+                            )
+                        }
         \(arityRange.map { "\(indent(4))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
 
         \(arityRange.map { "\(indent(4))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
 
-                        if v.count == 0 {
-                            for pullback in pullbacks {
-                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(.zero)
-        \(arityRange.map { "\(indent(6))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                            }
-                        }
-                        else {
-                            // thoughts:
-                            // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                            // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
+                        // thoughts:
+                        // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
+                        // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                            precondition(v.count == pullbacks.count)
+                        precondition(v.count == pullbacks.count)
 
-                            for (tangentElement, pullback) in zip(v, pullbacks) {
-                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+                        for (tangentElement, pullback) in zip(v, pullbacks) {
+                            let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
 
-        \(arityRange.map { "\(indent(6))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                            }
+        \(arityRange.map { "\(indent(5))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
                         }
 
                         return TangentVector(
