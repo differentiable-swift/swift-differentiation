@@ -108,24 +108,21 @@ enum ZipWithGenerator {
             return (
                 value: Array(results),
                 pullback: { v in
+                    guard v.count != 0 else {
+                        return (
+        \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
+                        )
+                    }
         \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
 
         \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
 
-                    if v.count == 0 {
-                        for pullback in pullbacks {
-                            let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(.zero)
-        \(arityRange.map { "\(indent(5))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                        }
-                    }
-                    else {
-                        precondition(v.count == pullbacks.count)
+                    precondition(v.count == pullbacks.count)
 
-                        for (tangentElement, pullback) in zip(v, pullbacks) {
-                            let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
+                    for (tangentElement, pullback) in zip(v, pullbacks) {
+                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
 
-        \(arityRange.map { "\(indent(5))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                        }
+        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
                     }
 
                     return (
