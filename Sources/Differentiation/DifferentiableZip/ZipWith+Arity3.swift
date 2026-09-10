@@ -26,25 +26,24 @@ public func differentiableZipWith<C1, C2, C3, Result>(
 
     if capacity == 0 { return [] }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(capacity)
-
     var c1i = c1.startIndex
     var c2i = c2.startIndex
     var c3i = c3.startIndex
 
-    for _ in 0 ..< capacity {
-        results.append(transform(
-            c1[c1i],
-            c2[c2i],
-            c3[c3i]
-        ))
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
-        c3.formIndex(after: &c3i)
+    return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        for i in 0 ..< capacity {
+            let value = transform(
+                c1[c1i],
+                c2[c2i],
+                c3[c3i]
+            )
+            buffer.initializeElement(at: i, to: value)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+            c3.formIndex(after: &c3i)
+        }
+        initializedCount = capacity
     }
-
-    return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
