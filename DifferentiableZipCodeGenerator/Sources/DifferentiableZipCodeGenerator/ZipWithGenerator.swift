@@ -30,19 +30,18 @@ enum ZipWithGenerator {
 
             if capacity == 0 { return [] }
 
-            var results = ContiguousArray<Result>()
-            results.reserveCapacity(capacity)
-
         \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
 
-            for _ in 0 ..< capacity {
-                results.append(transform(
-        \(arityRange.map { "\(indent(3))c\($0)[c\($0)i]" }.joined(separator: ",\n"))
-                ))
-        \(arityRange.map { "\(indent(2))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+            return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+                for i in 0 ..< capacity {
+                    let value = transform(
+        \(arityRange.map { "\(indent(4))c\($0)[c\($0)i]" }.joined(separator: ",\n"))
+                    )
+                    buffer.initializeElement(at: i, to: value)
+        \(arityRange.map { "\(indent(3))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+                }
+                initializedCount = capacity
             }
-
-            return Array(results)
         }
 
         @derivative(of: differentiableZipWith)

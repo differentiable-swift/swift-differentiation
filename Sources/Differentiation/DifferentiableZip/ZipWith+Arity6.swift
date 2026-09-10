@@ -41,9 +41,6 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
 
     if capacity == 0 { return [] }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(capacity)
-
     var c1i = c1.startIndex
     var c2i = c2.startIndex
     var c3i = c3.startIndex
@@ -51,24 +48,26 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, Result>(
     var c5i = c5.startIndex
     var c6i = c6.startIndex
 
-    for _ in 0 ..< capacity {
-        results.append(transform(
-            c1[c1i],
-            c2[c2i],
-            c3[c3i],
-            c4[c4i],
-            c5[c5i],
-            c6[c6i]
-        ))
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
-        c3.formIndex(after: &c3i)
-        c4.formIndex(after: &c4i)
-        c5.formIndex(after: &c5i)
-        c6.formIndex(after: &c6i)
+    return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        for i in 0 ..< capacity {
+            let value = transform(
+                c1[c1i],
+                c2[c2i],
+                c3[c3i],
+                c4[c4i],
+                c5[c5i],
+                c6[c6i]
+            )
+            buffer.initializeElement(at: i, to: value)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+            c3.formIndex(after: &c3i)
+            c4.formIndex(after: &c4i)
+            c5.formIndex(after: &c5i)
+            c6.formIndex(after: &c6i)
+        }
+        initializedCount = capacity
     }
-
-    return Array(results)
 }
 
 @derivative(of: differentiableZipWith)
