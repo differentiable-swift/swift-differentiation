@@ -23,6 +23,12 @@ let package = Package(
             name: "Differentiation",
             dependencies: [
                 .product(name: "_Differentiation", package: "swift-differentiation-stdlib", condition: .when(platforms: [.macOS, .iOS])),
+            ],
+            swiftSettings: [
+                // required for Swift 6.5 valueWithPullback overloads. Provides access to the `Builtin` module
+                .enableExperimentalFeature("BuiltinModule"),
+                // required for Swift 6.5 valueWithPullback overloads. Currently crashes in language mode .v6
+                .swiftLanguageMode(.v5),
             ]
         ),
         .testTarget(

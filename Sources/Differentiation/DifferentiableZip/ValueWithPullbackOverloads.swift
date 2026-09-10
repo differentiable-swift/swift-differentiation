@@ -1,5 +1,298 @@
 import _Differentiation
 
+#if compiler(>=6.5)
+import Builtin
+
+@inlinable
+func valueWithPullback<A, B, C, D, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, of body: @differentiable(reverse) (A, B, C, D) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity4(body, a, b, c, d)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, of body: @differentiable(reverse) (A, B, C, D, E) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity5(body, a, b, c, d, e)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, of body: @differentiable(reverse) (A, B, C, D, E, F) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity6(body, a, b, c, d, e, f)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, of body: @differentiable(reverse) (A, B, C, D, E, F, G) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity7(body, a, b, c, d, e, f, g)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, of body: @differentiable(reverse) (A, B, C, D, E, F, G, H) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity8(body, a, b, c, d, e, f, g, h)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I,
+    of body: @differentiable(reverse) (A, B, C, D, E, F, G, H, I) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity9(body, a, b, c, d, e, f, g, h, i)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, J, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I, _ j: J, of body: @differentiable(reverse) (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J
+    ) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector,
+        J.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity10(body, a, b, c, d, e, f, g, h, i, j)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, J, K, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I, _ j: J, _ k: K, of body: @differentiable(reverse) (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K
+    ) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector,
+        J.TangentVector,
+        K.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity11(body, a, b, c, d, e, f, g, h, i, j, k)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, J, K, L, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I, _ j: J, _ k: K, _ l: L, of body: @differentiable(reverse) (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L
+    ) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector,
+        J.TangentVector,
+        K.TangentVector,
+        L.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity12(body, a, b, c, d, e, f, g, h, i, j, k, l)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, J, K, L, M, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I, _ j: J, _ k: K, _ l: L, _ m: M,
+    of body: @differentiable(reverse) (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M
+    ) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector,
+        J.TangentVector,
+        K.TangentVector,
+        L.TangentVector,
+        M.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity13(body, a, b, c, d, e, f, g, h, i, j, k, l, m)
+}
+
+@inlinable
+func valueWithPullback<A, B, C, D, E, F, G, H, I, J, K, L, M, N, Result>(
+    at a: A, _ b: B, _ c: C, _ d: D, _ e: E, _ f: F, _ g: G, _ h: H, _ i: I, _ j: J, _ k: K, _ l: L, _ m: M, _ n: N,
+    of body: @differentiable(reverse) (
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N
+    ) -> Result
+) -> (
+    value: Result,
+    pullback: (Result.TangentVector) -> (
+        A.TangentVector,
+        B.TangentVector,
+        C.TangentVector,
+        D.TangentVector,
+        E.TangentVector,
+        F.TangentVector,
+        G.TangentVector,
+        H.TangentVector,
+        I.TangentVector,
+        J.TangentVector,
+        K.TangentVector,
+        L.TangentVector,
+        M.TangentVector,
+        N.TangentVector
+    )
+) {
+    Builtin.applyDerivative_vjp_arity14(body, a, b, c, d, e, f, g, h, i, j, k, l, m, n)
+}
+
+#else
+
 public struct Pair<A, B> {
     @usableFromInline
     var a: A
@@ -564,3 +857,4 @@ func valueWithPullback<L, M, N, O, P, Q, S, T, U, V, W, X, Y, Z, R>(
         }
     )
 }
+#endif
