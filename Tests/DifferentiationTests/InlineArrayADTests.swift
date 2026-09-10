@@ -1,7 +1,7 @@
 import Differentiation
 import Testing
 
-#if swift(>=6.2)
+#if compiler(>=6.2)
 
 /// High-level differentiation tests for the `ad:` accessor on `InlineArray`.
 ///

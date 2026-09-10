@@ -1,7 +1,7 @@
 import Differentiation
 import Testing
 
-#if swift(>=6.2)
+#if compiler(>=6.2)
 
 @Suite
 struct InlineArrayTests {

@@ -1,4 +1,4 @@
-#if swift(>=6.2)
+#if compiler(>=6.2)
 
 import _Differentiation
 
