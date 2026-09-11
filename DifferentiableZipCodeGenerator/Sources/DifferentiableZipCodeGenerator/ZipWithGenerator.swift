@@ -112,25 +112,35 @@ enum ZipWithGenerator {
             return (
                 value: results,
                 pullback: { v in
-                    guard v.count != 0 else {
+                    if v.count == 0 {
                         return (
         \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
                         )
                     }
-        \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
+                    let n = pullbacks.count
+                    precondition(v.count == n)
 
-        \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let scratch\($0) = UnsafeMutableBufferPointer<C\($0).Element.TangentVector>.allocate(capacity: n)" }
+            .joined(separator: "\n"))
+        \(arityRange.dropFirst().map { "\(indent(3))defer { scratch\($0).deallocate() }" }.joined(separator: "\n"))
 
-                    precondition(v.count == pullbacks.count)
-
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
-
-        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
+                    let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                        pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                            C1.TangentVector.building(count: n) { index in
+                                let (\(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](vBuffer[index])
+        \(arityRange.dropFirst().map { "\(indent(6))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
+                                return v1
+                            }
+                        }
                     }
 
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .joined(separator: "\n"))
+
                     return (
-        \(arityRange.map { "\(indent(4))results\($0)" }.joined(separator: ",\n"))
+        \(arityRange.map { "\(indent(4))tangents\($0)" }.joined(separator: ",\n"))
                     )
                 }
             )

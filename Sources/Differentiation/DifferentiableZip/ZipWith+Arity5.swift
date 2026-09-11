@@ -169,7 +169,7 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, Result>(
     return (
         value: results,
         pullback: { v in
-            guard v.count != 0 else {
+            if v.count == 0 {
                 return (
                     C1.TangentVector.zero,
                     C2.TangentVector.zero,
@@ -178,36 +178,42 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, Result>(
                     C5.TangentVector.zero
                 )
             }
-            var results1 = C1.TangentVector()
-            var results2 = C2.TangentVector()
-            var results3 = C3.TangentVector()
-            var results4 = C4.TangentVector()
-            var results5 = C5.TangentVector()
+            let n = pullbacks.count
+            precondition(v.count == n)
 
-            results1.reserveCapacity(pullbacks.count)
-            results2.reserveCapacity(pullbacks.count)
-            results3.reserveCapacity(pullbacks.count)
-            results4.reserveCapacity(pullbacks.count)
-            results5.reserveCapacity(pullbacks.count)
+            let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
+            let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
+            let scratch4 = UnsafeMutableBufferPointer<C4.Element.TangentVector>.allocate(capacity: n)
+            let scratch5 = UnsafeMutableBufferPointer<C5.Element.TangentVector>.allocate(capacity: n)
+            defer { scratch2.deallocate() }
+            defer { scratch3.deallocate() }
+            defer { scratch4.deallocate() }
+            defer { scratch5.deallocate() }
 
-            precondition(v.count == pullbacks.count)
-
-            for (tangentElement, pullback) in zip(v, pullbacks) {
-                let (v1, v2, v3, v4, v5) = pullback(tangentElement)
-
-                results1.appendContribution(of: v1)
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
+            let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                    C1.TangentVector.building(count: n) { index in
+                        let (v1, v2, v3, v4, v5) = pullbackBuffer[index](vBuffer[index])
+                        scratch2.initializeElement(at: index, to: v2)
+                        scratch3.initializeElement(at: index, to: v3)
+                        scratch4.initializeElement(at: index, to: v4)
+                        scratch5.initializeElement(at: index, to: v5)
+                        return v1
+                    }
+                }
             }
 
+            let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
+            let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector.building(count: n) { i in scratch4.moveElement(from: i) }
+            let tangents5 = C5.TangentVector.building(count: n) { i in scratch5.moveElement(from: i) }
+
             return (
-                results1,
-                results2,
-                results3,
-                results4,
-                results5
+                tangents1,
+                tangents2,
+                tangents3,
+                tangents4,
+                tangents5
             )
         }
     )

@@ -13,6 +13,7 @@ public protocol DifferentiableCollectionTangentVector: DifferentiableCollection 
     init()
     mutating func reserveCapacity(_ capacity: Int)
     mutating func appendContribution(of value: Element)
+    init(count: Int, nextElement: () -> Element)
 }
 
 extension Array: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
@@ -23,6 +24,16 @@ extension Array.DifferentiableView: DifferentiableCollectionTangentVector where 
     @inlinable
     public mutating func appendContribution(of value: Element) {
         self.append(value)
+    }
+
+    @inlinable
+    public init(count: Int, nextElement: () -> Element) {
+        self.init([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
+            for i in 0 ..< count {
+                buffer.initializeElement(at: i, to: nextElement())
+            }
+            initializedCount = count
+        })
     }
 }
 
@@ -35,6 +46,16 @@ extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVec
     public mutating func appendContribution(of value: Element) {
         self.append(value)
     }
+
+    @inlinable
+    public init(count: Int, nextElement: () -> Element) {
+        self.init(ContiguousArray<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
+            for i in 0 ..< count {
+                buffer.initializeElement(at: i, to: nextElement())
+            }
+            initializedCount = count
+        })
+    }
 }
 
 extension ArraySlice: DifferentiableCollection where Element: Differentiable & AdditiveArithmetic {}
@@ -45,6 +66,16 @@ extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector w
     @inlinable
     public mutating func appendContribution(of value: Element) {
         self.append(value)
+    }
+
+    @inlinable
+    public init(count: Int, nextElement: () -> Element) {
+        self.init(ArraySlice(Array<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
+            for i in 0 ..< count {
+                buffer.initializeElement(at: i, to: nextElement())
+            }
+            initializedCount = count
+        }))
     }
 }
 
@@ -64,6 +95,40 @@ extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector whe
         let newValue = self.base.repeatedValue + value
         let newCount = self.base.count + 1
         self.base = repeatElement(newValue, count: newCount)
+    }
+
+    @inlinable
+    public init(count: Int, nextElement: () -> Element) {
+        var value: Element = .zero
+        for _ in 0 ..< count {
+            value += nextElement()
+        }
+        self.init(base: repeatElement(value, count: count))
+    }
+}
+
+extension DifferentiableCollectionTangentVector {
+    /// Build a dense tangent of `count` elements, where element `i` is `element(i)`.
+    ///
+    /// Drives `init(count:nextElement:)` with a closure that produces `element(0), element(1), …,
+    /// element(count - 1)` strictly in order, exactly once each, and traps if the conformer
+    /// consumes too few or too many. Callers may therefore stage per-index side effects in
+    /// `element` without trusting the conformer's loop to be well-behaved. Construct tangents
+    /// through this entry point rather than calling `init(count:nextElement:)` directly — a direct
+    /// call carries none of these checks.
+    @inlinable
+    static func building(count: Int, _ element: (Int) -> Element) -> Self {
+        var next = 0
+        let result = Self(count: count) {
+            precondition(next < count, "\(Self.self).init(count:nextElement:) consumed more than \(count) elements")
+            defer { next += 1 }
+            return element(next)
+        }
+        precondition(
+            next == count,
+            "\(Self.self).init(count:nextElement:) consumed \(next) of \(count) elements"
+        )
+        return result
     }
 }
 
