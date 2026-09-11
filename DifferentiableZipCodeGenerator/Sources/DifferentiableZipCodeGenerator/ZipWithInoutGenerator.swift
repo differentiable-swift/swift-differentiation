@@ -84,65 +84,69 @@ enum ZipWithInoutGenerator {
                 return (
                     value: (),
                     pullback: { _ in
-                        // swiftformat:disable:next redundantParens
-                        (
-        \(arityRange.map { "\(indent(5))C\($0).TangentVector.zero" }.joined(separator: ",\n"))
-                        )
+                        \(tupleExpression(arityRange.map { "C\($0).TangentVector.zero" }, parenIndent: 4))
                     }
                 )
             }
 
-            var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+            let pullbacks = ContiguousArray<(Inout.Element.TangentVector) -> (
                 Inout.Element.TangentVector,
         \(arityRange.map { "\(indent(2))C\($0).Element.TangentVector" }.joined(separator: ",\n"))
-            )> = []
-            pullbacks.reserveCapacity(count)
+            )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+                var c1i = c1.startIndex
+        \(arityRange.map { "\(indent(2))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
 
-            var c1i = c1.startIndex
-        \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
+                for i in 0 ..< count {
+                    let (value, pullback) = valueWithPullback(
+                        at:
+                        c1[c1i],
+        \(arityRange.map { "\(indent(4))c\($0)[c\($0)i]" }.joined(separator: ",\n")),
+                        of: transform
+                    )
 
-            for _ in 0 ..< count {
-                let (value, pullback) = valueWithPullback(
-                    at:
-                    c1[c1i],
-        \(arityRange.map { "\(indent(3))c\($0)[c\($0)i]" }.joined(separator: ",\n")),
-                    of: transform
-                )
+                    c1[c1i] = value
 
-                c1[c1i] = value
+                    pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-                pullbacks.append(pullback)
+                    c1.formIndex(after: &c1i)
+        \(arityRange.map { "\(indent(3))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+                }
 
-                c1.formIndex(after: &c1i)
-        \(arityRange.map { "\(indent(2))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+                pullbacksInitializedCount = count
             }
 
             return (
                 value: (),
                 pullback: { v in
-        \(arityRange.map { "\(indent(3))var results\($0) = C\($0).TangentVector()" }.joined(separator: "\n"))
-
-        \(arityRange.map { "\(indent(3))results\($0).reserveCapacity(pullbacks.count)" }.joined(separator: "\n"))
-
                     if v.count == 0 {
-                        v.reserveCapacity(pullbacks.count)
-                        for _ in 0 ..< pullbacks.count {
-                            v.appendContribution(of: .zero)
+                        return \(tupleExpression(arityRange.map { "C\($0).TangentVector.zero" }, parenIndent: 4))
+                    }
+
+                    let n = pullbacks.count
+                    precondition(v.count == n)
+
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let scratch\($0) = UnsafeMutableBufferPointer<C\($0).Element.TangentVector>.allocate(capacity: n)" }
+            .joined(separator: "\n"))
+        \(arityRange.dropFirst().map { "\(indent(3))defer { scratch\($0).deallocate() }" }.joined(separator: "\n"))
+
+                    let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        var vi = v.startIndex
+                        return C2.TangentVector.building(count: v.count) { index in
+                            let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullbackBuffer[index](v[vi])
+                            v[vi] = v1
+        \(arityRange.dropFirst().map { "\(indent(5))scratch\($0).initializeElement(at: index, to: v\($0))" }.joined(separator: "\n"))
+
+                            v.formIndex(after: &vi)
+                            return v2
                         }
                     }
 
-                    precondition(v.count == pullbacks.count)
+        \(arityRange.dropFirst()
+            .map { "\(indent(3))let tangents\($0) = C\($0).TangentVector.building(count: n) { i in scratch\($0).moveElement(from: i) }" }
+            .joined(separator: "\n"))
 
-                    for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                        let (v1, \(arityRange.map { "v\($0)" }.joined(separator: ", "))) = pullback(tangentElement)
-                        v[index] = v1
-        \(arityRange.map { "\(indent(4))results\($0).appendContribution(of: v\($0))" }.joined(separator: "\n"))
-                    }
-
-                    // swiftformat:disable:next redundantParens
-                    return (
-        \(arityRange.map { "\(indent(4))results\($0)" }.joined(separator: ",\n"))
-                    )
+                    return \(tupleExpression(arityRange.map { "tangents\($0)" }, parenIndent: 3))
                 }
             )
         }

@@ -63,65 +63,59 @@ public func _vjpDifferentiableZipWith<Inout, C2>(
         return (
             value: (),
             pullback: { _ in
-                // swiftformat:disable:next redundantParens
-                (
-                    C2.TangentVector.zero
-                )
+                C2.TangentVector.zero
             }
         )
     }
 
-    var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+    let pullbacks = ContiguousArray<(Inout.Element.TangentVector) -> (
         Inout.Element.TangentVector,
         C2.Element.TangentVector
-    )> = []
-    pullbacks.reserveCapacity(count)
+    )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
+        for i in 0 ..< count {
+            let (value, pullback) = valueWithPullback(
+                at:
+                c1[c1i],
+                c2[c2i],
+                of: transform
+            )
 
-    for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(
-            at:
-            c1[c1i],
-            c2[c2i],
-            of: transform
-        )
+            c1[c1i] = value
 
-        c1[c1i] = value
+            pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-        pullbacks.append(pullback)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+        }
 
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
+        pullbacksInitializedCount = count
     }
 
     return (
         value: (),
         pullback: { v in
-            var results2 = C2.TangentVector()
-
-            results2.reserveCapacity(pullbacks.count)
-
             if v.count == 0 {
-                v.reserveCapacity(pullbacks.count)
-                for _ in 0 ..< pullbacks.count {
-                    v.appendContribution(of: .zero)
+                return C2.TangentVector.zero
+            }
+
+            let n = pullbacks.count
+            precondition(v.count == n)
+
+            let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                var vi = v.startIndex
+                return C2.TangentVector.building(count: v.count) { index in
+                    let (v1, v2) = pullbackBuffer[index](v[vi])
+                    v[vi] = v1
+
+                    v.formIndex(after: &vi)
+                    return v2
                 }
             }
 
-            precondition(v.count == pullbacks.count)
-
-            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                let (v1, v2) = pullback(tangentElement)
-                v[index] = v1
-                results2.appendContribution(of: v2)
-            }
-
-            // swiftformat:disable:next redundantParens
-            return (
-                results2
-            )
+            return tangents2
         }
     )
 }
