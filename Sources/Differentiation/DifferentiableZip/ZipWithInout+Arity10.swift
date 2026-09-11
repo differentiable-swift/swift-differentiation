@@ -175,7 +175,6 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
         return (
             value: (),
             pullback: { _ in
-                // swiftformat:disable:next redundantParens
                 (
                     C2.TangentVector.zero,
                     C3.TangentVector.zero,
@@ -191,7 +190,7 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
         )
     }
 
-    var pullbacks: ContiguousArray<(Inout.Element.TangentVector) -> (
+    let pullbacks = ContiguousArray<(Inout.Element.TangentVector) -> (
         Inout.Element.TangentVector,
         C2.Element.TangentVector,
         C3.Element.TangentVector,
@@ -202,109 +201,128 @@ public func _vjpDifferentiableZipWith<Inout, C2, C3, C4, C5, C6, C7, C8, C9, C10
         C8.Element.TangentVector,
         C9.Element.TangentVector,
         C10.Element.TangentVector
-    )> = []
-    pullbacks.reserveCapacity(count)
+    )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
+        var c3i = c3.startIndex
+        var c4i = c4.startIndex
+        var c5i = c5.startIndex
+        var c6i = c6.startIndex
+        var c7i = c7.startIndex
+        var c8i = c8.startIndex
+        var c9i = c9.startIndex
+        var c10i = c10.startIndex
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
-    var c3i = c3.startIndex
-    var c4i = c4.startIndex
-    var c5i = c5.startIndex
-    var c6i = c6.startIndex
-    var c7i = c7.startIndex
-    var c8i = c8.startIndex
-    var c9i = c9.startIndex
-    var c10i = c10.startIndex
+        for i in 0 ..< count {
+            let (value, pullback) = valueWithPullback(
+                at:
+                c1[c1i],
+                c2[c2i],
+                c3[c3i],
+                c4[c4i],
+                c5[c5i],
+                c6[c6i],
+                c7[c7i],
+                c8[c8i],
+                c9[c9i],
+                c10[c10i],
+                of: transform
+            )
 
-    for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(
-            at:
-            c1[c1i],
-            c2[c2i],
-            c3[c3i],
-            c4[c4i],
-            c5[c5i],
-            c6[c6i],
-            c7[c7i],
-            c8[c8i],
-            c9[c9i],
-            c10[c10i],
-            of: transform
-        )
+            c1[c1i] = value
 
-        c1[c1i] = value
+            pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-        pullbacks.append(pullback)
+            c1.formIndex(after: &c1i)
+            c2.formIndex(after: &c2i)
+            c3.formIndex(after: &c3i)
+            c4.formIndex(after: &c4i)
+            c5.formIndex(after: &c5i)
+            c6.formIndex(after: &c6i)
+            c7.formIndex(after: &c7i)
+            c8.formIndex(after: &c8i)
+            c9.formIndex(after: &c9i)
+            c10.formIndex(after: &c10i)
+        }
 
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
-        c3.formIndex(after: &c3i)
-        c4.formIndex(after: &c4i)
-        c5.formIndex(after: &c5i)
-        c6.formIndex(after: &c6i)
-        c7.formIndex(after: &c7i)
-        c8.formIndex(after: &c8i)
-        c9.formIndex(after: &c9i)
-        c10.formIndex(after: &c10i)
+        pullbacksInitializedCount = count
     }
 
     return (
         value: (),
         pullback: { v in
-            var results2 = C2.TangentVector()
-            var results3 = C3.TangentVector()
-            var results4 = C4.TangentVector()
-            var results5 = C5.TangentVector()
-            var results6 = C6.TangentVector()
-            var results7 = C7.TangentVector()
-            var results8 = C8.TangentVector()
-            var results9 = C9.TangentVector()
-            var results10 = C10.TangentVector()
-
-            results2.reserveCapacity(pullbacks.count)
-            results3.reserveCapacity(pullbacks.count)
-            results4.reserveCapacity(pullbacks.count)
-            results5.reserveCapacity(pullbacks.count)
-            results6.reserveCapacity(pullbacks.count)
-            results7.reserveCapacity(pullbacks.count)
-            results8.reserveCapacity(pullbacks.count)
-            results9.reserveCapacity(pullbacks.count)
-            results10.reserveCapacity(pullbacks.count)
-
             if v.count == 0 {
-                v.reserveCapacity(pullbacks.count)
-                for _ in 0 ..< pullbacks.count {
-                    v.appendContribution(of: .zero)
+                return (
+                    C2.TangentVector.zero,
+                    C3.TangentVector.zero,
+                    C4.TangentVector.zero,
+                    C5.TangentVector.zero,
+                    C6.TangentVector.zero,
+                    C7.TangentVector.zero,
+                    C8.TangentVector.zero,
+                    C9.TangentVector.zero,
+                    C10.TangentVector.zero
+                )
+            }
+
+            let n = pullbacks.count
+            precondition(v.count == n)
+
+            let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
+            let scratch4 = UnsafeMutableBufferPointer<C4.Element.TangentVector>.allocate(capacity: n)
+            let scratch5 = UnsafeMutableBufferPointer<C5.Element.TangentVector>.allocate(capacity: n)
+            let scratch6 = UnsafeMutableBufferPointer<C6.Element.TangentVector>.allocate(capacity: n)
+            let scratch7 = UnsafeMutableBufferPointer<C7.Element.TangentVector>.allocate(capacity: n)
+            let scratch8 = UnsafeMutableBufferPointer<C8.Element.TangentVector>.allocate(capacity: n)
+            let scratch9 = UnsafeMutableBufferPointer<C9.Element.TangentVector>.allocate(capacity: n)
+            let scratch10 = UnsafeMutableBufferPointer<C10.Element.TangentVector>.allocate(capacity: n)
+            defer { scratch3.deallocate() }
+            defer { scratch4.deallocate() }
+            defer { scratch5.deallocate() }
+            defer { scratch6.deallocate() }
+            defer { scratch7.deallocate() }
+            defer { scratch8.deallocate() }
+            defer { scratch9.deallocate() }
+            defer { scratch10.deallocate() }
+
+            let tangents2 = pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                var vi = v.startIndex
+                return C2.TangentVector.building(count: v.count) { index in
+                    let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) = pullbackBuffer[index](v[vi])
+                    v[vi] = v1
+                    scratch3.initializeElement(at: index, to: v3)
+                    scratch4.initializeElement(at: index, to: v4)
+                    scratch5.initializeElement(at: index, to: v5)
+                    scratch6.initializeElement(at: index, to: v6)
+                    scratch7.initializeElement(at: index, to: v7)
+                    scratch8.initializeElement(at: index, to: v8)
+                    scratch9.initializeElement(at: index, to: v9)
+                    scratch10.initializeElement(at: index, to: v10)
+
+                    v.formIndex(after: &vi)
+                    return v2
                 }
             }
 
-            precondition(v.count == pullbacks.count)
+            let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
+            let tangents4 = C4.TangentVector.building(count: n) { i in scratch4.moveElement(from: i) }
+            let tangents5 = C5.TangentVector.building(count: n) { i in scratch5.moveElement(from: i) }
+            let tangents6 = C6.TangentVector.building(count: n) { i in scratch6.moveElement(from: i) }
+            let tangents7 = C7.TangentVector.building(count: n) { i in scratch7.moveElement(from: i) }
+            let tangents8 = C8.TangentVector.building(count: n) { i in scratch8.moveElement(from: i) }
+            let tangents9 = C9.TangentVector.building(count: n) { i in scratch9.moveElement(from: i) }
+            let tangents10 = C10.TangentVector.building(count: n) { i in scratch10.moveElement(from: i) }
 
-            for (index, (tangentElement, pullback)) in zip(v.indices, zip(v, pullbacks)) {
-                let (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10) = pullback(tangentElement)
-                v[index] = v1
-                results2.appendContribution(of: v2)
-                results3.appendContribution(of: v3)
-                results4.appendContribution(of: v4)
-                results5.appendContribution(of: v5)
-                results6.appendContribution(of: v6)
-                results7.appendContribution(of: v7)
-                results8.appendContribution(of: v8)
-                results9.appendContribution(of: v9)
-                results10.appendContribution(of: v10)
-            }
-
-            // swiftformat:disable:next redundantParens
             return (
-                results2,
-                results3,
-                results4,
-                results5,
-                results6,
-                results7,
-                results8,
-                results9,
-                results10
+                tangents2,
+                tangents3,
+                tangents4,
+                tangents5,
+                tangents6,
+                tangents7,
+                tangents8,
+                tangents9,
+                tangents10
             )
         }
     )
