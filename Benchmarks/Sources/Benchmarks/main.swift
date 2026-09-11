@@ -23,6 +23,7 @@ protocol HasBenchmarks {
     static func addSubscriptGetContinuousBenchmarks(_ benchmark: inout Benchmark)
     static func addSumArbitraryBenchmarks(_ benchmark: inout Benchmark)
     static func addMutRangeBenchmarks(_ benchmark: inout Benchmark)
+    static func addZipWithVariantBenchmarks(_ benchmark: inout Benchmark)
 }
 
 extension Array: HasBenchmarks where Element == Float {}
@@ -39,6 +40,7 @@ for type in types {
     type.addSubscriptGetContinuousBenchmarks(&benchmark)
     type.addSumArbitraryBenchmarks(&benchmark)
     type.addMutRangeBenchmarks(&benchmark)
+    type.addZipWithVariantBenchmarks(&benchmark)
 }
 
 benchmark.main()
