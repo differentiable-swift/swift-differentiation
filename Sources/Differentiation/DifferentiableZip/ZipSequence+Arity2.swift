@@ -152,56 +152,64 @@ extension Zip2SequenceDifferentiable: Differentiable where
             C2.Element
         ) -> Result
     ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
-        var results: [Result] = []
-        results.reserveCapacity(self.count)
-        var pullbacks: [(Result.TangentVector) -> (
+        let capacity = self.count
+
+        var pullbacks: ContiguousArray<(Result.TangentVector) -> (
             C1.Element.TangentVector,
             C2.Element.TangentVector
-        )] = []
-        pullbacks.reserveCapacity(self.count)
+        )>!
 
-        for parameters in self {
-            let (value, pullback) = valueWithPullback(
-                at:
-                parameters.0,
-                parameters.1,
-                of: transform
-            )
-            results.append(value)
-            pullbacks.append(pullback)
+        let results = Array<Result>(unsafeUninitializedCapacity: count) { resultsBuffer, resultsInitializedCount in
+            pullbacks = ContiguousArray<(Result.TangentVector) -> (
+                C1.Element.TangentVector,
+                C2.Element.TangentVector
+            )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+                for i in 0 ..< capacity {
+                    let parameters = self[i]
+                    let (value, pullback) = valueWithPullback(
+                        at:
+                        parameters.0,
+                        parameters.1,
+                        of: transform
+                    )
+                    resultsBuffer.initializeElement(at: i, to: value)
+                    pullbacksBuffer.initializeElement(at: i, to: pullback)
+                }
+                pullbacksInitializedCount = count
+            }
+            resultsInitializedCount = count
         }
 
         return (
             value: results,
             pullback: { v in
-                guard v.count != 0 else {
+                if v.count == 0 {
                     return TangentVector(
                         C1.TangentVector.zero,
                         C2.TangentVector.zero
                     )
                 }
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
+                let n = pullbacks.count
+                precondition(v.count == n)
 
-                results1.reserveCapacity(pullbacks.count)
-                results2.reserveCapacity(pullbacks.count)
+                let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
+                defer { scratch2.deallocate() }
 
-                // thoughts:
-                // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
-
-                precondition(v.count == pullbacks.count)
-
-                for (tangentElement, pullback) in zip(v, pullbacks) {
-                    let (v1, v2) = pullback(tangentElement)
-
-                    results1.appendContribution(of: v1)
-                    results2.appendContribution(of: v2)
+                let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        C1.TangentVector.building(count: n) { index in
+                            let (v1, v2) = pullbackBuffer[index](vBuffer[index])
+                            scratch2.initializeElement(at: index, to: v2)
+                            return v1
+                        }
+                    }
                 }
 
+                let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
+
                 return TangentVector(
-                    results1,
-                    results2
+                    tangents1,
+                    tangents2
                 )
             }
         )
