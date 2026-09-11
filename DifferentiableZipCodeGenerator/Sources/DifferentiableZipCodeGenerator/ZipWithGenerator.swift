@@ -30,9 +30,9 @@ enum ZipWithGenerator {
 
             if capacity == 0 { return [] }
 
-        \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
-
             return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        \(arityRange.map { "\(indent(2))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
+
                 for i in 0 ..< capacity {
                     let value = transform(
         \(arityRange.map { "\(indent(4))c\($0)[c\($0)i]" }.joined(separator: ",\n"))
@@ -83,30 +83,34 @@ enum ZipWithGenerator {
                 )
             }
 
-            var results = ContiguousArray<Result>()
-            results.reserveCapacity(count)
             var pullbacks: ContiguousArray<(Result.TangentVector) -> (
         \(arityRange.map { "\(indent(2))C\($0).Element.TangentVector" }.joined(separator: ",\n"))
-            )> = []
-            pullbacks.reserveCapacity(count)
+            )>!
+            let results = Array<Result>(unsafeUninitializedCapacity: count) { resultsBuffer, resultsInitializedCount in
+                pullbacks = ContiguousArray<(Result.TangentVector) -> (
+        \(arityRange.map { "\(indent(3))C\($0).Element.TangentVector" }.joined(separator: ",\n"))
+                )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+        \(arityRange.map { "\(indent(3))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
 
-        \(arityRange.map { "\(indent(1))var c\($0)i = c\($0).startIndex" }.joined(separator: "\n"))
+                    for i in 0 ..< count {
+                        let (value, pullback) = valueWithPullback(
+                            at:
+        \(arityRange.map { "\(indent(5))c\($0)[c\($0)i]" }.joined(separator: ",\n")),
+                            of: transform
+                        )
 
-            for _ in 0 ..< count {
-                let (value, pullback) = valueWithPullback(
-                    at:
-        \(arityRange.map { "\(indent(3))c\($0)[c\($0)i]" }.joined(separator: ",\n")),
-                    of: transform
-                )
+                        resultsBuffer.initializeElement(at: i, to: value)
+                        pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-                results.append(value)
-                pullbacks.append(pullback)
-
-        \(arityRange.map { "\(indent(2))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+        \(arityRange.map { "\(indent(4))c\($0).formIndex(after: &c\($0)i)" }.joined(separator: "\n"))
+                    }
+                    pullbacksInitializedCount = count
+                }
+                resultsInitializedCount = count
             }
 
             return (
-                value: Array(results),
+                value: results,
                 pullback: { v in
                     guard v.count != 0 else {
                         return (
