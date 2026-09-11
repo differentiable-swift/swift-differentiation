@@ -51,16 +51,16 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, Result>(
 
     if capacity == 0 { return [] }
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
-    var c3i = c3.startIndex
-    var c4i = c4.startIndex
-    var c5i = c5.startIndex
-    var c6i = c6.startIndex
-    var c7i = c7.startIndex
-    var c8i = c8.startIndex
-
     return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
+        var c3i = c3.startIndex
+        var c4i = c4.startIndex
+        var c5i = c5.startIndex
+        var c6i = c6.startIndex
+        var c7i = c7.startIndex
+        var c8i = c8.startIndex
+
         for i in 0 ..< capacity {
             let value = transform(
                 c1[c1i],
@@ -165,8 +165,6 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, Result>(
         )
     }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(count)
     var pullbacks: ContiguousArray<(Result.TangentVector) -> (
         C1.Element.TangentVector,
         C2.Element.TangentVector,
@@ -176,47 +174,60 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, C6, C7, C8, Result>(
         C6.Element.TangentVector,
         C7.Element.TangentVector,
         C8.Element.TangentVector
-    )> = []
-    pullbacks.reserveCapacity(count)
+    )>!
+    let results = Array<Result>(unsafeUninitializedCapacity: count) { resultsBuffer, resultsInitializedCount in
+        pullbacks = ContiguousArray<(Result.TangentVector) -> (
+            C1.Element.TangentVector,
+            C2.Element.TangentVector,
+            C3.Element.TangentVector,
+            C4.Element.TangentVector,
+            C5.Element.TangentVector,
+            C6.Element.TangentVector,
+            C7.Element.TangentVector,
+            C8.Element.TangentVector
+        )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+            var c1i = c1.startIndex
+            var c2i = c2.startIndex
+            var c3i = c3.startIndex
+            var c4i = c4.startIndex
+            var c5i = c5.startIndex
+            var c6i = c6.startIndex
+            var c7i = c7.startIndex
+            var c8i = c8.startIndex
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
-    var c3i = c3.startIndex
-    var c4i = c4.startIndex
-    var c5i = c5.startIndex
-    var c6i = c6.startIndex
-    var c7i = c7.startIndex
-    var c8i = c8.startIndex
+            for i in 0 ..< count {
+                let (value, pullback) = valueWithPullback(
+                    at:
+                    c1[c1i],
+                    c2[c2i],
+                    c3[c3i],
+                    c4[c4i],
+                    c5[c5i],
+                    c6[c6i],
+                    c7[c7i],
+                    c8[c8i],
+                    of: transform
+                )
 
-    for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(
-            at:
-            c1[c1i],
-            c2[c2i],
-            c3[c3i],
-            c4[c4i],
-            c5[c5i],
-            c6[c6i],
-            c7[c7i],
-            c8[c8i],
-            of: transform
-        )
+                resultsBuffer.initializeElement(at: i, to: value)
+                pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-        results.append(value)
-        pullbacks.append(pullback)
-
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
-        c3.formIndex(after: &c3i)
-        c4.formIndex(after: &c4i)
-        c5.formIndex(after: &c5i)
-        c6.formIndex(after: &c6i)
-        c7.formIndex(after: &c7i)
-        c8.formIndex(after: &c8i)
+                c1.formIndex(after: &c1i)
+                c2.formIndex(after: &c2i)
+                c3.formIndex(after: &c3i)
+                c4.formIndex(after: &c4i)
+                c5.formIndex(after: &c5i)
+                c6.formIndex(after: &c6i)
+                c7.formIndex(after: &c7i)
+                c8.formIndex(after: &c8i)
+            }
+            pullbacksInitializedCount = count
+        }
+        resultsInitializedCount = count
     }
 
     return (
-        value: Array(results),
+        value: results,
         pullback: { v in
             guard v.count != 0 else {
                 return (

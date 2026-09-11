@@ -26,11 +26,11 @@ public func differentiableZipWith<C1, C2, C3, Result>(
 
     if capacity == 0 { return [] }
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
-    var c3i = c3.startIndex
-
     return [Result](unsafeUninitializedCapacity: capacity) { buffer, initializedCount in
+        var c1i = c1.startIndex
+        var c2i = c2.startIndex
+        var c3i = c3.startIndex
+
         for i in 0 ..< capacity {
             let value = transform(
                 c1[c1i],
@@ -90,38 +90,44 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, Result>(
         )
     }
 
-    var results = ContiguousArray<Result>()
-    results.reserveCapacity(count)
     var pullbacks: ContiguousArray<(Result.TangentVector) -> (
         C1.Element.TangentVector,
         C2.Element.TangentVector,
         C3.Element.TangentVector
-    )> = []
-    pullbacks.reserveCapacity(count)
+    )>!
+    let results = Array<Result>(unsafeUninitializedCapacity: count) { resultsBuffer, resultsInitializedCount in
+        pullbacks = ContiguousArray<(Result.TangentVector) -> (
+            C1.Element.TangentVector,
+            C2.Element.TangentVector,
+            C3.Element.TangentVector
+        )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+            var c1i = c1.startIndex
+            var c2i = c2.startIndex
+            var c3i = c3.startIndex
 
-    var c1i = c1.startIndex
-    var c2i = c2.startIndex
-    var c3i = c3.startIndex
+            for i in 0 ..< count {
+                let (value, pullback) = valueWithPullback(
+                    at:
+                    c1[c1i],
+                    c2[c2i],
+                    c3[c3i],
+                    of: transform
+                )
 
-    for _ in 0 ..< count {
-        let (value, pullback) = valueWithPullback(
-            at:
-            c1[c1i],
-            c2[c2i],
-            c3[c3i],
-            of: transform
-        )
+                resultsBuffer.initializeElement(at: i, to: value)
+                pullbacksBuffer.initializeElement(at: i, to: pullback)
 
-        results.append(value)
-        pullbacks.append(pullback)
-
-        c1.formIndex(after: &c1i)
-        c2.formIndex(after: &c2i)
-        c3.formIndex(after: &c3i)
+                c1.formIndex(after: &c1i)
+                c2.formIndex(after: &c2i)
+                c3.formIndex(after: &c3i)
+            }
+            pullbacksInitializedCount = count
+        }
+        resultsInitializedCount = count
     }
 
     return (
-        value: Array(results),
+        value: results,
         pullback: { v in
             guard v.count != 0 else {
                 return (
