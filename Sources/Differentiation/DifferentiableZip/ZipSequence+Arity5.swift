@@ -134,31 +134,11 @@ public func _vjpDifferentiableZip<C1, C2, C3, C4, C5>(
         C5.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection
 {
     (
         value: differentiableZip(
