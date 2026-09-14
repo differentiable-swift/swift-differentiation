@@ -16,17 +16,12 @@ public func differentiableZipWith<C1, C2, C3, C4, C5, Result>(
         C5.Element
     ) -> Result
 ) -> [Result] where
+    Result: Differentiable,
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
-    C5: DifferentiableCollection,
-    C5.Element: Differentiable,
-    Result: Differentiable
+    C5: DifferentiableCollection
 {
     var capacity = c1.count
     capacity = Swift.min(capacity, c2.count)
@@ -87,17 +82,12 @@ public func _vjpDifferentiableZipWith<C1, C2, C3, C4, C5, Result>(
         C5.TangentVector
     )
 ) where
+    Result: Differentiable,
     C1: DifferentiableCollection,
-    C1.Element: Differentiable,
     C2: DifferentiableCollection,
-    C2.Element: Differentiable,
     C3: DifferentiableCollection,
-    C3.Element: Differentiable,
     C4: DifferentiableCollection,
-    C4.Element: Differentiable,
-    C5: DifferentiableCollection,
-    C5.Element: Differentiable,
-    Result: Differentiable
+    C5: DifferentiableCollection
 {
     var count = c1.count
     count = Swift.min(count, c2.count)

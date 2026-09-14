@@ -254,71 +254,19 @@ public func _vjpDifferentiableZip<C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, 
         C13.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector,
-    C5: Differentiable,
-    C5.Element: Differentiable,
-    C5.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C5.TangentVector.Index == Int,
-    C5.TangentVector.Element == C5.Element.TangentVector,
-    C6: Differentiable,
-    C6.Element: Differentiable,
-    C6.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C6.TangentVector.Index == Int,
-    C6.TangentVector.Element == C6.Element.TangentVector,
-    C7: Differentiable,
-    C7.Element: Differentiable,
-    C7.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C7.TangentVector.Index == Int,
-    C7.TangentVector.Element == C7.Element.TangentVector,
-    C8: Differentiable,
-    C8.Element: Differentiable,
-    C8.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C8.TangentVector.Index == Int,
-    C8.TangentVector.Element == C8.Element.TangentVector,
-    C9: Differentiable,
-    C9.Element: Differentiable,
-    C9.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C9.TangentVector.Index == Int,
-    C9.TangentVector.Element == C9.Element.TangentVector,
-    C10: Differentiable,
-    C10.Element: Differentiable,
-    C10.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C10.TangentVector.Index == Int,
-    C10.TangentVector.Element == C10.Element.TangentVector,
-    C11: Differentiable,
-    C11.Element: Differentiable,
-    C11.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C11.TangentVector.Index == Int,
-    C11.TangentVector.Element == C11.Element.TangentVector,
-    C12: Differentiable,
-    C12.Element: Differentiable,
-    C12.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C12.TangentVector.Index == Int,
-    C12.TangentVector.Element == C12.Element.TangentVector,
-    C13: Differentiable,
-    C13.Element: Differentiable,
-    C13.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C13.TangentVector.Index == Int,
-    C13.TangentVector.Element == C13.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection,
+    C5: DifferentiableCollection,
+    C6: DifferentiableCollection,
+    C7: DifferentiableCollection,
+    C8: DifferentiableCollection,
+    C9: DifferentiableCollection,
+    C10: DifferentiableCollection,
+    C11: DifferentiableCollection,
+    C12: DifferentiableCollection,
+    C13: DifferentiableCollection
 {
     (
         value: differentiableZip(

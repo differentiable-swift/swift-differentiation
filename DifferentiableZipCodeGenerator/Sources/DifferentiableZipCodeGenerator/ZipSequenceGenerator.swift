@@ -113,19 +113,7 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(2))C\($0).TangentVector" }.joined(separator: ",\n"))
             )
         ) where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             (
                 value: differentiableZip(

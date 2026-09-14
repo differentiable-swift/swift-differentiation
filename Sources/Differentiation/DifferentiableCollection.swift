@@ -10,9 +10,6 @@ public protocol DifferentiableCollection: Differentiable & Collection where
 }
 
 public protocol DifferentiableCollectionTangentVector: DifferentiableCollection {
-    init()
-    mutating func reserveCapacity(_ capacity: Int)
-    mutating func appendContribution(of value: Element)
     init(count: Int, nextElement: () -> Element)
 }
 
@@ -21,11 +18,6 @@ extension Array: DifferentiableCollection where Element: Differentiable & Additi
 extension Array.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Array.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    @inlinable
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
     @inlinable
     public init(count: Int, nextElement: () -> Element) {
         self.init([Element](unsafeUninitializedCapacity: count) { buffer, initializedCount in
@@ -43,11 +35,6 @@ extension ContiguousArray.DifferentiableView: DifferentiableCollection where Ele
 
 extension ContiguousArray.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     @inlinable
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
-    @inlinable
     public init(count: Int, nextElement: () -> Element) {
         self.init(ContiguousArray<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
             for i in 0 ..< count {
@@ -64,11 +51,6 @@ extension ArraySlice.DifferentiableView: DifferentiableCollection where Element:
 
 extension ArraySlice.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
     @inlinable
-    public mutating func appendContribution(of value: Element) {
-        self.append(value)
-    }
-
-    @inlinable
     public init(count: Int, nextElement: () -> Element) {
         self.init(ArraySlice(Array<Element>(unsafeUninitializedCapacity: count) { buffer, initializedCount in
             for i in 0 ..< count {
@@ -84,19 +66,6 @@ extension Repeated: DifferentiableCollection where Element: Differentiable & Add
 extension Repeated.DifferentiableView: DifferentiableCollection where Element: AdditiveArithmetic {}
 
 extension Repeated.DifferentiableView: DifferentiableCollectionTangentVector where Element: AdditiveArithmetic {
-    @inlinable
-    public init() { self = .zero }
-
-    @inlinable
-    public mutating func reserveCapacity(_: Int) { /* no-op */ }
-
-    @inlinable
-    public mutating func appendContribution(of value: Repeated<Element>.Element) {
-        let newValue = self.base.repeatedValue + value
-        let newCount = self.base.count + 1
-        self.base = repeatElement(newValue, count: newCount)
-    }
-
     @inlinable
     public init(count: Int, nextElement: () -> Element) {
         var value: Element = .zero
