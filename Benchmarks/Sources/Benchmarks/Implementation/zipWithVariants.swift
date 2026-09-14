@@ -14,6 +14,8 @@ extension Array where Element == Float {
     static func addZipWithVariantBenchmarks(_ benchmark: inout Benchmark) {
         addZipWith2Variant(&benchmark, name: "canonical", kernel: zipWith2_canonical)
         addZipWith8Variant(&benchmark, name: "canonical", kernel: zipWith8_canonical)
+        addZipWith2Variant(&benchmark, name: "fused", kernel: zipWith2_fused)
+        addZipWith8Variant(&benchmark, name: "fused", kernel: zipWith8_fused)
     }
 
     private static func addZipWith2Variant(
