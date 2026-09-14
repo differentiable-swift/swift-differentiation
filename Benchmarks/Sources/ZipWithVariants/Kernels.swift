@@ -57,3 +57,69 @@ public func zipWith8_canonical(_ inputs: Inputs8) -> [Float] {
         inputs.c1, inputs.c2, inputs.c3, inputs.c4, inputs.c5, inputs.c6, inputs.c7, inputs.c8
     ) { $0 * $1 + $2 * $3 + $4 * $5 + $6 * $7 }
 }
+
+// MARK: - Arity coverage (3, 4, 14) for the shape-regression matrix
+
+public struct Inputs3: Differentiable {
+    public var c1, c2, c3: [Float]
+
+    public init(n: Int) {
+        c1 = makeInput(n, seed: 1)
+        c2 = makeInput(n, seed: 2)
+        c3 = makeInput(n, seed: 3)
+    }
+}
+
+@differentiable(reverse)
+public func zipWith3_canonical(_ inputs: Inputs3) -> [Float] {
+    differentiableZipWith(
+        inputs.c1, inputs.c2, inputs.c3
+    ) { $0 * $1 + $2 }
+}
+
+public struct Inputs4: Differentiable {
+    public var c1, c2, c3, c4: [Float]
+
+    public init(n: Int) {
+        c1 = makeInput(n, seed: 1)
+        c2 = makeInput(n, seed: 2)
+        c3 = makeInput(n, seed: 3)
+        c4 = makeInput(n, seed: 4)
+    }
+}
+
+@differentiable(reverse)
+public func zipWith4_canonical(_ inputs: Inputs4) -> [Float] {
+    differentiableZipWith(
+        inputs.c1, inputs.c2, inputs.c3, inputs.c4
+    ) { $0 * $1 + $2 * $3 }
+}
+
+public struct Inputs14: Differentiable {
+    public var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14: [Float]
+
+    public init(n: Int) {
+        c1 = makeInput(n, seed: 1)
+        c2 = makeInput(n, seed: 2)
+        c3 = makeInput(n, seed: 3)
+        c4 = makeInput(n, seed: 4)
+        c5 = makeInput(n, seed: 5)
+        c6 = makeInput(n, seed: 6)
+        c7 = makeInput(n, seed: 7)
+        c8 = makeInput(n, seed: 8)
+        c9 = makeInput(n, seed: 9)
+        c10 = makeInput(n, seed: 10)
+        c11 = makeInput(n, seed: 11)
+        c12 = makeInput(n, seed: 12)
+        c13 = makeInput(n, seed: 13)
+        c14 = makeInput(n, seed: 14)
+    }
+}
+
+@differentiable(reverse)
+public func zipWith14_canonical(_ inputs: Inputs14) -> [Float] {
+    differentiableZipWith(
+        inputs.c1, inputs.c2, inputs.c3, inputs.c4, inputs.c5, inputs.c6, inputs.c7, inputs.c8, inputs.c9, inputs.c10, inputs.c11,
+        inputs.c12, inputs.c13, inputs.c14
+    ) { $0 * $1 + $2 * $3 + $4 * $5 + $6 * $7 + $8 * $9 + $10 * $11 + $12 * $13 }
+}
