@@ -134,7 +134,11 @@ let benchmarks: @Sendable () -> Void = {
     for n in [1000, 100000] {
         addArity2("canonical", n: n, kernel: zipWith2_canonical)
         addArity8("canonical", n: n, kernel: zipWith8_canonical)
+        addArity2("fused", n: n, kernel: zipWith2_fused)
+        addArity8("fused", n: n, kernel: zipWith8_fused)
         addArity2Gradient("canonical", n: n, kernel: zipWith2_canonical)
         addArity8Gradient("canonical", n: n, kernel: zipWith8_canonical)
+        addArity2Gradient("fused", n: n, kernel: zipWith2_fused)
+        addArity8Gradient("fused", n: n, kernel: zipWith8_fused)
     }
 }
