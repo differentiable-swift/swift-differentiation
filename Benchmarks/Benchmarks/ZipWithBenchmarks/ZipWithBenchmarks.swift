@@ -95,8 +95,44 @@ let benchmarks: @Sendable () -> Void = {
         }
     }
 
+    func addArity2Gradient(
+        _ name: String,
+        n: Int,
+        kernel: @escaping @differentiable(reverse) ([Float], [Float]) -> [Float]
+    ) {
+        Benchmark("zipWith2.\(name).gradient.n=\(n)") { benchmark, input in
+            let (lhs, rhs, seed) = input
+            for _ in benchmark.scaledIterations {
+                let (value, pullback) = valueWithPullback(at: lhs, rhs, of: kernel)
+                blackHole(value)
+                blackHole(pullback(seed))
+            }
+        } setup: { () -> ([Float], [Float], [Float].TangentVector) in
+            (makeInput(n), makeInput(n, seed: 2), [Float].TangentVector([Float](repeating: 1, count: n)))
+        }
+    }
+
+    func addArity8Gradient(
+        _ name: String,
+        n: Int,
+        kernel: @escaping @differentiable(reverse) (Inputs8) -> [Float]
+    ) {
+        Benchmark("zipWith8.\(name).gradient.n=\(n)") { benchmark, input in
+            let (inputs, seed) = input
+            for _ in benchmark.scaledIterations {
+                let (value, pullback) = valueWithPullback(at: inputs, of: kernel)
+                blackHole(value)
+                blackHole(pullback(seed))
+            }
+        } setup: { () -> (Inputs8, [Float].TangentVector) in
+            (Inputs8(n: n), [Float].TangentVector([Float](repeating: 1, count: n)))
+        }
+    }
+
     for n in [1000, 100000] {
         addArity2("canonical", n: n, kernel: zipWith2_canonical)
         addArity8("canonical", n: n, kernel: zipWith8_canonical)
+        addArity2Gradient("canonical", n: n, kernel: zipWith2_canonical)
+        addArity8Gradient("canonical", n: n, kernel: zipWith8_canonical)
     }
 }
