@@ -129,6 +129,8 @@ let benchmarks: @Sendable () -> Void = {
         }
     }
 
+    registerArityCoverageBenchmarks()
+
     for n in [1000, 100000] {
         addArity2("canonical", n: n, kernel: zipWith2_canonical)
         addArity8("canonical", n: n, kernel: zipWith8_canonical)
