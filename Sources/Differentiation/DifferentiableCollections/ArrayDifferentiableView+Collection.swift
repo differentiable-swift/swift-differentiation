@@ -89,3 +89,12 @@ extension Array.DifferentiableView:
         base.remove(at: index)
     }
 }
+
+extension Array.DifferentiableView {
+    @inlinable
+    public func withUnsafeContiguousStorage<R>(
+        _ body: (UnsafeBufferPointer<Element>) -> R
+    ) -> R {
+        base.withUnsafeBufferPointer { body($0) }
+    }
+}

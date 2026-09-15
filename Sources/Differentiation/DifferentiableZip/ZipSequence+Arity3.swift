@@ -21,11 +21,7 @@ public struct Zip3SequenceDifferentiable<
     C1: Collection,
     C2: Collection,
     C3: Collection
-> where
-    C1.Index == Int,
-    C2.Index == Int,
-    C3.Index == Int
-{
+> {
     @usableFromInline
     internal var _collection1: C1
     @usableFromInline
@@ -65,9 +61,9 @@ extension Zip3SequenceDifferentiable: Collection {
     @inlinable
     public subscript(index: Int) -> Element {
         (
-            _collection1[_collection1.startIndex.advanced(by: index)],
-            _collection2[_collection2.startIndex.advanced(by: index)],
-            _collection3[_collection3.startIndex.advanced(by: index)]
+            _collection1[_collection1.index(_collection1.startIndex, offsetBy: index)],
+            _collection2[_collection2.index(_collection2.startIndex, offsetBy: index)],
+            _collection3[_collection3.index(_collection3.startIndex, offsetBy: index)]
         )
     }
 
@@ -104,21 +100,9 @@ public func _vjpDifferentiableZip<C1, C2, C3>(
         C3.TangentVector
     )
 ) where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection
 {
     (
         value: differentiableZip(
@@ -150,21 +134,9 @@ extension Zip3SequenceDifferentiable {
 }
 
 extension Zip3SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -182,83 +154,86 @@ extension Zip3SequenceDifferentiable: Differentiable where
             C3.Element
         ) -> Result
     ) -> (value: [Result], pullback: ([Result].TangentVector) -> TangentVector) {
-        var results: [Result] = []
-        results.reserveCapacity(self.count)
-        var pullbacks: [(Result.TangentVector) -> (
+        let capacity = self.count
+
+        var pullbacks: ContiguousArray<(Result.TangentVector) -> (
             C1.Element.TangentVector,
             C2.Element.TangentVector,
             C3.Element.TangentVector
-        )] = []
-        pullbacks.reserveCapacity(self.count)
+        )>!
 
-        for parameters in self {
-            let (value, pullback) = valueWithPullback(
-                at:
-                parameters.0,
-                parameters.1,
-                parameters.2,
-                of: transform
-            )
-            results.append(value)
-            pullbacks.append(pullback)
+        let results = Array<Result>(unsafeUninitializedCapacity: count) { resultsBuffer, resultsInitializedCount in
+            pullbacks = ContiguousArray<(Result.TangentVector) -> (
+                C1.Element.TangentVector,
+                C2.Element.TangentVector,
+                C3.Element.TangentVector
+            )>(unsafeUninitializedCapacity: count) { pullbacksBuffer, pullbacksInitializedCount in
+                for i in 0 ..< capacity {
+                    let parameters = self[i]
+                    let (value, pullback) = valueWithPullback(
+                        at:
+                        parameters.0,
+                        parameters.1,
+                        parameters.2,
+                        of: transform
+                    )
+                    resultsBuffer.initializeElement(at: i, to: value)
+                    pullbacksBuffer.initializeElement(at: i, to: pullback)
+                }
+                pullbacksInitializedCount = count
+            }
+            resultsInitializedCount = count
         }
 
         return (
             value: results,
             pullback: { v in
-                var results1 = C1.TangentVector()
-                var results2 = C2.TangentVector()
-                var results3 = C3.TangentVector()
-
-                results1.reserveCapacity(pullbacks.count)
-                results2.reserveCapacity(pullbacks.count)
-                results3.reserveCapacity(pullbacks.count)
-
                 if v.count == 0 {
-                    for pullback in pullbacks {
-                        let (v1, v2, v3) = pullback(.zero)
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
-                        results3.appendContribution(of: v3)
+                    return TangentVector(
+                        C1.TangentVector.zero,
+                        C2.TangentVector.zero,
+                        C3.TangentVector.zero
+                    )
+                }
+                let n = pullbacks.count
+                precondition(v.count == n)
+
+                let scratch2 = UnsafeMutableBufferPointer<C2.Element.TangentVector>.allocate(capacity: n)
+                let scratch3 = UnsafeMutableBufferPointer<C3.Element.TangentVector>.allocate(capacity: n)
+                defer { scratch2.deallocate() }
+                defer { scratch3.deallocate() }
+
+                let tangents1 = v.withUnsafeContiguousStorage { vBuffer in
+                    pullbacks.withUnsafeBufferPointer { pullbackBuffer in
+                        C1.TangentVector.building(count: n) { index in
+                            let (v1, v2, v3) = pullbackBuffer[index](vBuffer[index])
+                            scratch2.initializeElement(at: index, to: v2)
+                            scratch3.initializeElement(at: index, to: v3)
+                            return v1
+                        }
                     }
                 }
-                else {
-                    // thoughts:
-                    // should Repeated tangentvector be a collection instead of also value + count alone? Will that make things easier?
-                    // we can't do append on a Repeated object so we either have to generate it from a single scope or not at all
 
-                    precondition(v.count == pullbacks.count)
-
-                    for (tangentElement, pullback) in zip(v, pullbacks) {
-                        let (v1, v2, v3) = pullback(tangentElement)
-
-                        results1.appendContribution(of: v1)
-                        results2.appendContribution(of: v2)
-                        results3.appendContribution(of: v3)
-                    }
-                }
+                let tangents2 = C2.TangentVector.building(count: n) { i in scratch2.moveElement(from: i) }
+                let tangents3 = C3.TangentVector.building(count: n) { i in scratch3.moveElement(from: i) }
 
                 return TangentVector(
-                    results1,
-                    results2,
-                    results3
+                    tangents1,
+                    tangents2,
+                    tangents3
                 )
             }
         )
     }
 }
 
+// TODO: We should change this to a DifferentiableView approach similar to Repeated and Array once tuples can conform to `AdditiveArithmetic` (This currently blocks from `Element` conforming due to being a tuple of collection elements
+
 extension Zip3SequenceDifferentiable {
     public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
-        C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
-        C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int,
-        C3: Differentiable,
-        C3.TangentVector: Collection,
-        C3.TangentVector.Index == Int
+        C1: DifferentiableCollection,
+        C2: DifferentiableCollection,
+        C3: DifferentiableCollection
     {
         public typealias TangentVector = Self
         public typealias Element = (
@@ -281,9 +256,9 @@ extension Zip3SequenceDifferentiable {
         @inlinable
         public subscript(index: Int) -> Element {
             (
-                collection1[index],
-                collection2[index],
-                collection3[index]
+                collection1[collection1.index(collection1.startIndex, offsetBy: index)],
+                collection2[collection2.index(collection2.startIndex, offsetBy: index)],
+                collection3[collection3.index(collection3.startIndex, offsetBy: index)]
             )
         }
 

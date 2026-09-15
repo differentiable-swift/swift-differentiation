@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Benchmarks
-        run: swift build -c release --package-path Benchmarks
+        run: apt-get update && apt-get install -y libjemalloc-dev && swift build -c release --package-path Benchmarks
 
   test-macos-26:
     name: Test Swift macos-26
