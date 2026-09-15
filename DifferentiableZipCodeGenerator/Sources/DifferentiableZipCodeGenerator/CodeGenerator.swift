@@ -27,6 +27,10 @@ struct CodeGenerator {
             let zipWithInoutFileURL = output.appending(component: "ZipWithInout+Arity\(arity).swift")
             let zipWithInoutCode = ZipWithInoutGenerator.generateFor(arity: arity)
             try zipWithInoutCode.write(to: zipWithInoutFileURL, atomically: true, encoding: .utf8)
+
+            let zipFusedFileURL = output.appending(component: "FusedZip+Arity\(arity).swift")
+            let zipFusedCode = FusedZipWithGenerator.generateFor(arity: arity)
+            try zipFusedCode.write(to: zipFusedFileURL, atomically: true, encoding: .utf8)
         }
     }
 }
