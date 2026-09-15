@@ -17,10 +17,7 @@ public func differentiableZip<
 public struct Zip2SequenceDifferentiable<
     C1: Collection,
     C2: Collection
-> where
-    C1.Index == Int,
-    C2.Index == Int
-{
+> {
     @usableFromInline
     internal var _collection1: C1
     @usableFromInline
@@ -54,8 +51,8 @@ extension Zip2SequenceDifferentiable: Collection {
     @inlinable
     public subscript(index: Int) -> Element {
         (
-            _collection1[_collection1.startIndex.advanced(by: index)],
-            _collection2[_collection2.startIndex.advanced(by: index)]
+            _collection1[_collection1.index(_collection1.startIndex, offsetBy: index)],
+            _collection2[_collection2.index(_collection2.startIndex, offsetBy: index)]
         )
     }
 
@@ -119,16 +116,8 @@ extension Zip2SequenceDifferentiable {
 }
 
 extension Zip2SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -208,14 +197,12 @@ extension Zip2SequenceDifferentiable: Differentiable where
     }
 }
 
+// TODO: We should change this to a DifferentiableView approach similar to Repeated and Array once tuples can conform to `AdditiveArithmetic` (This currently blocks from `Element` conforming due to being a tuple of collection elements
+
 extension Zip2SequenceDifferentiable {
     public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
-        C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
-        C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int
+        C1: DifferentiableCollection,
+        C2: DifferentiableCollection
     {
         public typealias TangentVector = Self
         public typealias Element = (
@@ -236,8 +223,8 @@ extension Zip2SequenceDifferentiable {
         @inlinable
         public subscript(index: Int) -> Element {
             (
-                collection1[index],
-                collection2[index]
+                collection1[collection1.index(collection1.startIndex, offsetBy: index)],
+                collection2[collection2.index(collection2.startIndex, offsetBy: index)]
             )
         }
 

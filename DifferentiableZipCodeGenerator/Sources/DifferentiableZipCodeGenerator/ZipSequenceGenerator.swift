@@ -8,13 +8,7 @@ enum ZipSequenceGenerator {
         public func differentiableZip<
         \(arityRange.map { "\(indent(1))C\($0)" }.joined(separator: ",\n"))
         >(
-
-        """
-        code += arityRange.map {
-            "\(indent(1))_ collection\($0): C\($0)"
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))_ collection\($0): C\($0)" }.joined(separator: ",\n"))
         ) -> Zip\(arity)SequenceDifferentiable<\(arityRange.map { "C\($0)" }.joined(separator: ", "))> {
             Zip\(arity)SequenceDifferentiable(
         \(arityRange.map { "\(indent(2))collection\($0)" }.joined(separator: ",\n"))
@@ -24,9 +18,7 @@ enum ZipSequenceGenerator {
         @frozen
         public struct Zip\(arity)SequenceDifferentiable<
         \(arityRange.map { "\(indent(1))C\($0): Collection" }.joined(separator: ",\n"))
-        > where
-        \(arityRange.map { "\(indent(1))C\($0).Index == Int" }.joined(separator: ",\n"))
-        {
+        > {
 
         """
         code += arityRange.map {
@@ -39,22 +31,9 @@ enum ZipSequenceGenerator {
 
             @inlinable
             internal init(
-
-        """
-        code += arityRange.map {
-            "\(indent(2))_ collection\($0): C\($0)"
-        }.joined(separator: ",\n")
-
-        code += """
-
+        \(arityRange.map { "\(indent(2))_ collection\($0): C\($0)" }.joined(separator: ",\n"))
             ) {
-
-        """
-        code += arityRange.map {
-            "\(indent(2))self._collection\($0) = collection\($0)"
-        }.joined(separator: "\n")
-        code += """
-
+        \(arityRange.map { "\(indent(2))self._collection\($0) = collection\($0)" }.joined(separator: "\n"))
             }
         }
 
@@ -76,7 +55,8 @@ enum ZipSequenceGenerator {
             @inlinable
             public subscript(index: Int) -> Element {
                 (
-        \(arityRange.map { "\(indent(3))_collection\($0)[_collection\($0).startIndex.advanced(by: index)]" }.joined(separator: ",\n"))
+        \(arityRange.map { "\(indent(3))_collection\($0)[_collection\($0).index(_collection\($0).startIndex, offsetBy: index)]" }
+            .joined(separator: ",\n"))
                 )
             }
 
@@ -95,12 +75,6 @@ enum ZipSequenceGenerator {
         \(arityRange.map { "\(indent(1))C\($0): Sendable" }.joined(separator: ",\n"))
         {}
 
-
-        """
-
-        // MARK: Differentiable code
-
-        code += """
         // MARK: Zip\(arity)SequenceDifferentiable + Differentiable
 
         @derivative(of: differentiableZip)
@@ -139,19 +113,7 @@ enum ZipSequenceGenerator {
         }
 
         extension Zip\(arity)SequenceDifferentiable: Differentiable where
-
-        """
-        code += arityRange.map {
-            """
-                C\($0): Differentiable,
-                C\($0).Element: Differentiable,
-                C\($0).TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-                C\($0).TangentVector.Index == Int,
-                C\($0).TangentVector.Element == C\($0).Element.TangentVector
-            """
-        }.joined(separator: ",\n")
-        code += """
-
+        \(arityRange.map { "\(indent(1))C\($0): DifferentiableCollection" }.joined(separator: ",\n"))
         {
             @inlinable
             public mutating func move(by offset: TangentVector) {
@@ -228,9 +190,7 @@ enum ZipSequenceGenerator {
             }
         }
 
-        """
         // TODO: We should change this to a DifferentiableView approach similar to Repeated and Array once tuples can conform to `AdditiveArithmetic` (This currently blocks from `Element` conforming due to being a tuple of collection elements
-        code += """
 
         extension Zip\(arity)SequenceDifferentiable {
             public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
@@ -238,9 +198,7 @@ enum ZipSequenceGenerator {
         """
         code += arityRange.map {
             """
-            \(indent(2))C\($0): Differentiable,
-            \(indent(2))C\($0).TangentVector: Collection,
-            \(indent(2))C\($0).TangentVector.Index == Int
+            \(indent(2))C\($0): DifferentiableCollection
             """
         }.joined(separator: ",\n")
         code += """
@@ -264,7 +222,8 @@ enum ZipSequenceGenerator {
                 @inlinable
                 public subscript(index: Int) -> Element {
                     (
-        \(arityRange.map { "\(indent(4))collection\($0)[index]" }.joined(separator: ",\n"))
+        \(arityRange.map { "\(indent(4))collection\($0)[collection\($0).index(collection\($0).startIndex, offsetBy: index)]" }
+            .joined(separator: ",\n"))
                     )
                 }
 

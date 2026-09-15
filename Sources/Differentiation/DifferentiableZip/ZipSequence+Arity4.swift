@@ -25,12 +25,7 @@ public struct Zip4SequenceDifferentiable<
     C2: Collection,
     C3: Collection,
     C4: Collection
-> where
-    C1.Index == Int,
-    C2.Index == Int,
-    C3.Index == Int,
-    C4.Index == Int
-{
+> {
     @usableFromInline
     internal var _collection1: C1
     @usableFromInline
@@ -76,10 +71,10 @@ extension Zip4SequenceDifferentiable: Collection {
     @inlinable
     public subscript(index: Int) -> Element {
         (
-            _collection1[_collection1.startIndex.advanced(by: index)],
-            _collection2[_collection2.startIndex.advanced(by: index)],
-            _collection3[_collection3.startIndex.advanced(by: index)],
-            _collection4[_collection4.startIndex.advanced(by: index)]
+            _collection1[_collection1.index(_collection1.startIndex, offsetBy: index)],
+            _collection2[_collection2.index(_collection2.startIndex, offsetBy: index)],
+            _collection3[_collection3.index(_collection3.startIndex, offsetBy: index)],
+            _collection4[_collection4.index(_collection4.startIndex, offsetBy: index)]
         )
     }
 
@@ -157,26 +152,10 @@ extension Zip4SequenceDifferentiable {
 }
 
 extension Zip4SequenceDifferentiable: Differentiable where
-    C1: Differentiable,
-    C1.Element: Differentiable,
-    C1.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C1.TangentVector.Index == Int,
-    C1.TangentVector.Element == C1.Element.TangentVector,
-    C2: Differentiable,
-    C2.Element: Differentiable,
-    C2.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C2.TangentVector.Index == Int,
-    C2.TangentVector.Element == C2.Element.TangentVector,
-    C3: Differentiable,
-    C3.Element: Differentiable,
-    C3.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C3.TangentVector.Index == Int,
-    C3.TangentVector.Element == C3.Element.TangentVector,
-    C4: Differentiable,
-    C4.Element: Differentiable,
-    C4.TangentVector: DifferentiableCollection, // at least needs to be a collection to have an Element associatedtype
-    C4.TangentVector.Index == Int,
-    C4.TangentVector.Element == C4.Element.TangentVector
+    C1: DifferentiableCollection,
+    C2: DifferentiableCollection,
+    C3: DifferentiableCollection,
+    C4: DifferentiableCollection
 {
     @inlinable
     public mutating func move(by offset: TangentVector) {
@@ -278,20 +257,14 @@ extension Zip4SequenceDifferentiable: Differentiable where
     }
 }
 
+// TODO: We should change this to a DifferentiableView approach similar to Repeated and Array once tuples can conform to `AdditiveArithmetic` (This currently blocks from `Element` conforming due to being a tuple of collection elements
+
 extension Zip4SequenceDifferentiable {
     public struct TangentVector: Collection & Differentiable & AdditiveArithmetic where
-        C1: Differentiable,
-        C1.TangentVector: Collection,
-        C1.TangentVector.Index == Int,
-        C2: Differentiable,
-        C2.TangentVector: Collection,
-        C2.TangentVector.Index == Int,
-        C3: Differentiable,
-        C3.TangentVector: Collection,
-        C3.TangentVector.Index == Int,
-        C4: Differentiable,
-        C4.TangentVector: Collection,
-        C4.TangentVector.Index == Int
+        C1: DifferentiableCollection,
+        C2: DifferentiableCollection,
+        C3: DifferentiableCollection,
+        C4: DifferentiableCollection
     {
         public typealias TangentVector = Self
         public typealias Element = (
@@ -316,10 +289,10 @@ extension Zip4SequenceDifferentiable {
         @inlinable
         public subscript(index: Int) -> Element {
             (
-                collection1[index],
-                collection2[index],
-                collection3[index],
-                collection4[index]
+                collection1[collection1.index(collection1.startIndex, offsetBy: index)],
+                collection2[collection2.index(collection2.startIndex, offsetBy: index)],
+                collection3[collection3.index(collection3.startIndex, offsetBy: index)],
+                collection4[collection4.index(collection4.startIndex, offsetBy: index)]
             )
         }
 
