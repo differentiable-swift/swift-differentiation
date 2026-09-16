@@ -6,19 +6,19 @@ import ZipWithVariants
 func registerArityCoverageBenchmarks() {
     let n = 100000
 
-    Benchmark("zipWith3.canonical.value.n=100000") { benchmark, input in
+    Benchmark("zipWith3.canonical.value.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(zipWith3_canonical(input))
         }
     } setup: { Inputs3(n: n) }
 
-    Benchmark("zipWith3.canonical.valueWithPullback.n=100000") { benchmark, input in
+    Benchmark("zipWith3.canonical.valueWithPullback.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(valueWithPullback(at: input, of: zipWith3_canonical))
         }
     } setup: { Inputs3(n: n) }
 
-    Benchmark("zipWith3.canonical.pullback.n=100000") { benchmark, input in
+    Benchmark("zipWith3.canonical.pullback.n=\(n)") { benchmark, input in
         let (pullback, seed) = input
         for _ in benchmark.scaledIterations {
             blackHole(pullback(seed))
@@ -28,7 +28,7 @@ func registerArityCoverageBenchmarks() {
         return (pullback, [Float].TangentVector([Float](repeating: 1, count: n)))
     }
 
-    Benchmark("zipWith3.canonical.gradient.n=100000") { benchmark, input in
+    Benchmark("zipWith3.canonical.gradient.n=\(n)") { benchmark, input in
         let (inputs, seed) = input
         for _ in benchmark.scaledIterations {
             let (value, pullback) = valueWithPullback(at: inputs, of: zipWith3_canonical)
@@ -39,19 +39,19 @@ func registerArityCoverageBenchmarks() {
         (Inputs3(n: n), [Float].TangentVector([Float](repeating: 1, count: n)))
     }
 
-    Benchmark("zipWith4.canonical.value.n=100000") { benchmark, input in
+    Benchmark("zipWith4.canonical.value.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(zipWith4_canonical(input))
         }
     } setup: { Inputs4(n: n) }
 
-    Benchmark("zipWith4.canonical.valueWithPullback.n=100000") { benchmark, input in
+    Benchmark("zipWith4.canonical.valueWithPullback.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(valueWithPullback(at: input, of: zipWith4_canonical))
         }
     } setup: { Inputs4(n: n) }
 
-    Benchmark("zipWith4.canonical.pullback.n=100000") { benchmark, input in
+    Benchmark("zipWith4.canonical.pullback.n=\(n)") { benchmark, input in
         let (pullback, seed) = input
         for _ in benchmark.scaledIterations {
             blackHole(pullback(seed))
@@ -61,7 +61,7 @@ func registerArityCoverageBenchmarks() {
         return (pullback, [Float].TangentVector([Float](repeating: 1, count: n)))
     }
 
-    Benchmark("zipWith4.canonical.gradient.n=100000") { benchmark, input in
+    Benchmark("zipWith4.canonical.gradient.n=\(n)") { benchmark, input in
         let (inputs, seed) = input
         for _ in benchmark.scaledIterations {
             let (value, pullback) = valueWithPullback(at: inputs, of: zipWith4_canonical)
@@ -72,19 +72,19 @@ func registerArityCoverageBenchmarks() {
         (Inputs4(n: n), [Float].TangentVector([Float](repeating: 1, count: n)))
     }
 
-    Benchmark("zipWith14.canonical.value.n=100000") { benchmark, input in
+    Benchmark("zipWith14.canonical.value.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(zipWith14_canonical(input))
         }
     } setup: { Inputs14(n: n) }
 
-    Benchmark("zipWith14.canonical.valueWithPullback.n=100000") { benchmark, input in
+    Benchmark("zipWith14.canonical.valueWithPullback.n=\(n)") { benchmark, input in
         for _ in benchmark.scaledIterations {
             blackHole(valueWithPullback(at: input, of: zipWith14_canonical))
         }
     } setup: { Inputs14(n: n) }
 
-    Benchmark("zipWith14.canonical.pullback.n=100000") { benchmark, input in
+    Benchmark("zipWith14.canonical.pullback.n=\(n)") { benchmark, input in
         let (pullback, seed) = input
         for _ in benchmark.scaledIterations {
             blackHole(pullback(seed))
@@ -94,7 +94,7 @@ func registerArityCoverageBenchmarks() {
         return (pullback, [Float].TangentVector([Float](repeating: 1, count: n)))
     }
 
-    Benchmark("zipWith14.canonical.gradient.n=100000") { benchmark, input in
+    Benchmark("zipWith14.canonical.gradient.n=\(n)") { benchmark, input in
         let (inputs, seed) = input
         for _ in benchmark.scaledIterations {
             let (value, pullback) = valueWithPullback(at: inputs, of: zipWith14_canonical)
