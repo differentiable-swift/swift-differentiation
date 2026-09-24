@@ -47,9 +47,11 @@ extension Version {
         #elseif compiler(<6.4)
         "603.3.0"
         #elseif compiler(<6.5)
-        "604.0.0-prerelease-3" // TODO: update to 604.0.0 once 6.4 is released
+        "604.0.0"
+        #elseif compiler(<6.6)
+        "605.0.0-prerelease-1"
         #else
-        "604.0.0-prerelease-3" // default to latest
+        "605.0.0-prerelease-1" // default to latest
         #endif
     }
 }
