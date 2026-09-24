@@ -34,8 +34,8 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
         let selfCount = self.count
         scatteringAssign(at: indices, values: values)
         return ((), { tv in
-            // The incoming tangent is either the zero tangent (empty base) meaning scatteringAssign's
-            // output didn't contribute. So the source tangent either stays zero, or it has exactly
+            // The incoming tangent is either the zero tangent (empty base), meaning scatteringAssign's
+            // output didn't contribute and the source tangent stays zero, or it has exactly
             // `self.count` elements.
             if tv.base.isEmpty {
                 return .zero
