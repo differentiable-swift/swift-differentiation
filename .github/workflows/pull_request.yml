@@ -58,3 +58,51 @@ jobs:
       enable_windows_checks: false
       enable_wasm_sdk_build: true
       wasm_sdk_versions: "[\"6.3\"]"
+
+  # 6.5-dev lives on the `main` snapshot stream: there is no nightly-6.5 release
+  # branch yet. These jobs are advisory (continue-on-error) so snapshot churn
+  # never blocks a PR, and they skip -warnings-as-errors so a red mark means a
+  # real failure rather than a new upstream warning.
+  test-main-snapshot-ubuntu-latest:
+    name: Test Swift 6.5-dev (main snapshot) Ubuntu Latest
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: swiftlang/swift:nightly-main-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain version
+        run: swift --version
+      - name: Run Tests
+        run: swift test
+
+  build-benchmarks-main-snapshot-ubuntu-latest:
+    name: Build Benchmarks Swift 6.5-dev (main snapshot) Ubuntu Latest
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    container: swiftlang/swift:nightly-main-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain version
+        run: swift --version
+      - name: Build Benchmarks
+        run: apt-get update && apt-get install -y libjemalloc-dev && swift build -c release --package-path Benchmarks
+
+  test-main-snapshot-macos-26:
+    name: Test Swift 6.5-dev (main snapshot) macos-26
+    runs-on: macos-26
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install swiftly + main snapshot
+        run: |
+          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg
+          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
+          ~/.swiftly/bin/swiftly init --quiet-shell-followup --assume-yes --skip-install
+          # .swift-version is gitignored, so pin the stream explicitly here
+          # rather than letting swiftly fall back to the Xcode toolchain.
+          ~/.swiftly/bin/swiftly install main-snapshot --use --assume-yes
+          echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
+      - name: Toolchain version
+        run: swift --version
+      - name: Run Tests
+        run: swift test
