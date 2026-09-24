@@ -27,8 +27,6 @@ let package = Package(
             swiftSettings: [
                 // required for Swift 6.5 valueWithPullback overloads. Provides access to the `Builtin` module
                 .enableExperimentalFeature("BuiltinModule"),
-                // required for Swift 6.5 valueWithPullback overloads. Currently crashes in language mode .v6
-                .swiftLanguageMode(.v5),
             ]
         ),
         .testTarget(
