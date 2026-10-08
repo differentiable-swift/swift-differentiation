@@ -1,17 +1,18 @@
 import _Differentiation
 
-extension ContiguousArray.DifferentiableView:
-    Sequence,
-    Collection,
-    RangeReplaceableCollection,
-    RandomAccessCollection,
-    BidirectionalCollection,
-    MutableCollection
+extension Array.DifferentiableView:
+    @retroactive Sequence,
+    @retroactive Collection,
+    @retroactive RangeReplaceableCollection,
+    @retroactive RandomAccessCollection,
+    @retroactive BidirectionalCollection,
+    @retroactive MutableCollection
     where Element: Differentiable
 {
-    public typealias Element = ContiguousArray.Element
-    public typealias Index = ContiguousArray.Index
-    public typealias SubSequence = ContiguousArray.SubSequence
+    public typealias Element = Array.Element
+    public typealias Index = Array.Index
+    public typealias Indices = Array.Indices
+    public typealias SubSequence = Array.SubSequence
 
     @inlinable
     public subscript(position: Index) -> Element {
@@ -58,7 +59,7 @@ extension ContiguousArray.DifferentiableView:
 
     @inlinable
     public init() {
-        self.init(ContiguousArray<Element>())
+        self.init(Array<Element>())
     }
 
     @inlinable
@@ -87,5 +88,14 @@ extension ContiguousArray.DifferentiableView:
     @discardableResult
     public mutating func remove(at index: Int) -> Element {
         base.remove(at: index)
+    }
+}
+
+extension Array.DifferentiableView {
+    @inlinable
+    public func withUnsafeContiguousStorage<R>(
+        _ body: (UnsafeBufferPointer<Element>) -> R
+    ) -> R {
+        base.withUnsafeBufferPointer { body($0) }
     }
 }
