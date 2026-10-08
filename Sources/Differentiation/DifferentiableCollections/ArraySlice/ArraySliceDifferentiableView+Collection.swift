@@ -11,6 +11,7 @@ extension ArraySlice.DifferentiableView:
 {
     public typealias Element = ArraySlice.Element
     public typealias Index = ArraySlice.Index
+    public typealias Indices = ArraySlice.Indices
     public typealias SubSequence = ArraySlice.SubSequence
 
     @inlinable
