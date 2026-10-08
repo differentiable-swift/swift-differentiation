@@ -40,6 +40,43 @@ struct ArrayScatteringAddTests {
         #expect(dValues == [3.0, 1.0, 3.0])
     }
 
+    @Test func scatteringAddContiguousArrayValues() {
+        // `values` is generic over `DifferentiableCollection`, not just `[Element]`, so the
+        // values cotangent comes back as `C.TangentVector` and has to be built through the
+        // conformer rather than as an `Array.DifferentiableView`.
+        var array: [Float] = [1.0, 2.0, 3.0, 4.0]
+        let values: ContiguousArray<Float> = [1.0, 2.0, 3.0]
+
+        // Asymmetric indices: a cotangent built in the wrong order would still read
+        // [3.0, 1.0, 3.0] for a palindrome like [2, 0, 2].
+        let (_, pullback) = array._vjpScatteringAdd(at: [2, 0, 3], values: values)
+        #expect(array == [3.0, 2.0, 4.0, 7.0])
+
+        var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
+        let dValues = pullback(&outTangent)
+
+        // Element j is the incoming tangent at indices[j], in order.
+        #expect(Array(dValues.base) == [3.0, 1.0, 4.0])
+    }
+
+    @Test func scatteringAddSlicedValues() {
+        // A `values` slice with a non-zero start index. The cotangent is addressed by position
+        // (0 ..< count), so it must not inherit the slice's own index range.
+        var array: [Float] = [1.0, 2.0, 3.0, 4.0]
+        let backing: [Float] = [9.0, 1.0, 2.0, 3.0, 9.0]
+        let values = backing[1 ..< 4]
+        #expect(values.startIndex == 1)
+
+        let (_, pullback) = array._vjpScatteringAdd(at: [2, 0, 3], values: values)
+        #expect(array == [3.0, 2.0, 4.0, 7.0])
+
+        var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
+        let dValues = pullback(&outTangent)
+
+        #expect(dValues.startIndex == 0)
+        #expect(Array(dValues.base) == [3.0, 1.0, 4.0])
+    }
+
     @Test func differentiableScatteringAdd() {
         @differentiable(reverse)
         func sumScattered(_ array: [Float], values: [Float]) -> [Float] {
