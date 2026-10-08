@@ -4,10 +4,14 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// Writes `values[j]` to `self[indices[j]]` for every `j`. Duplicate indices are last-write-wins
     @inlinable
     @differentiable(reverse, wrt: (self, values))
-    public mutating func scatteringAssign(
+    public mutating func scatteringAssign<C>(
         at indices: some RandomAccessCollection<Index>,
-        values: [Element]
-    ) {
+        values: C
+    ) where
+        C: DifferentiableCollection,
+        C.Element == Element,
+        C.TangentVector: BidirectionalCollection & MutableCollection
+    {
         precondition(indices.count == values.count, "Mismatched indices and values length, \(indices.count) vs \(values.count)")
         for (index, value) in zip(indices, values) {
             self[index] = value
@@ -24,13 +28,17 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// it, so earlier writes to the same slot correctly receive zero.
     @inlinable
     @derivative(of: scatteringAssign, wrt: (self, values))
-    public mutating func _vjpScatteringAssign(
+    public mutating func _vjpScatteringAssign<C>(
         at indices: some RandomAccessCollection<Index>,
-        values: [Element]
+        values: C
     ) -> (
         value: Void,
-        pullback: (inout TangentVector) -> [Element].TangentVector
-    ) {
+        pullback: (inout TangentVector) -> C.TangentVector
+    ) where
+        C: DifferentiableCollection,
+        C.Element == Element,
+        C.TangentVector: BidirectionalCollection & MutableCollection
+    {
         let selfCount = self.count
         scatteringAssign(at: indices, values: values)
         return ((), { tv in
@@ -43,11 +51,11 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
 
             precondition(tv.base.count == selfCount, "Incoming tangent has \(tv.base.count) elements, expected \(selfCount)")
 
-            var dValues = [Element].TangentVector(repeating: .zero, count: indices.count)
-            var j = indices.count
+            var dValues = C.TangentVector(count: indices.count) { .zero }
+            var j = dValues.endIndex
             for index in indices.reversed() {
-                j -= 1
-                dValues.base[j] = tv.base[index]
+                dValues.formIndex(before: &j)
+                dValues[j] = tv.base[index]
                 // Sever the self-cotangent at the overwritten slot: its prior value never reached
                 // the output, so no gradient may flow back into it. Zeroing as we walk backwards
                 // also gives any earlier duplicate write to this slot a zero cotangent, matching

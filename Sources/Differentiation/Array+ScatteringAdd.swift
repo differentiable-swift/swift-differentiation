@@ -4,10 +4,13 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// Adds `values[j]` to `self[indices[j]]` for every `j`. Duplicate indices accumulate.
     @inlinable
     @differentiable(reverse, wrt: (self, values))
-    public mutating func scatteringAdd(
+    public mutating func scatteringAdd<C>(
         at indices: some RandomAccessCollection<Index>,
-        values: [Element]
-    ) {
+        values: C
+    ) where
+        C: DifferentiableCollection,
+        C.Element == Element
+    {
         precondition(indices.count == values.count, "Mismatched indices and values length, \(indices.count) vs \(values.count)")
         for (index, value) in zip(indices, values) {
             self[index] += value
@@ -20,13 +23,16 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
     /// `(indices, values.count, self.count)` — no per-element pullback storage.
     @inlinable
     @derivative(of: scatteringAdd, wrt: (self, values))
-    public mutating func _vjpScatteringAdd(
+    public mutating func _vjpScatteringAdd<C>(
         at indices: some RandomAccessCollection<Index>,
-        values: [Element]
+        values: C
     ) -> (
         value: Void,
-        pullback: (inout TangentVector) -> [Element].TangentVector
-    ) {
+        pullback: (inout TangentVector) -> C.TangentVector
+    ) where
+        C: DifferentiableCollection,
+        C.Element == Element
+    {
         let selfCount = self.count
         scatteringAdd(at: indices, values: values)
         return ((), { tv in
@@ -38,7 +44,9 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
 
             precondition(tv.base.count == selfCount, "Incoming tangent has \(tv.base.count) elements, expected \(selfCount)")
 
-            return TangentVector(tv.base.gather(at: indices))
+            return C.TangentVector.building(count: indices.count) { j in
+                tv.base[indices[indices.index(indices.startIndex, offsetBy: j)]]
+            }
         })
     }
 }
