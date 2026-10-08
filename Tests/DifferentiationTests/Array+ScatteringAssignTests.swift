@@ -44,6 +44,44 @@ struct ArrayScatteringAssignTests {
         #expect(outTangent == [0.0, 2.0, 0.0, 4.0])
     }
 
+    @Test func scatteringAssignContiguousArrayValues() {
+        // `values` is generic over `DifferentiableCollection`, not just `[Element]`, so the
+        // values cotangent comes back as `C.TangentVector`. Duplicate indices here also put the
+        // back-to-front walk through `formIndex(before:)` on a non-Array tangent.
+        var array: [Float] = [1.0, 2.0, 3.0, 4.0]
+        let values: ContiguousArray<Float> = [1.0, 2.0, 3.0]
+
+        let (_, pullback) = array._vjpScatteringAssign(at: [2, 0, 2], values: values)
+        // Last write wins: values[0] writes slot 2, then values[2] overwrites it.
+        #expect(array == [2.0, 2.0, 3.0, 4.0])
+
+        var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
+        let dValues = pullback(&outTangent)
+
+        // Only the surviving write to slot 2 earns its cotangent; values[0] gets zero.
+        #expect(Array(dValues.base) == [0.0, 1.0, 3.0])
+        #expect(outTangent == [0.0, 2.0, 0.0, 4.0])
+    }
+
+    @Test func scatteringAssignSlicedValues() {
+        // A `values` slice with a non-zero start index. The cotangent is built fresh and walked
+        // back-to-front, so it must be zero-based rather than inheriting the slice's range.
+        var array: [Float] = [1.0, 2.0, 3.0, 4.0]
+        let backing: [Float] = [9.0, 7.0, 8.0, 9.0]
+        let values = backing[1 ..< 3]
+        #expect(values.startIndex == 1)
+
+        let (_, pullback) = array._vjpScatteringAssign(at: [2, 0], values: values)
+        #expect(array == [8.0, 2.0, 7.0, 4.0])
+
+        var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
+        let dValues = pullback(&outTangent)
+
+        #expect(dValues.startIndex == 0)
+        #expect(Array(dValues.base) == [3.0, 1.0])
+        #expect(outTangent == [0.0, 2.0, 0.0, 4.0])
+    }
+
     @Test func differentiableScatteringAssign() {
         @differentiable(reverse)
         func assignScattered(_ array: [Float], values: [Float]) -> [Float] {
