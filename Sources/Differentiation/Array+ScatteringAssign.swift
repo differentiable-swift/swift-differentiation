@@ -9,8 +9,7 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
         values: C
     ) where
         C: DifferentiableCollection,
-        C.Element == Element,
-        C.TangentVector: BidirectionalCollection & MutableCollection
+        C.Element == Element
     {
         precondition(indices.count == values.count, "Mismatched indices and values length, \(indices.count) vs \(values.count)")
         for (index, value) in zip(indices, values) {
@@ -36,8 +35,7 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
         pullback: (inout TangentVector) -> C.TangentVector
     ) where
         C: DifferentiableCollection,
-        C.Element == Element,
-        C.TangentVector: BidirectionalCollection & MutableCollection
+        C.Element == Element
     {
         let selfCount = self.count
         scatteringAssign(at: indices, values: values)
@@ -51,18 +49,27 @@ extension Array where Element: Differentiable, Element.TangentVector == Element 
 
             precondition(tv.base.count == selfCount, "Incoming tangent has \(tv.base.count) elements, expected \(selfCount)")
 
-            var dValues = C.TangentVector(count: indices.count) { .zero }
-            var j = dValues.endIndex
-            for index in indices.reversed() {
-                dValues.formIndex(before: &j)
-                dValues[j] = tv.base[index]
+            // The walk has to run back-to-front, but `C.TangentVector` can only be built
+            // front-to-back, so the cotangents land in a scratch buffer first and move into the
+            // tangent in one forward pass.
+            let count = indices.count
+            let scratch = UnsafeMutableBufferPointer<C.TangentVector.Element>.allocate(capacity: count)
+            defer { scratch.deallocate() }
+
+            var j = count
+            var cursor = indices.endIndex
+            while j > 0 {
+                j -= 1
+                indices.formIndex(before: &cursor)
+                let index = indices[cursor]
+                scratch.initializeElement(at: j, to: tv.base[index])
                 // Sever the self-cotangent at the overwritten slot: its prior value never reached
                 // the output, so no gradient may flow back into it. Zeroing as we walk backwards
                 // also gives any earlier duplicate write to this slot a zero cotangent, matching
                 // the forward pass's last-write-wins.
                 tv.base[index] = .zero
             }
-            return dValues
+            return C.TangentVector.building(count: count) { scratch.moveElement(from: $0) }
         })
     }
 }
