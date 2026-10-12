@@ -63,6 +63,11 @@ extension ContiguousArray.DifferentiableView:
     }
 
     @inlinable
+    public init(repeating repeatedValue: Element, count: Int) {
+        self.init(ContiguousArray<Element>(repeating: repeatedValue, count: count))
+    }
+
+    @inlinable
     public mutating func replaceSubrange<C>(_ subrange: Range<Index>, with newElements: C)
         where C: Collection, Element == C.Element
     {
