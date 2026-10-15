@@ -47,20 +47,19 @@ struct ArrayScatteringAssignTests {
     @Test func scatteringAssignContiguousArrayValues() {
         // `values` is generic over `DifferentiableCollection`, not just `[Element]`, so the
         // values cotangent comes back as `C.TangentVector`. Duplicate indices here also put the
-        // back-to-front walk through `formIndex(before:)` on a non-Array tangent.
+        // walk on a non-Array tangent.
         var array: [Float] = [1.0, 2.0, 3.0, 4.0]
         let values: ContiguousArray<Float> = [1.0, 2.0, 3.0]
 
-        let (_, pullback) = array._vjpScatteringAssign(at: [2, 0, 2], values: values)
-        // Last write wins: values[0] writes slot 2, then values[2] overwrites it.
-        #expect(array == [2.0, 2.0, 3.0, 4.0])
+        let (_, pullback) = array._vjpScatteringAssign(at: [2, 0, 3], values: values)
+        #expect(array == [2.0, 2.0, 1.0, 3.0])
 
         var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
         let dValues = pullback(&outTangent)
 
-        // Only the surviving write to slot 2 earns its cotangent; values[0] gets zero.
-        #expect(Array(dValues.base) == [0.0, 1.0, 3.0])
-        #expect(outTangent == [0.0, 2.0, 0.0, 4.0])
+        // Each written slot hands its cotangent to the value that wrote it, then is severed.
+        #expect(Array(dValues.base) == [3.0, 1.0, 4.0])
+        #expect(outTangent == [0.0, 2.0, 0.0, 0.0])
     }
 
     @Test func scatteringAssignSlicedValues() {
@@ -159,81 +158,20 @@ struct ArrayScatteringAssignTests {
         #expect(assignedGradient.1 == clearedGradient.1)
     }
 
-    @Test func vjpScatteringAssignDuplicateIndices() {
-        var array: [Float] = [1.0, 2.0, 3.0, 4.0]
-
-        // Slot 1 is written twice: the forward pass is last-write-wins, so values[1] survives
-        // and values[0] never reaches the output.
-        let (_, pullback) = array._vjpScatteringAssign(at: [1, 1], values: [5.0, 6.0])
-        #expect(array == [1.0, 6.0, 3.0, 4.0])
-
-        var outTangent: [Float].TangentVector = [1.0, 2.0, 3.0, 4.0]
-        let dValues = pullback(&outTangent)
-
-        // Only the surviving write earns the cotangent; the overwritten one gets zero.
-        #expect(dValues == [0.0, 2.0])
-        #expect(outTangent == [1.0, 0.0, 3.0, 4.0])
-    }
-
-    @Test func differentiableScatteringAssignDuplicateIndices() {
-        // Same last-write-wins contract, but through the real AD path rather than the raw VJP.
-        @differentiable(reverse)
-        func assignScattered(_ array: [Double], values: [Double]) -> [Double] {
-            var array = array
-            array.scatteringAssign(at: [2, 0, 2], values: values)
-            return array
-        }
-
-        let vwpb = valueWithPullback(at: [1.0, 2.0, 3.0, 4.0], [7.0, 8.0, 9.0], of: assignScattered)
-        // values[0] writes slot 2 first, then values[2] overwrites it.
-        #expect(vwpb.value == [8.0, 2.0, 9.0, 4.0])
-
-        let gradient = vwpb.pullback([10.0, 20.0, 30.0, 40.0])
-        // Slots 0 and 2 were written, so their self-gradient is severed; 1 and 3 pass through.
-        #expect(gradient.0 == [0.0, 20.0, 0.0, 40.0])
-        // values[0] was overwritten before it reached the output, so it earns nothing.
-        #expect(gradient.1 == [0.0, 10.0, 30.0])
-    }
-
-    @Test func scatteringAssignDuplicatesMatchClearThenAdd() {
-        // The clear-then-add reference has no notion of "last write", so spell the equivalent
-        // out directly: assigning [a, b] to the same slot must match assigning just b.
-        @differentiable(reverse)
-        func twice(_ array: [Double], values: [Double]) -> [Double] {
-            var array = array
-            array.scatteringAssign(at: [1, 1], values: values)
-            return array
-        }
-
-        @differentiable(reverse)
-        func once(_ array: [Double], values: [Double]) -> [Double] {
-            var array = array
-            array.scatteringAssign(at: [1], values: [values[1]])
-            return array
-        }
-
-        let testArray: [Double] = [1.0, 2.0, 3.0]
-        let testValues: [Double] = [5.0, 6.0]
-
-        let duplicated = valueWithPullback(at: testArray, testValues, of: twice)
-        let single = valueWithPullback(at: testArray, testValues, of: once)
-        #expect(duplicated.value == single.value)
-
-        let seed: [Double].TangentVector = [1.0, 2.0, 3.0]
-        #expect(duplicated.pullback(seed).0 == single.pullback(seed).0)
-        #expect(duplicated.pullback(seed).1 == single.pullback(seed).1)
-    }
-
     /// The defining property of a correct pullback for a linear operator: it is the transpose.
     /// `<A(s, v), y> == <s, ds> + <v, dv>` must hold for every seed, which pins the pullback
-    /// exactly — including the back-to-front walk that duplicate indices depend on. Stronger than
-    /// the hand-picked gradients above, since no choice of indices can satisfy it by accident.
+    /// exactly. Stronger than the hand-picked gradients above, since no choice of indices can
+    /// satisfy it by accident.
+    ///
+    /// Index sets are duplicate-free: `scatteringAssign` requires that, and the transpose identity
+    /// does not hold for a repeated index — the same output slot would owe its cotangent to more
+    /// than one input.
     @Test func scatteringAssignPullbackIsTheTranspose() {
         func dot(_ a: [Double], _ b: [Double]) -> Double {
             zip(a, b).reduce(0) { $0 + $1.0 * $1.1 }
         }
 
-        for indices in [[0, 2], [2, 0, 2], [1, 1], [3, 3, 3], [4, 3, 2, 1, 0], []] {
+        for indices in [[0, 2], [4, 3, 2, 1, 0], [], [1], [0, 1, 2, 3, 4]] {
             let s: [Double] = [1.0, 2.0, 3.0, 4.0, 5.0]
             let v = (0 ..< indices.count).map { Double($0) * 10.0 + 7.0 }
             let y: [Double] = [0.5, -2.0, 3.0, 1.25, -0.75]
@@ -249,6 +187,16 @@ struct ArrayScatteringAssignTests {
             let rhs = dot(s, tv.base) + dot(v, dValues.base)
 
             #expect(lhs == rhs, "indices \(indices): \(lhs) vs \(rhs)")
+        }
+    }
+
+    /// Duplicate indices are a contract violation, caught in debug builds only — the `assert`
+    /// condition is never evaluated under `-O`, which is what benchmarks build with.
+    @Test func scatteringAssignDuplicateIndicesTrapInDebug() async {
+        await #expect(processExitsWith: .failure) {
+            var array: [Double] = [1.0, 2.0, 3.0, 4.0]
+            array.scatteringAssign(at: [2, 0, 2], values: [1.0, 2.0, 3.0])
+            _ = array
         }
     }
 
